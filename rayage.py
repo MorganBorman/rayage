@@ -1,11 +1,15 @@
 #!/usr/local/bin/python
 
 import os
+import sys
 import json
-import bottle
-from bottle import route, static_file
 
 system_directory = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(system_directory + "/imports")
+
+import bottle
+from bottle import route, static_file
 
 bottle.debug(True)
 
