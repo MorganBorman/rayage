@@ -10,6 +10,8 @@ sys.path.append(system_directory + "/imports")
 
 import bottle
 from bottle import route, static_file
+from tornadosocket import TornadoWebSocketServer
+import tornado.websocket
 
 bottle.debug(True)
 
@@ -33,4 +35,18 @@ def codemirror(path):
 def send_image(filename):
     return static_file(filename, root=system_directory+'/images', mimetype='image/png')
 
-bottle.run(host='localhost', port=8080)
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print "WebSocket opened"
+
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print "WebSocket closed"
+
+tornado_handlers = [
+        (r"/ws", WebSocketHandler)
+    ]
+
+bottle.run(port=8080, server=TornadoWebSocketServer, handlers=tornado_handlers)
