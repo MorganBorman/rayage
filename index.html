@@ -1,49 +1,24 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Rayage IDE</title>
-        
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Rayage IDE</title>
+
+		<link rel="stylesheet" href="style.css" media="screen">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
+
         <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
-        <link rel="stylesheet" href="/codemirror/theme/blackboard.css">
+        <link rel="stylesheet" href="/codemirror/theme/neat.css">
         <script src="/codemirror/lib/codemirror.js"></script>
         <script src="/codemirror/mode/clike/clike.js"></script>
-        
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/resources/dojo.css"> 
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css">
-        
-    </head>
-    <body class="claro">
-        
-        <div data-dojo-type="dijit/layout/TabContainer" style="width: 100%; height: 100%; margin: 0px;">
-            <div data-dojo-type="dijit/layout/ContentPane" title="tab #1">
-            
-                <form>
-                    <textarea id="code" name="code">#include <iostream>
-using namespace std;
 
-int main ()
-{
-  cout << "Hello World!\n";     // prints Hello World!
-  cout << "I'm a C++ program\n"; // prints I'm a C++ program
-  return 0;
-}
-</textarea>
-                </form>
-            
-            </div>
-            <div data-dojo-type="dijit/layout/ContentPane" title="tab #2">tab pane #2</div>
-            <div data-dojo-type="dijit/layout/ContentPane" title="tab #3">tab pane #3</div>
-        </div>
-        
-        <!-- load Dojo -->
-        <script>dojoConfig = {parseOnLoad: true}</script>
-        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js"
-                   data-dojo-config="async: true"></script>
-                   
-        <script>require(["dojo/parser", "dijit/layout/TabContainer", "dijit/layout/ContentPane"]);</script>
-        <script src="rayage.js"></script>
-    </body>
+	</head>
+	<body class="claro">
+        <div id="wrapper"></div>
+		<div id="appLayout" class="demoLayout"></div>
+		<!-- load dojo and provide config via data attribute -->
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
+		<script src="rayage.js"></script>
+	</body>
 </html>
+

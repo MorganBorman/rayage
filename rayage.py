@@ -40,7 +40,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         print "WebSocket opened"
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message)
+        self.write_message(message)
 
     def on_close(self):
         print "WebSocket closed"
