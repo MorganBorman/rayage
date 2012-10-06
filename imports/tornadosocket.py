@@ -2,6 +2,7 @@
 # https://github.com/cime/bottle-tornadosocket
 
 from bottle import ServerAdapter
+import socket
 
 class TornadoWebSocketServer(ServerAdapter):
     """ The super hyped asynchronous server by facebook. Untested. """
@@ -18,5 +19,8 @@ class TornadoWebSocketServer(ServerAdapter):
             handlers = default_handlers
 
         tornado_app = tornado.web.Application(handlers)
-        tornado.httpserver.HTTPServer(tornado_app).listen(self.port)
+        
+        tornado_http = tornado.httpserver.HTTPServer(tornado_app)
+        tornado_http.bind(self.port, family=socket.AF_INET)
+        tornado_http.start()
         tornado.ioloop.IOLoop.instance().start()
