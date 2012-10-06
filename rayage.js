@@ -1,10 +1,13 @@
+// Require all the dijit element classes we need and parse the declarative application components
+require(["dojo/parser", "dojo/ready", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem"],
+function(parser, ready){
+    ready(function(){
+        parser.parse();
+    });
+});
+
+
 /*
-
-
-
-
-*/
-
 var ws = new WebSocket("ws://localhost:8080/ws");
 ws.onopen = function() {
    ws.send("Hello, world");
@@ -113,3 +116,4 @@ require(["dojo/ready", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/Menu", 
         pMenuBar.startup();
     });
 });
+*/
