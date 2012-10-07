@@ -1,0 +1,67 @@
+.rayage_icon {
+  background-repeat: no-repeat;
+  background-size: 18px 18px !important;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+}
+
+.rayage_icon_clear {
+    background: url(/images/clear.png);
+}
+
+.rayage_icon_search {
+    background: url(/images/search.png);
+}
+
+.rayage_icon_console {
+    background: url(/images/console.png);
+}
+
+.rayage_icon_build {
+    background: url(/images/build.png);
+}
+
+.rayage_icon_help {
+    background: url(/images/help.png);
+}
+
+.rayage_icon_new_project {
+    background: url(/images/new-project.png);
+}
+
+.rayage_icon_new_source {
+    background: url(/images/new-src.png);
+}
+
+.rayage_icon_delete_project {
+    background: url(/images/delete-project.png);
+}
+
+.rayage_icon_delete_source {
+    background: url(/images/delete-src.png);
+}
+
+.rayage_icon_edit_copy {
+    background: url(/images/edit-copy.png);
+}
+
+.rayage_icon_edit_cut {
+    background: url(/images/edit-cut.png);
+}
+
+.rayage_icon_edit_paste {
+    background: url(/images/edit-paste.png);
+}
+
+.rayage_icon_edit_select_all {
+    background: url(/images/edit-select-all.png);
+}
+
+.rayage_icon_src_c {
+    background: url(/images/text-x-csrc.png);
+}
+
+.rayage_icon_src_cpp {
+    background: url(/images/text-x-cppsrc.png);
+}

@@ -22,14 +22,18 @@ def index():
 @route('/rayage.js')
 def javascript():
     return static_file("rayage.js", root=system_directory, mimetype='text/javascript')
-        
-@route('/style.css')
-def style():
-    return static_file("style.css", root=system_directory, mimetype='text/css')
+
+@route('/styles/<filename:re:.*\.css>')
+def send_image(filename):
+    return static_file(filename, root=system_directory+'/styles', mimetype='text/css')
     
 @route('/codemirror/<path:path>')
 def codemirror(path):
     return static_file("/codemirror/" + path, root=system_directory)
+
+@route('/images/favicon.ico')
+def send_favicon():
+    return static_file("favicon.ico", root=system_directory+'/images', mimetype='image/x-icon')
 
 @route('/images/<filename:re:.*\.png>')
 def send_image(filename):

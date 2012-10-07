@@ -1,11 +1,33 @@
 // Require all the dijit element classes we need and parse the declarative application components
-require(["dojo/parser", "dojo/ready", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem"],
-function(parser, ready){
+require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem"],
+function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
     ready(function(){
         parser.parse();
+
+        var editor_tabs = registry.byId("rayage_editor_tabs");
+
+        function addEditorTab(pane) {
+            editor_tabs.addChild(pane);
+            editor_tabs.selectChild(pane);
+        }
+
+        
+        var delem = document.createElement('div');
+        
+        var pane = new ContentPane({ title:"hello.cpp", content: delem, iconClass:'rayage_icon rayage_icon_src_cpp' });
+        addEditorTab(pane);
+        
+        var code = "#include <iostream>\nusing namespace std;\n\nint main ()\n{\n\tcout << \"Hello World!\";     // prints Hello World!\n\tcout << \"I'm a C++ program\"; // prints I'm a C++ program\n\treturn 0;\n}\n";
+        
+        var editor = CodeMirror(delem, {
+            value: code,
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "clike",
+            theme: "neat",
+        });
     });
 });
-
 
 /*
 var ws = new WebSocket("ws://localhost:8080/ws");
