@@ -33,18 +33,18 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
     });
 });
 
-/*
+
 // Uncomment this to demo the websocket functionality of the backend
 
 
-var ws = new WebSocket("ws://localhost:8080/ws");
+var ws = new WebSocket("wss://localhost:8080/ws");
 ws.onopen = function() {
-   ws.send("Hello, world");
+   ws.send(JSON.stringify({greeting: "hello world"}));
 };
 ws.onmessage = function (evt) {
-   alert("received socket echo: " + evt.data);
+   alert("received socket echo: " + JSON.parse(evt.data));
 };
-*/
+
 
 
 /*

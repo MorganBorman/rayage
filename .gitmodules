@@ -1,5 +1,5 @@
 [submodule "codemirror"]
-	path = codemirror
+	path = static/codemirror
 	url = http://marijnhaverbeke.nl/git/codemirror
 [submodule "tornado"]
 	path = tornado

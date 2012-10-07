@@ -3,58 +3,46 @@
 import os
 import sys
 import json
+import socket
 
 system_directory = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(system_directory + "/imports")
 
-import bottle
-from bottle import route, static_file
-from tornadosocket import TornadoWebSocketServer
 import tornado.websocket
-
-bottle.debug(True)
-
-@route('/')
-def index():
-    return static_file("index.html", root=system_directory, mimetype='text/html')
-    
-@route('/welcome.html')
-def index():
-    return static_file("welcome.html", root=system_directory, mimetype='text/html')
-        
-@route('/rayage.js')
-def javascript():
-    return static_file("rayage.js", root=system_directory, mimetype='text/javascript')
-
-@route('/styles/<filename:re:.*\.css>')
-def send_image(filename):
-    return static_file(filename, root=system_directory+'/styles', mimetype='text/css')
-    
-@route('/codemirror/<path:path>')
-def codemirror(path):
-    return static_file("/codemirror/" + path, root=system_directory)
-
-@route('/images/favicon.ico')
-def send_favicon():
-    return static_file("favicon.ico", root=system_directory+'/images', mimetype='image/x-icon')
-
-@route('/images/<filename:re:.*\.png>')
-def send_image(filename):
-    return static_file(filename, root=system_directory+'/images', mimetype='image/png')
+import tornado.web
+import tornado.wsgi
+import tornado.httpserver
+import tornado.ioloop
+import tornado.template
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
+    authenticated = False
+
     def open(self):
         print "WebSocket opened"
 
     def on_message(self, message):
+        msg = json.loads(message)
+        print msg
         self.write_message(message)
 
     def on_close(self):
         print "WebSocket closed"
 
-tornado_handlers = [
-        (r"/ws", WebSocketHandler)
-    ]
+handlers = [
+    (r'/()', tornado.web.StaticFileHandler, {'path': system_directory+'/static', 'default_filename': 'index.html'}),
+    (r'/(rayage\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
+    (r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
+    (r'/images/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/images'}),
+    (r'/styles/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/styles'}),
+    (r'/ws', WebSocketHandler),
+]
 
-bottle.run(port=8080, server=TornadoWebSocketServer, handlers=tornado_handlers)
+if __name__ == "__main__":
+        tornado_app = tornado.web.Application(handlers)
+        
+        tornado_http = tornado.httpserver.HTTPServer(tornado_app, ssl_options= {"certfile": "misc/server.crt", "keyfile": "misc/server.key"})
+        tornado_http.bind(8080, family=socket.AF_INET)
+        tornado_http.start()
+        tornado.ioloop.IOLoop.instance().start()
