@@ -18,6 +18,10 @@ bottle.debug(True)
 @route('/')
 def index():
     return static_file("index.html", root=system_directory, mimetype='text/html')
+    
+@route('/welcome.html')
+def index():
+    return static_file("welcome.html", root=system_directory, mimetype='text/html')
         
 @route('/rayage.js')
 def javascript():
