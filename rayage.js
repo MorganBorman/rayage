@@ -1,5 +1,5 @@
 // Require all the dijit element classes we need and parse the declarative application components
-require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem"],
+require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
 function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
     ready(function(){
         parser.parse();
@@ -11,6 +11,9 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
             editor_tabs.selectChild(pane);
         }
 
+        /*
+        // Uncomment this block to see a demo editor pane
+        
         
         var delem = document.createElement('div');
         
@@ -26,10 +29,14 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
             mode: "clike",
             theme: "neat",
         });
+        */
     });
 });
 
 /*
+// Uncomment this to demo the websocket functionality of the backend
+
+
 var ws = new WebSocket("ws://localhost:8080/ws");
 ws.onopen = function() {
    ws.send("Hello, world");
@@ -37,6 +44,11 @@ ws.onopen = function() {
 ws.onmessage = function (evt) {
    alert("received socket echo: " + evt.data);
 };
+*/
+
+
+/*
+// Stuff below here is just kept for examples of how to work with dojo programmatically
 
 require(["dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dojo/ready"],
 function(BorderContainer, TabContainer,ContentPane, ready){

@@ -19,31 +19,31 @@
 	<body class="claro">
 
         <div data-dojo-type="dijit/MenuBar" id="navMenu">
-            <div data-dojo-type="dijit/PopupMenuBarItem">
+            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true">
                 <span>Project</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="projectMenu">
-                    <div data-dojo-type="dijit/PopupMenuItem">
-                        <span>New</span>
-                        <div data-dojo-type="dijit/Menu" id="projectMenu_submenu_new">
-                            <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">Project</div>
-                            <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">File</div>
-                        </div>
-                    </div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">New Project</div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project', onClick:function(){alert('Open Project!')}">Open Project</div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">New File</div>
+                </div>
+            </div>
+            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true">
+                <span>Edit</span>
+                <div data-dojo-type="dijit/DropDownMenu" id="editMenu">
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut', onClick:function(){alert('cut!')}">Cut</div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy', onClick:function(){alert('copy!')}">Copy</div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste', onClick:function(){alert('paste!')}">Paste</div>
                 </div>
             </div>
             <div data-dojo-type="dijit/PopupMenuBarItem">
-                <span>Edit</span>
-                <div data-dojo-type="dijit/DropDownMenu" id="editMenu">
-                                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut', onClick:function(){alert('cut!')}">Cut</div>
-                                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy', onClick:function(){alert('copy!')}">Copy</div>
-                                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste', onClick:function(){alert('paste!')}">Paste</div>
+                <span>Login</span>
+                <div data-dojo-type="dijit/TooltipDialog">
+                    <label for="login_username">Username:</label> <input data-dojo-type="dijit/form/TextBox" id="login_username" name="login_username" /><br />
+                    <label for="login_password">Password:</label> <input data-dojo-type="dijit/form/TextBox" type="password" id="login_password" name="login_password" /><br />
+                    <button data-dojo-type="dijit/form/Button" type="submit">Login</button>
                 </div>
             </div>
-            <div data-dojo-type="dijit/MenuBarItem" data-dojo-props="iconClass:'dijitEditorIcon dijitEditorIconSave', onClick:function(){alert('save!')}">
-                Save
-            </div>
         </div>
-
         
 		<div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%">
 		
@@ -53,9 +53,8 @@
                 </div>
             </div>
             
-		    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true" id="rayage_bottom_pane">
+		    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true, minSize: 200" id="rayage_bottom_pane">
                 <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'" id="rayage_output_tabs">
-                    
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props='title:"Build output", iconClass:"rayage_icon rayage_icon_build", tooltip:"Build output shows up here."'>
                         build output goes here
                     </div>
@@ -63,12 +62,9 @@
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props='title:"Run output", iconClass:"rayage_icon rayage_icon_console", tooltip:"Run output shows up here."'>
                         run output goes here
                     </div>
-                    
                 </div>
 		    </div>
-		
 		</div>
-		
 		
 		<!-- load dojo and provide config via data attribute -->
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" data-dojo-config="async: true"></script>
