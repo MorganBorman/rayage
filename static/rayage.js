@@ -3,12 +3,13 @@ ws.onopen = function() {
    console.log("Websocket connection established.");
 };
 
-var login = function (){}
-var logout = function(){}
+var login = function (){};
+var logout = function(){};
+var open_project = function(){};
 
 // Require all the dijit element classes we need and parse the declarative application components
-require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
-function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
+require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/Dialog", "dijit/form/Select", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
+function(parser, ready, registry, BorderContainer, TabContainer, ContentPane, Dialog, Select){
     ready(function(){
         parser.parse();
 
@@ -18,6 +19,12 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
         var rayage_logout_button = registry.byId("rayage_logout_button");
         
         rayage_logout_button.domNode.style.display = "none";
+        
+        open_project = function() {
+            var project_list_request = {"type": "project_list_request"};
+            
+            ws.send(JSON.stringify(project_list_request));
+        }
         
         ws.onmessage = function (evt) {
             var msg = JSON.parse(evt.data);
@@ -40,6 +47,10 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
                     rayage_login_menu.domNode.style.display = "inline";
                     rayage_logout_button.domNode.style.display = "none";
                 
+                    break;
+                case "project_list":
+                    //actually update the list of available projects here
+                    open_project_dialog.show();
                     break;
                 default:
                     console.log("Unknown message type receivied: " + msg.type);

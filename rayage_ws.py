@@ -86,5 +86,9 @@ def handle_logout_request(socket_connection, message):
     result_message = {'type': 'logout_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
 
+@messageHandler("project_list_request")
+def handle_logout_request(socket_connection, message):
+    result_message = {'type': 'project_list', 'projects': [{'name': "Hello World", 'identifier': 'hello_world'}, {'name': "Another Example", 'identifier': 'another_example'}]}
+    socket_connection.write_message(json.dumps(result_message))
 
 

@@ -23,7 +23,7 @@
                 <span>Project</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_project_menu_drop_down">
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">New Project</div>
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project', onClick:function(){alert('Open Project!')}">Open Project</div>
+                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project', onClick:function(){open_project();}">Open Project</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">New File</div>
                 </div>
             </div>
@@ -67,6 +67,18 @@
                 </div>
 		    </div>
 		</div>
+		
+		<div data-dojo-type="dijit/Dialog" data-dojo-id="open_project_dialog" title="Open a project">
+            <select name="open_project_selection" data-dojo-type="dijit/form/Select" data-dojo-id="open_project_dialog_selection">
+                <option value="hello_world" selected="selected">Hello World</option>
+                <option value="another_example">Another Example</option>
+            </select>
+
+            <div class="dijitDialogPaneActionBar">
+                <button dojoType="dijit.form.Button" type="button" onClick="open_project_dialog.onCancel();" id="open">Open</button>
+                <button dojoType="dijit.form.Button" type="button" onClick="open_project_dialog.onCancel();" id="cancel">Cancel</button>
+            </div>
+        </div>
 		
 		<!-- load dojo and provide config via data attribute -->
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" data-dojo-config="async: true"></script>
