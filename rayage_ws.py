@@ -49,7 +49,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         print "WebSocket closed"
 
 class messageHandler(object):
-    def __init__(self, message_type, required_fields, require_auth=True):
+    def __init__(self, message_type, required_fields=[], require_auth=True):
         self.message_type = message_type
         self.required_fields = required_fields
         self.require_auth = require_auth
@@ -81,7 +81,10 @@ def handle_login_request(socket_connection, message):
         
     socket_connection.write_message(json.dumps(result_message))
 
-
+@messageHandler("logout_request")
+def handle_logout_request(socket_connection, message):
+    result_message = {'type': 'logout_acknowledge'}
+    socket_connection.write_message(json.dumps(result_message))
 
 
 

@@ -4,6 +4,7 @@ ws.onopen = function() {
 };
 
 var login = function (){}
+var logout = function(){}
 
 // Require all the dijit element classes we need and parse the declarative application components
 require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
@@ -11,14 +12,34 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
     ready(function(){
         parser.parse();
 
+        var rayage_project_menu = registry.byId("rayage_project_menu");
+        var rayage_edit_menu = registry.byId("rayage_edit_menu");
+        var rayage_login_menu = registry.byId("rayage_login_menu");
+        var rayage_logout_button = registry.byId("rayage_logout_button");
+        
+        rayage_logout_button.domNode.style.display = "none";
+        
         ws.onmessage = function (evt) {
             var msg = JSON.parse(evt.data);
             switch(msg.type) {
                 case "login_success":
-                    alert("login succeeded.");
+                    rayage_edit_menu.set("disabled", false);
+                    rayage_project_menu.set("disabled", false);
+                    
+                    rayage_login_menu.domNode.style.display = "none";
+                    rayage_logout_button.domNode.style.display = "inline";
+                    
                     break;
                 case "login_failure":
                     alert("login failed, try again.");
+                    break;
+                case "logout_acknowledge":
+                    rayage_edit_menu.set("disabled", true);
+                    rayage_project_menu.set("disabled", true);
+                    
+                    rayage_login_menu.domNode.style.display = "inline";
+                    rayage_logout_button.domNode.style.display = "none";
+                
                     break;
                 default:
                     console.log("Unknown message type receivied: " + msg.type);
@@ -27,7 +48,6 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
         };
         
         login = function() {
-        
             var login_username = registry.byId("rayage_login_username");
             var login_password = registry.byId("rayage_login_password");
             
@@ -36,6 +56,12 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
                                  "password": login_password.value};
         
             ws.send(JSON.stringify(login_message));
+        }
+        
+        logout = function() {
+            var logout_message = {"type": "logout_request"};
+            
+            ws.send(JSON.stringify(logout_message));
         }
 
         function addEditorTab(pane) {
