@@ -2,33 +2,17 @@
 
 import os
 import sys
-import json
 import socket
 
 system_directory = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(system_directory + "/imports")
 
-import tornado.websocket
 import tornado.web
-import tornado.wsgi
 import tornado.httpserver
 import tornado.ioloop
-import tornado.template
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler):
-    authenticated = False
-
-    def open(self):
-        print "WebSocket opened"
-
-    def on_message(self, message):
-        msg = json.loads(message)
-        print msg
-        self.write_message(message)
-
-    def on_close(self):
-        print "WebSocket closed"
+from rayage_ws import WebSocketHandler
 
 handlers = [
     (r'/()', tornado.web.StaticFileHandler, {'path': system_directory+'/static', 'default_filename': 'index.html'}),

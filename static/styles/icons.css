@@ -26,6 +26,10 @@
     background: url(/images/help.png);
 }
 
+.rayage_icon_authenticate {
+    background: url(/images/authenticate.png);
+}
+
 .rayage_icon_open_project {
     background: url(/images/open-project.png);
 }

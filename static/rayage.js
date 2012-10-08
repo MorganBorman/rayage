@@ -1,10 +1,42 @@
+var ws = new WebSocket("wss://localhost:8080/ws");
+ws.onopen = function() {
+   console.log("Websocket connection established.");
+};
+
+var login = function (){}
+
 // Require all the dijit element classes we need and parse the declarative application components
 require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
 function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
     ready(function(){
         parser.parse();
 
-        var editor_tabs = registry.byId("rayage_editor_tabs");
+        ws.onmessage = function (evt) {
+            var msg = JSON.parse(evt.data);
+            switch(msg.type) {
+                case "login_success":
+                    alert("login succeeded.");
+                    break;
+                case "login_failure":
+                    alert("login failed, try again.");
+                    break;
+                default:
+                    console.log("Unknown message type receivied: " + msg.type);
+                    break
+            }
+        };
+        
+        login = function() {
+        
+            var login_username = registry.byId("rayage_login_username");
+            var login_password = registry.byId("rayage_login_password");
+            
+            var login_message = {"type": "login_request",
+                                 "username": login_username.value,
+                                 "password": login_password.value};
+        
+            ws.send(JSON.stringify(login_message));
+        }
 
         function addEditorTab(pane) {
             editor_tabs.addChild(pane);
@@ -32,20 +64,6 @@ function(parser, ready, registry, BorderContainer, TabContainer, ContentPane){
         */
     });
 });
-
-
-// Uncomment this to demo the websocket functionality of the backend
-
-
-var ws = new WebSocket("wss://localhost:8080/ws");
-ws.onopen = function() {
-   ws.send(JSON.stringify({greeting: "hello world"}));
-};
-ws.onmessage = function (evt) {
-   alert("received socket echo: " + JSON.parse(evt.data));
-};
-
-
 
 /*
 // Stuff below here is just kept for examples of how to work with dojo programmatically

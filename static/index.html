@@ -19,28 +19,28 @@
 	<body class="claro">
 
         <div data-dojo-type="dijit/MenuBar" id="navMenu">
-            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true">
+            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true" id="rayage_project_menu">
                 <span>Project</span>
-                <div data-dojo-type="dijit/DropDownMenu" id="projectMenu">
+                <div data-dojo-type="dijit/DropDownMenu" id="rayage_project_menu_drop_down">
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">New Project</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project', onClick:function(){alert('Open Project!')}">Open Project</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">New File</div>
                 </div>
             </div>
-            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true">
+            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true" id="rayage_edit_menu">
                 <span>Edit</span>
-                <div data-dojo-type="dijit/DropDownMenu" id="editMenu">
+                <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut', onClick:function(){alert('cut!')}">Cut</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy', onClick:function(){alert('copy!')}">Copy</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste', onClick:function(){alert('paste!')}">Paste</div>
                 </div>
             </div>
-            <div data-dojo-type="dijit/PopupMenuBarItem">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_login_menu">
                 <span>Login</span>
                 <div data-dojo-type="dijit/TooltipDialog">
-                    <label for="login_username">Username:</label> <input data-dojo-type="dijit/form/TextBox" id="login_username" name="login_username" /><br />
-                    <label for="login_password">Password:</label> <input data-dojo-type="dijit/form/TextBox" type="password" id="login_password" name="login_password" /><br />
-                    <button data-dojo-type="dijit/form/Button" type="submit">Login</button>
+                    <label for="rayage_login_username">Username:</label> <input data-dojo-type="dijit/form/TextBox" id="rayage_login_username" name="rayage_login_username" /><br />
+                    <label for="rayage_login_password">Password:</label> <input data-dojo-type="dijit/form/TextBox" type="password" id="rayage_login_password" name="rayage_login_password" /><br />
+                    <button data-dojo-type="dijit/form/Button" type="submit" id="login_submit" data-dojo-props="iconClass:'rayage_icon rayage_icon_authenticate', onClick:function(){login()}">Login</button>
                 </div>
             </div>
         </div>
