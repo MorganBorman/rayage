@@ -7,6 +7,41 @@ var login = function (){};
 var logout = function(){};
 var open_project = function(){};
 
+require(["dojo/topic"], 
+function(topic){    
+    // Potential topic organization
+    /*
+    ui/menus/project/create_project
+    ui/menus/project/open_project
+    ui/menus/project/create_file
+    
+    ui/menus/edit/copy
+    ui/menus/edit/cut
+    ui/menus/edit/paste
+    ui/menus/edit/select_all
+    ui/menus/edit/find
+    
+    ui/menus/login
+    ui/menus/logout
+    
+    ui/dialogs/open_project
+    */
+    
+    // Example of subscribing
+    /*
+    topic.subscribe("ui/menus/login", function(username, password){
+            var login_message = {"type": "login_request",
+                                 "username": username,
+                                 "password": password};
+        
+            ws.send(JSON.stringify(login_message));
+    });
+    
+    // Example of publishing
+    topic.publish("ui/menus/login", "test", "password");
+    */
+});
+
 // Require all the dijit element classes we need and parse the declarative application components
 require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/Dialog", "dijit/form/Select", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
 function(parser, ready, registry, BorderContainer, TabContainer, ContentPane, Dialog, Select){
