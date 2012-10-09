@@ -8,7 +8,19 @@
 
 		<link rel="stylesheet" href="/styles/style.css" media="screen">
         <link rel="stylesheet" href="/styles/icons.css" media="screen">
+        
+        <script>
+            dojoConfig = {
+                isDebug: true
+            };
+        </script>
+        
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" data-dojo-config="async: true"></script>
+		
+		<script src="rayage.js"></script>
+		<script src="rayage.ui.js"></script>
+		<script src="rayage.ws.js"></script>
 
         <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
         <link rel="stylesheet" href="/codemirror/theme/neat.css">
@@ -22,17 +34,17 @@
             <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_project_menu">
                 <span>Project</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_project_menu_drop_down">
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">New Project</div>
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project', onClick:function(){open_project();}">Open Project</div>
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">New File</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project'">New Project</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_open_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project'">Open Project</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_source" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
                 </div>
             </div>
             <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_edit_menu">
                 <span>Edit</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
-                    <div data-dojo-id="ui_menus_edit_cut" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy', onClick:function(){alert('copy!')}">Copy</div>
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste', onClick:function(){alert('paste!')}">Paste</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_cut" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_copy" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy'">Copy</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_paste" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste'">Paste</div>
                 </div>
             </div>
             <div data-dojo-type="dijit/MenuBarItem" data-dojo-props="onClick:function(){logout();}" id="rayage_logout_button">
@@ -79,12 +91,6 @@
                 <button dojoType="dijit.form.Button" type="button" onClick="open_project_dialog.onCancel();" id="cancel">Cancel</button>
             </div>
         </div>
-		
-		<!-- load dojo and provide config via data attribute -->
-		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" data-dojo-config="async: true"></script>
-		<script src="rayage.js"></script>
-		<script src="rayage.ui.js"></script>
-		<script src="rayage.ws.js"></script>
 	</body>
 </html>
 
