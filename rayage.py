@@ -16,7 +16,7 @@ from rayage_ws import WebSocketHandler
 
 handlers = [
     (r'/()', tornado.web.StaticFileHandler, {'path': system_directory+'/static', 'default_filename': 'index.html'}),
-    (r'/(rayage\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
+    (r'/(rayage.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
     (r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
     (r'/images/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/images'}),
     (r'/styles/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/styles'}),

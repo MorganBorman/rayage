@@ -1,7 +1,7 @@
 // This file will contain publishers and subscriber to topics for all direct manipulation of the UI (that is the public interface to the UI)
 
-require(["dojo/parser", "dojo/ready", "dojo/topic"],
-function(parser, ready, topic){
+require(["dojo/parser", "dojo/ready", "dojo/on", "dojo/topic", "dijit/registry"],
+function(parser, ready, on, topic, registry){
     ready(function(){
         parser.parse();
         
@@ -30,6 +30,20 @@ function(parser, ready, topic){
         
         ui/ready
         
+         data-dojo-props="disabled:true"
+        
         */
+        
+        // This doesn't work yet
+        var ui_menus_edit_cut = registry.byId("ui_menus_edit_cut");
+        on(ui_menus_edit_cut, "click", function(evt){
+            topic.publish("ui/menus/edit/cut");
+        });
+        
+        topic.subscribe("ui/menus/edit/cut", function(){
+            alert("cut through topics.");
+        });
+        
+        topic.publish("ui/ready");
     });
 });

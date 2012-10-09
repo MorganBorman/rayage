@@ -19,7 +19,7 @@
 	<body class="claro">
 
         <div data-dojo-type="dijit/MenuBar" id="navMenu">
-            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true" id="rayage_project_menu">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_project_menu">
                 <span>Project</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_project_menu_drop_down">
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project', onClick:function(){alert('New Project!')}">New Project</div>
@@ -27,10 +27,10 @@
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source', onClick:function(){alert('New File!')}">New File</div>
                 </div>
             </div>
-            <div data-dojo-type="dijit/PopupMenuBarItem" data-dojo-props="disabled:true" id="rayage_edit_menu">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_edit_menu">
                 <span>Edit</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
-                    <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut', onClick:function(){alert('cut!')}">Cut</div>
+                    <div data-dojo-id="ui_menus_edit_cut" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy', onClick:function(){alert('copy!')}">Copy</div>
                     <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste', onClick:function(){alert('paste!')}">Paste</div>
                 </div>
@@ -83,6 +83,8 @@
 		<!-- load dojo and provide config via data attribute -->
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script src="rayage.js"></script>
+		<script src="rayage.ui.js"></script>
+		<script src="rayage.ws.js"></script>
 	</body>
 </html>
 
