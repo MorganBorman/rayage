@@ -33,9 +33,7 @@ function(topic){
         rayage_ws.ws.onmessage = function (event) {
             var msgdata = JSON.parse(event.data);
             var msgtype = msgdata.type
-            
             console.log("recieved:", msgtype, " -> ", msgdata);
-            
             topic.publish("ws/message/" + msgtype, msgdata);
         };
     };
@@ -49,7 +47,9 @@ function(topic){
     
     rayage_ws.send = function (msgdata){
         if (rayage_ws.ws != null) {
-            rayage_ws.ws.send(JSON.stringify(msgdata));
+            var msgstrdata = JSON.stringify(msgdata);
+            console.log("sending: ", msgstrdata);
+            rayage_ws.ws.send(msgstrdata);
         }
     };
     

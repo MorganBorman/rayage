@@ -123,10 +123,11 @@ def handle_continue_session(socket_connection, message):
     # use this to theck the validity of the cookie when the client sends it back later. 
     # This in combination with verifying the session key against the database and checking whether it has expired should ensure that only valid sessions can be resumed.
     if check_cookie(secret_key, cookie_value):
-        username = cookie_value.split("&", 1)[0]
-        if sessions[username] == cookie_value:
+        username = cookie_value.split("&", 1)[0].split("=", 1)[1]
+        if username in sessions.keys() and sessions[username] == cookie_value:
             socket_connection.authenticated = True
             session_cookie = generate_session_cookie(secret_key, username, session_timeout)
+            sessions[username] = session_cookie
             result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
             socket_connection.write_message(json.dumps(result_message))
             return
@@ -140,9 +141,9 @@ def handle_login_request(socket_connection, message):
     
     if username in users.keys() and password == users[username]:
         socket_connection.authenticated = True
-        session_cookie = generate_session_cookie(secret_key, username, 600)
+        session_cookie = generate_session_cookie(secret_key, username, session_timeout)
         sessions[username] = session_cookie
-        result_message = {'type': 'login_success', 'session_cookie': session_cookie}
+        result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
     else:
         result_message = {'type': 'login_failure'}
         
@@ -150,6 +151,7 @@ def handle_login_request(socket_connection, message):
 
 @messageHandler("logout_request")
 def handle_logout_request(socket_connection, message):
+    # Need to use the stored (should be stored) username to clear any current sessions for that user
     result_message = {'type': 'logout_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
 
