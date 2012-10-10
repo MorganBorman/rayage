@@ -18,4 +18,7 @@ git submodule update
 python rayage.py
 ```
 
+Username: test
+Password: password
+
 Then visit [https://localhost:8080](https://localhost:8080)
