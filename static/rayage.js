@@ -74,6 +74,7 @@ function(topic, cookie){
             if (session_cookie != null) {
                 var continue_session = {"type": "continue_session",
                                         "cookie_value": session_cookie};
+                cookie("rayage_session", null, { expires: -1, secure: true });
                 rayage_ws.send(continue_session);
             }
         });
