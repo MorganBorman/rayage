@@ -1,18 +1,67 @@
 require(["dojo/topic"],
 function(topic){
-    topic.subscribe("ws/ready", function(){
-        
-        // Hook up all the subscribers which listen to the other compoenents of the application here
-        
-        // Hook up all the publishers which control the rest of the application here
-        
-        // Potential topic organization
-        /*
-        app/ready
-        */
-        
-        
+    var rayage_ws = null;
+    var rayage_ui = null;
+    
+    var on_ui_ws_ready = function(){};
+    
+    topic.subscribe("ws/ready", function(ws){
+        rayage_ws = ws;
+        if (rayage_ui != null) {
+            on_ui_ws_ready();
+        }
     });
+    
+    topic.subscribe("ui/ready", function(ui){
+        rayage_ui = ui;
+        if (rayage_ws != null) {
+            on_ui_ws_ready();
+        }
+    });
+    
+    on_ui_ws_ready = function(){
+        rayage_ws.connect();
+        
+        rayage_ui.menus.edit.menu.set("disabled", true);
+        rayage_ui.menus.project.menu.set("disabled", true);
+        rayage_ui.menus.logout.setVisible(false);
+        
+        topic.subscribe("ui/menus/login", function(username, password) {
+            rayage_ws.send({"type": "login_request",
+                             "username": username,
+                             "password": password});
+        });
+        
+        topic.subscribe("ui/menus/logout", function() {
+            rayage_ws.send({"type": "logout_request"});
+        });
+        
+        topic.subscribe("ui/menus/project/open_project", function() {
+            rayage_ws.send({"type": "project_list_request"});
+        });
+        
+        topic.subscribe("ws/message/project_list", function(data) {
+            rayage_ui.dialogs.open_project.setSelections(data.projects);
+            rayage_ui.dialogs.open_project.dialog.show();
+        });
+        
+        topic.subscribe("ws/message/login_success", function() {
+            rayage_ui.menus.project.menu.set("disabled", false);
+            rayage_ui.menus.logout.setVisible(true);
+            rayage_ui.menus.login.menu.setVisible(false);
+        });
+        
+        topic.subscribe("ws/message/login_failure", function() {
+            alert("login failed, try again.");
+        });
+        
+        topic.subscribe("ws/message/logout_acknowledge", function() {
+            rayage_ui.menus.project.menu.set("disabled", true);
+            rayage_ui.menus.logout.setVisible(false);
+            rayage_ui.menus.login.menu.setVisible(true);
+        });
+        
+    };
 });
 
 
@@ -27,108 +76,17 @@ function(topic){
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
-// Example of subscribing
-/*
-topic.subscribe("ui/menus/login", function(username, password){
-        var login_message = {"type": "login_request",
-                             "username": username,
-                             "password": password};
-        
-        topic.publish("ws/send", username, password);
-        
-        ws.send(JSON.stringify(login_message));
-});
-
-// Example of publishing
-topic.publish("ui/menus/login", "test", "password");
-
-
-
-
+// to be used to make enter key in the password box the same as clicking on the "login" button
 //onKeyUp:function(e){if(e.keyCode == dojo.keys.ENTER) {login();}}
 
-
-var login = function (){};
-var logout = function(){};
-var open_project = function(){};
-
-// Require all the dijit element classes we need and parse the declarative application components
-require(["dojo/parser", "dojo/ready", "dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/Dialog", "dijit/form/Select", "dijit/MenuBar", "dijit/MenuBarItem", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/TooltipDialog"],
-function(parser, ready, registry, BorderContainer, TabContainer, ContentPane, Dialog, Select){
-    ready(function(){
-        parser.parse();
-
-        var rayage_project_menu = registry.byId("rayage_project_menu");
-        var rayage_edit_menu = registry.byId("rayage_edit_menu");
-        var rayage_login_menu = registry.byId("rayage_login_menu");
-        var rayage_logout_button = registry.byId("rayage_logout_button");
-        
-        rayage_logout_button.domNode.style.display = "none";
-        
-        open_project = function() {
-            var project_list_request = {"type": "project_list_request"};
-            
-            ws.send(JSON.stringify(project_list_request));
-        }
-        
-        ws.onmessage = function (evt) {
-            var msg = JSON.parse(evt.data);
-            switch(msg.type) {
-                case "login_success":
-                    rayage_edit_menu.set("disabled", false);
-                    rayage_project_menu.set("disabled", false);
-                    
-                    rayage_login_menu.domNode.style.display = "none";
-                    rayage_logout_button.domNode.style.display = "inline";
-                    
-                    break;
-                case "login_failure":
-                    alert("login failed, try again.");
-                    break;
-                case "logout_acknowledge":
-                    rayage_edit_menu.set("disabled", true);
-                    rayage_project_menu.set("disabled", true);
-                    
-                    rayage_login_menu.domNode.style.display = "inline";
-                    rayage_logout_button.domNode.style.display = "none";
-                
-                    break;
-                case "project_list":
-                    //actually update the list of available projects here
-                    open_project_dialog.show();
-                    break;
-                default:
-                    console.log("Unknown message type receivied: " + msg.type);
-                    break
-            }
-        };
-        
-        login = function() {
-            var login_username = registry.byId("rayage_login_username");
-            var login_password = registry.byId("rayage_login_password");
-            
-            var login_message = {"type": "login_request",
-                                 "username": login_username.value,
-                                 "password": login_password.value};
-        
-            ws.send(JSON.stringify(login_message));
-        }
-        
-        logout = function() {
-            var logout_message = {"type": "logout_request"};
-            
-            ws.send(JSON.stringify(logout_message));
-        }
+/*      // example of how to programmatically create an editor pane
 
         function addEditorTab(pane) {
             editor_tabs.addChild(pane);
             editor_tabs.selectChild(pane);
         }
 
-        /*
-        // Uncomment this block to see a demo editor pane
+        
         
         
         var delem = document.createElement('div');
@@ -214,42 +172,4 @@ function(BorderContainer, TabContainer,ContentPane, ready){
 	});
 });
 
-require(["dojo/ready", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/Menu", "dijit/MenuItem", "dijit/DropDownMenu"], function(ready, MenuBar, PopupMenuBarItem, Menu, MenuItem, DropDownMenu){
-    ready(function(){
-        var pMenuBar = new MenuBar({});
-
-        var pSubMenu = new DropDownMenu({});
-        pSubMenu.addChild(new MenuItem({
-            label: "File item #1"
-        }));
-        pSubMenu.addChild(new MenuItem({
-            label: "File item #2"
-        }));
-        pMenuBar.addChild(new PopupMenuBarItem({
-            label: "File",
-            popup: pSubMenu
-        }));
-
-        var pSubMenu2 = new DropDownMenu({});
-        pSubMenu2.addChild(new MenuItem({
-            label: "Cut",
-            iconClass: "dijitEditorIcon dijitEditorIconCut"
-        }));
-        pSubMenu2.addChild(new MenuItem({
-            label: "Copy",
-            iconClass: "dijitEditorIcon dijitEditorIconCopy"
-        }));
-        pSubMenu2.addChild(new MenuItem({
-            label: "Paste",
-            iconClass: "dijitEditorIcon dijitEditorIconPaste"
-        }));
-        pMenuBar.addChild(new PopupMenuBarItem({
-            label: "Edit",
-            popup: pSubMenu2
-        }));
-
-        pMenuBar.placeAt("wrapper");
-        pMenuBar.startup();
-    });
-});
 */

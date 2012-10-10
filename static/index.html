@@ -30,16 +30,16 @@
 	</head>
 	<body class="claro">
 
-        <div data-dojo-type="dijit/MenuBar" id="navMenu">
-            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_project_menu">
+        <div data-dojo-type="dijit/MenuBar" id="ui_menus">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_project">
                 <span>Project</span>
-                <div data-dojo-type="dijit/DropDownMenu" id="rayage_project_menu_drop_down">
+                <div data-dojo-type="dijit/DropDownMenu" id="ui_menus_project_drop_down">
                     <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project'">New Project</div>
                     <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_open_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project'">Open Project</div>
-                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_source" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
+                    <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
                 </div>
             </div>
-            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_edit_menu">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_edit">
                 <span>Edit</span>
                 <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
                     <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_cut" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
@@ -47,15 +47,15 @@
                     <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_paste" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste'">Paste</div>
                 </div>
             </div>
-            <div data-dojo-type="dijit/MenuBarItem" data-dojo-props="onClick:function(){logout();}" id="rayage_logout_button">
+            <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
                 Logout
             </div>
-            <div data-dojo-type="dijit/PopupMenuBarItem" id="rayage_login_menu">
+            <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_login">
                 <span>Login</span>
                 <div data-dojo-type="dijit/TooltipDialog">
-                    <label for="rayage_login_username">Username:</label> <input data-dojo-type="dijit/form/TextBox" id="rayage_login_username" name="rayage_login_username" /><br />
-                    <label for="rayage_login_password">Password:</label> <input data-dojo-type="dijit/form/TextBox" type="password" id="rayage_login_password" name="rayage_login_password" /><br />
-                    <button data-dojo-type="dijit/form/Button" type="submit" id="login_submit" data-dojo-props="iconClass:'rayage_icon rayage_icon_authenticate', onClick:function(){login()}">Login</button>
+                    <label for="ui_menus_login_username">Username:</label> <input data-dojo-type="dijit/form/TextBox" id="ui_menus_login_username" /><br />
+                    <label for="ui_menus_login_password">Password:</label> <input data-dojo-type="dijit/form/TextBox" id="ui_menus_login_password" type="password" /><br />
+                    <button data-dojo-type="dijit/form/Button" id="ui_menus_login_button" type="submit" data-dojo-props="iconClass:'rayage_icon rayage_icon_authenticate'">Login</button>
                 </div>
             </div>
         </div>
@@ -80,15 +80,13 @@
 		    </div>
 		</div>
 		
-		<div data-dojo-type="dijit/Dialog" data-dojo-id="open_project_dialog" title="Open a project">
-            <select name="open_project_selection" data-dojo-type="dijit/form/Select" data-dojo-id="open_project_dialog_selection">
-                <option value="hello_world" selected="selected">Hello World</option>
-                <option value="another_example">Another Example</option>
+		<div data-dojo-type="dijit/Dialog" id="ui_dialogs_open_project" title="Open a project">
+            <select data-dojo-type="dijit/form/Select" id="ui_dialogs_open_project_selection">
             </select>
 
             <div class="dijitDialogPaneActionBar">
-                <button dojoType="dijit.form.Button" type="button" onClick="open_project_dialog.onCancel();" id="open">Open</button>
-                <button dojoType="dijit.form.Button" type="button" onClick="open_project_dialog.onCancel();" id="cancel">Cancel</button>
+                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_open_project_open">Open</button>
+                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_open_project_cancel">Cancel</button>
             </div>
         </div>
 	</body>

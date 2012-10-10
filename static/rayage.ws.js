@@ -11,51 +11,47 @@ function(topic){
     ws/connection/error
     ws/message/<type>
     ws/ready
-    
-    // subscribed topics
-    ws/connect
-    ws/disconnect
-    ws/send
     */
     
-    var ws = null;
+    var rayage_ws = new Object();
     
-    topic.subscribe("ws/connect", function(){
+    rayage_ws.connect = function (){
+        rayage_ws.ws = new WebSocket("wss://localhost:8080/ws");
     
-        ws = new WebSocket("wss://localhost:8080/ws");
-    
-        ws.onopen = function() {
+        rayage_ws.ws.onopen = function() {
             topic.publish("ws/connection/opened");
         };
         
-        ws.onclose = function() {
+        rayage_ws.ws.onclose = function() {
             topic.publish("ws/connection/closed");
         };
         
-        ws.onerror = function() {
+        rayage_ws.ws.onerror = function() {
             topic.publish("ws/connection/error");
         };
         
-        ws.onmessage = function (event) {
+        rayage_ws.ws.onmessage = function (event) {
             var msgdata = JSON.parse(event.data);
             var msgtype = msgdata.type
             
+            console.log("recieved:", msgtype, " -> ", msgdata);
+            
             topic.publish("ws/message/" + msgtype, msgdata);
         };
-    });
-    
-    topic.subscribe("ws/disconnect", function(){
-        ws.close();
-        ws = null;
-    });
-    
-    topic.subscribe("ws/send", function(msgdata){
-        if (ws != null) {
-            ws.send(JSON.stringify(msgdata));
-        } else {
-            console.log("Attempted to send data without websocket connection.");
+    };
+   
+    rayage_ws.disconnect = function (){
+        if (rayage_ws.ws != null) {
+            rayage_ws.ws.close();
+            rayage_ws.ws = null;
         }
-    });
+    };
     
-    topic.publish("ws/ready");
+    rayage_ws.send = function (msgdata){
+        if (rayage_ws.ws != null) {
+            rayage_ws.ws.send(JSON.stringify(msgdata));
+        }
+    };
+    
+    topic.publish("ws/ready", rayage_ws);
 });
