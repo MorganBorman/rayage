@@ -32,7 +32,7 @@ function(topic, cookie){
         
         rayage_ws.ws.onmessage = function (event) {
             var msgdata = JSON.parse(event.data);
-            var msgtype = msgdata.type
+            var msgtype = msgdata.type;
             console.log("recieved:", msgtype, " -> ", msgdata);
             topic.publish("ws/message/" + msgtype, msgdata);
         };
