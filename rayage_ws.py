@@ -1,5 +1,27 @@
 import tornado.websocket
 import json
+import hashlib
+import hmac
+import time
+
+try:
+    import Crypto.Random
+    import Crypto.Util.number
+    def get_random_bytes(b):
+        return Crypto.Util.number.getRandomNBitInteger(b*8, Crypto.Random.get_random_bytes)
+except ImportError:
+    import random
+    print("Warning using non-cryptographically random session keys. Please install pycrypto.")
+    def get_random_bytes(b):
+        return random.getrandbits(b*8)
+
+def sign_cookie(signing_key, value):
+    hm = hmac.new(signing_key, value, hashlib.sha256)
+    return hm.hexdigest()
+    
+def check_cookie(signing_key, full_cookie_value):
+    cookie_value, cookie_signature = full_cookie_value.rsplit("&", 1)
+    return sign_cookie(signing_key, cookie_value)
 
 class MalformedMessage(Exception):
     '''A message is missing fields or fields are invalid.'''
@@ -70,12 +92,57 @@ class messageHandler(object):
         WebSocketHandler.message_handlers[self.message_type] = handler
         
         return f
-        
+    
+
+secret_key = "foobarbaz" # A (hopefully) long string used to sign the session key cookie to prevent tampering
+
+users = {"test": hashlib.sha256("password").hexdigest()}
+
+session_timeout = 600
+
+# In the future these would need to be stored as seperate components rather than just the session cookie string
+# ... and in a DB obviously
+sessions = {}
+
+def generate_session_cookie(secret_key, username, expiry_length):
+    # Example of how signing of the session keys could work
+    
+    # A random key used to identify a client session across seperate websocket connections without re-verifying their password
+    session_key = format(get_random_bytes(16), 'X')
+    
+    # Store this in the database with the user credentials. Later when the client sends the cookie back we see whether it matches
+    cookie_value = "username=%s&expires=%d&key=%s" %(username, int(time.time()) + expiry_length, session_key)
+    
+    # This is the value we send to the client for them to store in a cookie
+    return cookie_value + "&" + sign_cookie(secret_key, cookie_value)
+
+@messageHandler("continue_session", ["cookie_value"], False)
+def handle_continue_session(socket_connection, message):
+    cookie_value = message['cookie_value']
+    
+    # use this to theck the validity of the cookie when the client sends it back later. 
+    # This in combination with verifying the session key against the database and checking whether it has expired should ensure that only valid sessions can be resumed.
+    if check_cookie(secret_key, cookie_value):
+        username = cookie_value.split("&", 1)[0]
+        if sessions[username] == cookie_value:
+            socket_connection.authenticated = True
+            session_cookie = generate_session_cookie(secret_key, username, session_timeout)
+            result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
+            socket_connection.write_message(json.dumps(result_message))
+            return
+    result_message = {'type': 'login_failure'}
+    socket_connection.write_message(json.dumps(result_message))
+    
 @messageHandler("login_request", ["username", "password"], False)
 def handle_login_request(socket_connection, message):
-    if message['username'] == "test" and message['password'] == "password":
+    username = message['username']
+    password = message['password']
+    
+    if username in users.keys() and password == users[username]:
         socket_connection.authenticated = True
-        result_message = {'type': 'login_success'}
+        session_cookie = generate_session_cookie(secret_key, username, 600)
+        sessions[username] = session_cookie
+        result_message = {'type': 'login_success', 'session_cookie': session_cookie}
     else:
         result_message = {'type': 'login_failure'}
         

@@ -1,5 +1,6 @@
 require(["dojo/topic"],
 function(topic){
+    
     var rayage_ws = null;
     var rayage_ui = null;
     
@@ -27,9 +28,10 @@ function(topic){
         rayage_ui.menus.logout.setVisible(false);
         
         topic.subscribe("ui/menus/login", function(username, password) {
+            var pwhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
             rayage_ws.send({"type": "login_request",
                              "username": username,
-                             "password": password});
+                             "password": pwhash});
         });
         
         topic.subscribe("ui/menus/logout", function() {
@@ -45,10 +47,13 @@ function(topic){
             rayage_ui.dialogs.open_project.dialog.show();
         });
         
-        topic.subscribe("ws/message/login_success", function() {
+        topic.subscribe("ws/message/login_success", function(data) {
             rayage_ui.menus.project.menu.set("disabled", false);
             rayage_ui.menus.logout.setVisible(true);
             rayage_ui.menus.login.menu.setVisible(false);
+            
+            //var expiry_date = new Date( data.session_timeout*1000);
+            //cookie("rayage_session", data.session_cookie, { expires: expiry_date, secure: true, domain: document.domain });
         });
         
         topic.subscribe("ws/message/login_failure", function() {
@@ -59,15 +64,21 @@ function(topic){
             rayage_ui.menus.project.menu.set("disabled", true);
             rayage_ui.menus.logout.setVisible(false);
             rayage_ui.menus.login.menu.setVisible(true);
+            
+            //cookie("rayage_session", null, { expires: -1, secure: true, domain: document.domain });
         });
         
+        //var session_cookie = cookie("rayage_session");
+        //console.log("session_cookie: ", session_cookie);
+        
+        //if (session_cookie != null) {
+        //    var continue_session = {"type": "continue_session",
+        //                            "cookie_value": session_cookie};
+        //    console.log(continue_session);
+        //    rayage_ws.send(continue_session);
+        //}
     };
 });
-
-
-
-
-
 
 
 // Ignore everything below here for now
