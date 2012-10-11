@@ -4,6 +4,8 @@ import hashlib
 import hmac
 import time
 import os
+import errno
+import shutil
 from constants import *
 
 try:
@@ -195,8 +197,38 @@ def handle_template_list_request(socket_connection, message):
     """
     templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR) 
                                        if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
-    templates.insert(0, {'label': 'Empty Template', 'id': 'Empty Template'})
+    templates.insert(0, {'label': 'Empty Template', 'id': ''})
 
     result_message = {'type': 'template_list', 
                       'templates': templates}
     socket_connection.write_message(json.dumps(result_message))
+
+@messageHandler("new_project_request", ["name", "template"], True)
+def handle_new_project_request(socket_connection, message):
+    """
+    Handles new project requests by creating a directory in the user's projects folder.
+
+    TODO:
+    Send proper responses
+    """
+    name = message["name"]
+    template = message["template"]
+
+    try:
+        new_project_dir = current_user_dir(name)
+        if template:
+            shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
+        else:
+            os.makedirs(new_project_dir)
+        # TODO: Acknowledge success
+        socket_connection.write_message(json.dumps("TODO: Successful New Project"))
+    except shutil.Error as e:
+        # copytree error
+        # This exception collects exceptions that are raised during a multi-file operation. 
+        # For copytree(), the exception argument is a list of 3-tuples (srcname, dstname, exception).
+        # TODO: Double check this. Existing project folder always falls into OSError.
+        socket_connection.write_message(json.dumps("TODO: Missing template"))
+    except OSError as e:
+        # makedirs error
+        socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
+

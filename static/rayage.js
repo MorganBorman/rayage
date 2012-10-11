@@ -41,6 +41,9 @@ function(topic, cookie){
         topic.subscribe("ui/menus/project/new_project", function() {
         	rayage_ws.send({"type": "template_list_request"});
         });
+        topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
+            rayage_ws.send({"type": "new_project_request", "name": name, "template": template});
+        });
         
         topic.subscribe("ws/message/template_list", function(data) {
             rayage_ui.dialogs.new_project.setSelections(data.templates);
