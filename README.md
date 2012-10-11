@@ -21,4 +21,12 @@ python rayage.py
 Username: test
 Password: password
 
+
 Then visit [https://localhost:8080](https://localhost:8080)
+
+##Making Changes:
+
+When you create stub methods, create an issue so we remember to update these.
+
+Whenever you commit code, create a new entry on the [wiki](https://github.com/MorganBorman/rayage/wiki/Current-Status)
+annotated with the date and what changes you made. Include issues you've created.
