@@ -50,9 +50,26 @@ function(topic, cookie){
         topic.subscribe("ui/menus/project/open_project", function() {
             rayage_ws.send({"type": "project_list_request"});
         });
-        
+        topic.subscribe("ui/dialogs/open_project/open", function(data) {
+            // stub method for open
+            alert("TODO: Open project.");
+            alert(JSON.stringify(data));
+        });
+
         topic.subscribe("ws/message/project_list", function(data) {
             rayage_ui.dialogs.open_project.setSelections(data.projects);
+
+            // Set up form when no projects exist.
+            if (data.projects.length < 1) {
+                // Add a no projects option and disable open and select elements.
+                var selection = rayage_ui.dialogs.open_project.selection;
+                selection.addOption({ label: "No Projects", value: "" });
+                selection.set('disabled', true);
+
+                var open = rayage_ui.dialogs.open_project.open;
+                open.set('disabled', true);
+            }
+
             rayage_ui.dialogs.open_project.dialog.show();
         });
         
