@@ -51,6 +51,10 @@ function(topic, cookie){
             rayage_ws.send({"type": "project_list_request"});
         });
         
+        topic.subscribe("ui/dialogs/open_project/open", function(project) {
+            rayage_ws.send({"type": "open_project", "id": project});
+        });
+        
         topic.subscribe("ws/message/project_list", function(data) {
             rayage_ui.dialogs.open_project.setSelections(data.projects);
             rayage_ui.dialogs.open_project.dialog.show();

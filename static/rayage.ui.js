@@ -141,6 +141,7 @@ function(parser, on, topic, registry, ObjectStore, Memory){
         var value = rayage_ui.dialogs.open_project.selection.get("value");
         topic.publish("ui/dialogs/open_project/open", value);
     });
+    
     on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
         var value = rayage_ui.dialogs.new_project.dialog.hide();
     });
