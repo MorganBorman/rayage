@@ -100,6 +100,12 @@ secret_key = "foobarbaz" # A (hopefully) long string used to sign the session ke
 
 users = {"test": hashlib.sha256("password").hexdigest()}
 
+def current_user():
+    """
+    Stub method that returns the currently authenticated username.
+    """
+    return "test"
+
 session_timeout = 600
 
 # In the future these would need to be stored as seperate components rather than just the session cookie string
@@ -163,7 +169,9 @@ def handle_project_list_request(socket_connection, message):
     Writes a JSON structure representing the available projects to work on to our socket.
     Currently a flat list of folders in the STUDENTS_DIR
     """
-    projects = [{'label': p, 'id': p} for p in os.listdir(STUDENTS_DIR)]
+    projects = [{'label': p, 'id': p} for p in os.listdir(os.path.join(STUDENTS_DIR, current_user())) 
+                                      if os.path.isdir(os.path.join(STUDENTS_DIR, current_user(), p))]
+                                      
     result_message = {'type': 'project_list',
                       'projects': projects}
     socket_connection.write_message(json.dumps(result_message))
@@ -178,8 +186,8 @@ def handle_template_list_request(socket_connection, message):
     Use a "real" id of some sort (at least remove problematic chars)
 
     """
-
-    templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR)]
+    templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR) 
+                                       if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
     templates.insert(0, {'label': 'Empty Template', 'id': 'Empty Template'})
 
     result_message = {'type': 'template_list', 
