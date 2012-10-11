@@ -156,8 +156,6 @@ def handle_logout_request(socket_connection, message):
     socket_connection.write_message(json.dumps(result_message))
 
 @messageHandler("project_list_request")
-def handle_logout_request(socket_connection, message):
-    result_message = {'type': 'project_list', 'projects': [{'label': 'Hello World', 'id': 'hello_world'}, {'label': 'Another Example', 'id': 'another_example'}]}
     socket_connection.write_message(json.dumps(result_message))
 
 
