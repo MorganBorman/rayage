@@ -3,6 +3,8 @@ import json
 import hashlib
 import hmac
 import time
+import os
+from constants import *
 
 try:
     import Crypto.Random
@@ -156,6 +158,30 @@ def handle_logout_request(socket_connection, message):
     socket_connection.write_message(json.dumps(result_message))
 
 @messageHandler("project_list_request")
+def handle_project_list_request(socket_connection, message):
+    """
+    Writes a JSON structure representing the available projects to work on to our socket.
+    Currently a flat list of folders in the STUDENTS_DIR
+    """
+    projects = [{'label': p, 'id': p} for p in os.listdir(STUDENTS_DIR)]
+    result_message = {'type': 'project_list',
+                      'projects': projects}
     socket_connection.write_message(json.dumps(result_message))
 
+@messageHandler("template_list_request")
+def handle_template_list_request(socket_connection, message):
+    """
+    Writes a JSON structure representing the available templates to our socket.
+    Currently a flat list of folders in the TEMPLATES_DIR
 
+    TODO:
+    Use a "real" id of some sort (at least remove problematic chars)
+
+    """
+
+    templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR)]
+    templates.insert(0, {'label': 'Empty Template', 'id': 'Empty Template'})
+
+    result_message = {'type': 'template_list', 
+                      'templates': templates}
+    socket_connection.write_message(json.dumps(result_message))

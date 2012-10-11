@@ -38,6 +38,15 @@ function(topic, cookie){
             rayage_ws.send({"type": "logout_request"});
         });
         
+        topic.subscribe("ui/menus/project/new_project", function() {
+        	rayage_ws.send({"type": "template_list_request"});
+        });
+        
+        topic.subscribe("ws/message/template_list", function(data) {
+            rayage_ui.dialogs.new_project.setSelections(data.templates);
+            rayage_ui.dialogs.new_project.dialog.show();
+        });
+        
         topic.subscribe("ui/menus/project/open_project", function() {
             rayage_ws.send({"type": "project_list_request"});
         });

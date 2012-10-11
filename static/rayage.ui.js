@@ -93,11 +93,26 @@ function(parser, on, topic, registry, ObjectStore, Memory){
     ///////////////////////////////////////////////////////////////////////////
     // Setup our dialogs
     ///////////////////////////////////////////////////////////////////////////
-    
+
+    var template_selection_store = new Memory({data: []});
+    var template_selection_object_store = new ObjectStore({ objectStore: template_selection_store });
+        
     var project_selection_store = new Memory({data: []});
     var project_selection_object_store = new ObjectStore({ objectStore: project_selection_store });
     
     rayage_ui.dialogs = {
+        new_project: {
+            dialog: registry.byId("ui_dialogs_new_project"),
+            selection: registry.byId("ui_dialogs_new_project_selection"),
+            selection_store: template_selection_store,
+            selection_object_store: template_selection_object_store,
+            new_project: registry.byId("ui_dialogs_new_project_open"),
+            cancel: registry.byId("ui_dialogs_new_project_cancel"),
+            setSelections: function(selections) {
+                rayage_ui.dialogs.new_project.selection_store.setData(selections);
+                rayage_ui.dialogs.new_project.selection.setStore(rayage_ui.dialogs.new_project.selection_object_store);
+            },
+        },
         open_project: {
             dialog: registry.byId("ui_dialogs_open_project"),
             selection: registry.byId("ui_dialogs_open_project_selection"),
@@ -114,8 +129,20 @@ function(parser, on, topic, registry, ObjectStore, Memory){
     
     on(rayage_ui.dialogs.open_project.open, "click", function(evt){
         var value = rayage_ui.dialogs.open_project.selection.get("value");
-        
         topic.publish("ui/dialogs/open_project/open", value);
+    });
+    on(rayage_ui.dialogs.open_project.cancel, "click", function(evt){
+        var value = rayage_ui.dialogs.open_project.dialog.hide();
+    });
+
+
+    on(rayage_ui.dialogs.new_project.new_project, "click", function(evt){
+        // we can reuse open's code I think
+        var value = rayage_ui.dialogs.open_project.selection.get("value");
+        topic.publish("ui/dialogs/open_project/open", value);
+    });
+    on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
+        var value = rayage_ui.dialogs.new_project.dialog.hide();
     });
     
     // Let the rest of the application know our UI is set up
