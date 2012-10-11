@@ -4,6 +4,8 @@ import hashlib
 import hmac
 import time
 import os
+import errno
+import shutil
 from constants import *
 
 try:
@@ -100,6 +102,19 @@ secret_key = "foobarbaz" # A (hopefully) long string used to sign the session ke
 
 users = {"test": hashlib.sha256("password").hexdigest()}
 
+def current_user():
+    """
+    Stub method that returns the currently authenticated username.
+    """
+    return "test"
+def current_user_dir(*args):
+    """
+    Stub method that returns the path to the current user's projects folder.
+    """
+    if len(args) < 1:
+        return os.path.join(STUDENTS_DIR, current_user())
+    return os.path.join(STUDENTS_DIR, current_user(), os.path.join(*args))
+
 session_timeout = 600
 
 # In the future these would need to be stored as seperate components rather than just the session cookie string
@@ -163,7 +178,9 @@ def handle_project_list_request(socket_connection, message):
     Writes a JSON structure representing the available projects to work on to our socket.
     Currently a flat list of folders in the STUDENTS_DIR
     """
-    projects = [{'label': p, 'id': p} for p in os.listdir(STUDENTS_DIR)]
+    projects = [{'label': p, 'id': p} for p in os.listdir(current_user_dir()) 
+                                      if os.path.isdir(current_user_dir(p))]
+                                      
     result_message = {'type': 'project_list',
                       'projects': projects}
     socket_connection.write_message(json.dumps(result_message))
@@ -178,10 +195,40 @@ def handle_template_list_request(socket_connection, message):
     Use a "real" id of some sort (at least remove problematic chars)
 
     """
-
-    templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR)]
-    templates.insert(0, {'label': 'Empty Template', 'id': 'Empty Template'})
+    templates = [{'label': t, 'id': t} for t in os.listdir(TEMPLATES_DIR) 
+                                       if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
+    templates.insert(0, {'label': 'Empty Template', 'id': ''})
 
     result_message = {'type': 'template_list', 
                       'templates': templates}
     socket_connection.write_message(json.dumps(result_message))
+
+@messageHandler("new_project_request", ["name", "template"], True)
+def handle_new_project_request(socket_connection, message):
+    """
+    Handles new project requests by creating a directory in the user's projects folder.
+
+    TODO:
+    Send proper responses
+    """
+    name = message["name"]
+    template = message["template"]
+
+    try:
+        new_project_dir = current_user_dir(name)
+        if template:
+            shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
+        else:
+            os.makedirs(new_project_dir)
+        # TODO: Acknowledge success
+        socket_connection.write_message(json.dumps("TODO: Successful New Project"))
+    except shutil.Error as e:
+        # copytree error
+        # This exception collects exceptions that are raised during a multi-file operation. 
+        # For copytree(), the exception argument is a list of 3-tuples (srcname, dstname, exception).
+        # TODO: Double check this. Existing project folder always falls into OSError.
+        socket_connection.write_message(json.dumps("TODO: Missing template"))
+    except OSError as e:
+        # makedirs error
+        socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
+

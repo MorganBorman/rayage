@@ -104,6 +104,7 @@ function(parser, on, topic, registry, ObjectStore, Memory){
         new_project: {
             dialog: registry.byId("ui_dialogs_new_project"),
             selection: registry.byId("ui_dialogs_new_project_selection"),
+            name: registry.byId("ui_dialogs_new_project_name"),
             selection_store: template_selection_store,
             selection_object_store: template_selection_object_store,
             new_project: registry.byId("ui_dialogs_new_project_open"),
@@ -138,8 +139,9 @@ function(parser, on, topic, registry, ObjectStore, Memory){
 
     on(rayage_ui.dialogs.new_project.new_project, "click", function(evt){
         // we can reuse open's code I think
-        var value = rayage_ui.dialogs.open_project.selection.get("value");
-        topic.publish("ui/dialogs/open_project/open", value);
+        var name = rayage_ui.dialogs.new_project.name.get("value")
+        var template = rayage_ui.dialogs.new_project.selection.get("value");
+        topic.publish("ui/dialogs/new_project/new", name, template);
     });
     
     on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
