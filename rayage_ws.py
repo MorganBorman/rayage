@@ -105,6 +105,13 @@ def current_user():
     Stub method that returns the currently authenticated username.
     """
     return "test"
+def current_user_dir(*args):
+    """
+    Stub method that returns the path to the current user's projects folder.
+    """
+    if len(args) < 1:
+        return os.path.join(STUDENTS_DIR, current_user())
+    return os.path.join(STUDENTS_DIR, current_user(), os.path.join(*args))
 
 session_timeout = 600
 
@@ -169,8 +176,8 @@ def handle_project_list_request(socket_connection, message):
     Writes a JSON structure representing the available projects to work on to our socket.
     Currently a flat list of folders in the STUDENTS_DIR
     """
-    projects = [{'label': p, 'id': p} for p in os.listdir(os.path.join(STUDENTS_DIR, current_user())) 
-                                      if os.path.isdir(os.path.join(STUDENTS_DIR, current_user(), p))]
+    projects = [{'label': p, 'id': p} for p in os.listdir(current_user_dir()) 
+                                      if os.path.isdir(current_user_dir(p))]
                                       
     result_message = {'type': 'project_list',
                       'projects': projects}
