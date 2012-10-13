@@ -81,6 +81,22 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Sets the current project for the currently authenticated user."
         self._project = value
 
+    def notify(self, msg, severity="message", duration=1.5):
+        """
+        Displays a non-blocking message to the user with a duration in seconds
+        and one of the following severities: ["fatal", "error", "warning", "message"]
+
+        TODO: Theme the messages using CSS based on severity (Toaster.css)
+        """
+        severities = ["fatal", "error", "warning", "message"]
+        if severity not in severities:
+            severity = "message"
+
+        notification = {'type': 'notification',
+                         'message': msg,
+                         'duration': duration*1000}
+        self.write_message(json.dumps(notification))
+
     def open(self):
         print "WebSocket opened"
         
@@ -253,6 +269,7 @@ def handle_new_project_request(socket_connection, message):
         else:
             os.makedirs(new_project_dir)
         # TODO: Acknowledge success
+        socket_connection.notify("You made a new project!")
         socket_connection.write_message(json.dumps("TODO: Successful New Project"))
     except shutil.Error as e:
         # copytree error
