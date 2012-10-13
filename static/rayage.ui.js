@@ -1,9 +1,9 @@
 // This file will contain publishers and subscriber to topics for all direct manipulation of the UI (that is the public interface to the UI)
 
-require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dojo/domReady!", "dijit/MenuBar", 
-         "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", 
+require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dojo/domReady!", "dijit/MenuBar", 
+         "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", 
          "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
-function(parser, on, topic, registry, ObjectStore, Memory){
+function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     parser.parse();
     
     // Hook up all the subscribers which provide ways to manipulate the UI here
@@ -12,6 +12,42 @@ function(parser, on, topic, registry, ObjectStore, Memory){
     
     // Create an object to hold references to all the relevant UI components
     rayage_ui = new Object();
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Setup our panes
+    ///////////////////////////////////////////////////////////////////////////
+    
+    rayage_ui.editor = {
+        tab_container: registry.byId("ui_editor_tab_container"),
+        tabs: [], // Will hold high level references to the contents of each tab (like the code mirror instance
+    };
+    
+    rayage_ui.editor.addEditorTab = function(title, code) {
+        var tab_body = document.createElement('div');
+        
+        var pane = new ContentPane({ title: title, content: tab_body, iconClass:'rayage_icon rayage_icon_src_cpp' });
+        rayage_ui.editor.tab_container.addChild(pane);
+        
+        var editor = CodeMirror(tab_body, {
+            value: code,
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "clike",
+            theme: "neat",
+        });
+        
+        var tab = {
+            pane: pane,
+            editor: editor,
+            tab_body: tab_body,
+        };
+        
+        rayage_ui.editor.tabs.push(tab);
+    };
+    
+    rayage_ui.output = {
+        tab_container: registry.byId("ui_output_tab_container"),
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // Setup our menus

@@ -53,11 +53,18 @@ function(topic, cookie){
         topic.subscribe("ui/menus/project/open_project", function() {
             rayage_ws.send({"type": "project_list_request"});
         });
+        
+        topic.subscribe("ws/message/project_state", function(data) {
+            var project_id = data.id;
+            var files = data.files;
+            
+            for(var i = 0; i < files.length; i++) {
+                rayage_ui.editor.addEditorTab(files[i].filename, files[i].data);
+            }
+        });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
-            // stub method for open
-            alert("TODO: Open project.");
-            alert(JSON.stringify(data));
+            rayage_ws.send({"type": "open_project_request", 'id': data});
         });
 
         topic.subscribe("ws/message/project_list", function(data) {
@@ -72,6 +79,13 @@ function(topic, cookie){
 
                 var open = rayage_ui.dialogs.open_project.open;
                 open.set('disabled', true);
+            } else {
+                // If there are projects then enable the open and select elements.
+                var selection = rayage_ui.dialogs.open_project.selection;
+                selection.set('disabled', false);
+
+                var open = rayage_ui.dialogs.open_project.open;
+                open.set('disabled', false);
             }
 
             rayage_ui.dialogs.open_project.dialog.show();
@@ -118,40 +132,8 @@ function(topic, cookie){
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-// to be used to make enter key in the password box the same as clicking on the "login" button
-//onKeyUp:function(e){if(e.keyCode == dojo.keys.ENTER) {login();}}
-
-/*      // example of how to programmatically create an editor pane
-
-        function addEditorTab(pane) {
-            editor_tabs.addChild(pane);
-            editor_tabs.selectChild(pane);
-        }
-
-        
-        
-        
-        var delem = document.createElement('div');
-        
-        var pane = new ContentPane({ title:"hello.cpp", content: delem, iconClass:'rayage_icon rayage_icon_src_cpp' });
-        addEditorTab(pane);
-        
-        var code = "#include <iostream>\nusing namespace std;\n\nint main ()\n{\n\tcout << \"Hello World!\";     // prints Hello World!\n\tcout << \"I'm a C++ program\"; // prints I'm a C++ program\n\treturn 0;\n}\n";
-        
-        var editor = CodeMirror(delem, {
-            value: code,
-            lineNumbers: true,
-            matchBrackets: true,
-            mode: "clike",
-            theme: "neat",
-        });
-        
-    });
-});
-
-
 // Stuff below here is just kept for examples of how to work with dojo programmatically
-
+/*
 require(["dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dojo/ready"],
 function(BorderContainer, TabContainer,ContentPane, ready){
 	ready(function(){

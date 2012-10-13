@@ -42,6 +42,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     authenticated = False
     _username = None
+    _project = None
     
     @property
     def username(self):
@@ -66,6 +67,19 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             return os.path.join(STUDENTS_DIR, self.username)
             
         return os.path.join(STUDENTS_DIR, self.username, os.path.join(*args))
+        
+    @property
+    def project(self):
+        "Gets the current project for the currently authenticated user."
+        if self.username is None:
+            return None
+            
+        return _project
+        
+    @project.setter
+    def project(self, value):
+        "Sets the current project for the currently authenticated user."
+        self._project = value
 
     def open(self):
         print "WebSocket opened"
@@ -182,6 +196,10 @@ def handle_login_request(socket_connection, message):
 
 @messageHandler("logout_request")
 def handle_logout_request(socket_connection, message):
+    """
+    Handles logout requests.
+    """
+    socket_connect.authenticated = False
     # Need to use the stored (should be stored) username to clear any current sessions for that user
     result_message = {'type': 'logout_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
@@ -245,4 +263,42 @@ def handle_new_project_request(socket_connection, message):
     except OSError as e:
         # makedirs error
         socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
+
+@messageHandler("open_project_request", ["id"], True)
+def handle_open_project_request(socket_connection, message):
+    """
+    Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
+    """
+    project_id = message['id']
+    
+    project_dir = socket_connection.user_dir(project_id)
+
+    if project_dir is None:
+        return #TODO: generic error message
+
+    if not os.path.isdir(project_dir):
+        return #TODO: unknown project
+        
+    socket_connection.project = project_id
+    
+    def is_project_file(filename):
+        root, ext = os.path.splitext(filename)
+        return ext in PROJECT_DATA_EXTENSIONS
+    
+    project_files = filter(is_project_file, os.listdir(project_dir))
+    
+    project_file_data = []
+    for filename in project_files:
+        with open(os.path.join(project_dir, filename), "r") as f:
+            project_file_data.append({'filename': filename, 
+                                      'data': f.read(), 
+                                      'modified': False, 
+                                      'undo_data': None})
+    
+    project_state = {'type': 'project_state',
+                     'id': project_id,
+                     'files': project_file_data}
+    
+    socket_connection.write_message(json.dumps(project_state))
+
 
