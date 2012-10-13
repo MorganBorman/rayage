@@ -41,6 +41,31 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
 
     authenticated = False
+    _username = None
+    
+    @property
+    def username(self):
+        "Gets the currently authenticated username for this connection."
+        if not self.authenticated:
+            return None
+        return self._username
+        
+    @username.setter
+    def username(self, value):
+        "Sets the currently authenticated username for this connection."
+        self._username = value
+    
+    def user_dir(self, *args):
+        """
+        Returns paths within current user's projects folder.
+        """
+        if self.username is None:
+            return None
+        
+        if len(args) < 1:
+            return os.path.join(STUDENTS_DIR, self.username)
+            
+        return os.path.join(STUDENTS_DIR, self.username, os.path.join(*args))
 
     def open(self):
         print "WebSocket opened"
@@ -102,19 +127,6 @@ secret_key = "foobarbaz" # A (hopefully) long string used to sign the session ke
 
 users = {"test": hashlib.sha256("password").hexdigest()}
 
-def current_user():
-    """
-    Stub method that returns the currently authenticated username.
-    """
-    return "test"
-def current_user_dir(*args):
-    """
-    Stub method that returns the path to the current user's projects folder.
-    """
-    if len(args) < 1:
-        return os.path.join(STUDENTS_DIR, current_user())
-    return os.path.join(STUDENTS_DIR, current_user(), os.path.join(*args))
-
 session_timeout = 600
 
 # In the future these would need to be stored as seperate components rather than just the session cookie string
@@ -143,6 +155,7 @@ def handle_continue_session(socket_connection, message):
         username = cookie_value.split("&", 1)[0].split("=", 1)[1]
         if username in sessions.keys() and sessions[username] == cookie_value:
             socket_connection.authenticated = True
+            socket_connection.username = username
             session_cookie = generate_session_cookie(secret_key, username, session_timeout)
             sessions[username] = session_cookie
             result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
@@ -158,6 +171,7 @@ def handle_login_request(socket_connection, message):
     
     if username in users.keys() and password == users[username]:
         socket_connection.authenticated = True
+        socket_connection.username = username
         session_cookie = generate_session_cookie(secret_key, username, session_timeout)
         sessions[username] = session_cookie
         result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
@@ -178,8 +192,8 @@ def handle_project_list_request(socket_connection, message):
     Writes a JSON structure representing the available projects to work on to our socket.
     Currently a flat list of folders in the STUDENTS_DIR
     """
-    projects = [{'label': p, 'id': p} for p in os.listdir(current_user_dir()) 
-                                      if os.path.isdir(current_user_dir(p))]
+    projects = [{'label': p, 'id': p} for p in os.listdir(socket_connection.user_dir()) 
+                                      if os.path.isdir(socket_connection.user_dir(p))]
                                       
     result_message = {'type': 'project_list',
                       'projects': projects}
@@ -215,7 +229,7 @@ def handle_new_project_request(socket_connection, message):
     template = message["template"]
 
     try:
-        new_project_dir = current_user_dir(name)
+        new_project_dir = socket_connection.user_dir(name)
         if template:
             shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
         else:
