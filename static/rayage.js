@@ -63,15 +63,18 @@ function(topic, cookie){
         topic.subscribe("ws/message/project_list", function(data) {
             rayage_ui.dialogs.open_project.setSelections(data.projects);
 
-            // Set up form when no projects exist.
+            // Toggle Project List form between projects and no projects state
+            var open = rayage_ui.dialogs.open_project.open;
+            var selection = rayage_ui.dialogs.open_project.selection;
             if (data.projects.length < 1) {
                 // Add a no projects option and disable open and select elements.
-                var selection = rayage_ui.dialogs.open_project.selection;
                 selection.addOption({ label: "No Projects", value: "" });
                 selection.set('disabled', true);
-
-                var open = rayage_ui.dialogs.open_project.open;
                 open.set('disabled', true);
+            }
+            else {
+                selection.set('disabled', false);
+                open.set('disabled', false);         
             }
 
             rayage_ui.dialogs.open_project.dialog.show();
