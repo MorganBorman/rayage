@@ -32,6 +32,7 @@ function(parser, on, topic, registry, ObjectStore, Memory){
         },
         login: {
             menu: registry.byId("ui_menus_login"),
+            dialog: registry.byId("ui_menus_login_dialog"),
             username: registry.byId("ui_menus_login_username"),
             password: registry.byId("ui_menus_login_password"),
             button: registry.byId("ui_menus_login_button"),
@@ -43,6 +44,7 @@ function(parser, on, topic, registry, ObjectStore, Memory){
     
     rayage_ui.menus.login.menu.setVisible = function(value) {
         rayage_ui.menus.login.menu.domNode.style.display = (value ? "inline" : "none");
+        rayage_ui.menus.login.dialog.domNode.style.display = (value ? "inline" : "none");;
     }
     
     rayage_ui.menus.logout.setVisible = function(value) {
@@ -79,15 +81,30 @@ function(parser, on, topic, registry, ObjectStore, Memory){
     
     // Login/Logout
     
-    on(rayage_ui.menus.login.button, "click", function(evt){
+    var login_method = function(evt){
         var username = rayage_ui.menus.login.username.value;
         var password = rayage_ui.menus.login.password.value;
         
         topic.publish("ui/menus/login", username, password);
-    });
+    }
+    on(rayage_ui.menus.login.button, "click", login_method);
     
     on(rayage_ui.menus.logout, "click", function(evt){
         topic.publish("ui/menus/logout");
+    });
+    
+    // some handlers to make the login tooltipdialog respond to pressing the enter key correctly
+    on(rayage_ui.menus.login.username, "keyup", function(evt){
+        if (evt.keyCode == dojo.keys.ENTER) {
+            rayage_ui.menus.login.password.focus();
+        }
+    });
+    
+    on(rayage_ui.menus.login.password, "keyup", function(evt){
+        if (evt.keyCode == dojo.keys.ENTER) {
+            rayage_ui.menus.login.button.focus();
+            login_method();
+        }
     });
     
     ///////////////////////////////////////////////////////////////////////////
