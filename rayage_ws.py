@@ -199,7 +199,7 @@ def handle_logout_request(socket_connection, message):
     """
     Handles logout requests.
     """
-    socket_connect.authenticated = False
+    socket_connection.authenticated = False
     # Need to use the stored (should be stored) username to clear any current sessions for that user
     result_message = {'type': 'logout_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))

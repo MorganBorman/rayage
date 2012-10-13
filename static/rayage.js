@@ -81,15 +81,8 @@ function(topic, cookie){
                 open.set('disabled', true);
             } else {
                 // If there are projects then enable the open and select elements.
-                var selection = rayage_ui.dialogs.open_project.selection;
                 selection.set('disabled', false);
-
-                var open = rayage_ui.dialogs.open_project.open;
                 open.set('disabled', false);
-            }
-            else {
-                selection.set('disabled', false);
-                open.set('disabled', false);         
             }
 
             rayage_ui.dialogs.open_project.dialog.show();
