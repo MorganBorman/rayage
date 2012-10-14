@@ -6,12 +6,33 @@ $.pnotify.defaults.width = "500px";
 
 require(["dojo/topic"],
 function(topic){
-    topic.subscribe("console/log", function(message) {
+    topic.subscribe("notify/notice", function(message) {
+        $(function(){
+	        $.pnotify({
+	            type: "notice",
+		        text: message.message,
+		        delay: message.duration
+	        });
+        });
+    });
+    
+    topic.subscribe("notify/info", function(message) {
         $(function(){
 	        $.pnotify({
 	            type: "info",
-		        title: 'console.log',
 		        text: message.message,
+		        icon: 'rayage_icon rayage_icon_notify_info',
+		        delay: message.duration
+	        });
+        });
+    });
+    
+    topic.subscribe("notify/success", function(message) {
+        $(function(){
+	        $.pnotify({
+	            type: "success",
+		        text: message.message,
+		        icon: 'rayage_icon rayage_icon_notify_info',
 		        delay: message.duration
 	        });
         });
@@ -22,6 +43,7 @@ function(topic){
 	        $.pnotify({
 	            type: "error",
 		        text: message.message,
+		        icon: 'rayage_icon rayage_icon_notify_error',
 		        delay: message.duration
 	        });
         });
@@ -32,6 +54,7 @@ function(topic){
 	        $.pnotify({
 	            pnotify_type: message.severity,
 		        pnotify_text: message.message,
+		        icon: 'rayage_icon rayage_icon_notify_' + message.severity,
 		        pnotify_delay: message.duration
 	        });
         });

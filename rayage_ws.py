@@ -100,7 +100,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print "WebSocket opened"
-        self.notify("Test notification from server");
         
     def access_denied(self):
         self.write_message(json.dumps({"type": "access_denied", "reason": "not authenticated"}))

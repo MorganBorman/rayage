@@ -82,6 +82,10 @@
     background: url(/images/oxygen/notify-info.png);
 }
 
+.rayage_icon_notify_success {
+    background: url(/images/oxygen/notify-success.png);
+}
+
 .rayage_icon_notify_warning {
     background: url(/images/oxygen/notify-warning.png);
 }

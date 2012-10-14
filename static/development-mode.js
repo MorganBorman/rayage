@@ -5,10 +5,16 @@
 var old_log = console.log;
 
 console.log = function() {
-    dojo.publish("console/log", 
-                 [{
-                    message: [].slice.apply(arguments).join(" "),
-                    duration: 2000
-                   }]);
+    var console_log_arguments = arguments;          
+    $(function(){
+        $.pnotify({
+            type: "info",
+	        title: 'console.log',
+	        text: [].slice.apply(console_log_arguments).join(" "),
+	        icon: 'rayage_icon rayage_icon_console',
+	        delay: 2000
+        });
+    });
+                   
     old_log.apply(this,arguments);
 };
