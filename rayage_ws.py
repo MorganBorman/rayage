@@ -207,6 +207,7 @@ def handle_login_request(socket_connection, message):
         session_cookie = generate_session_cookie(secret_key, username, session_timeout)
         sessions[username] = session_cookie
         result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
+        socket_connection.notify("Now logged in.", "success")
     else:
         result_message = {'type': 'login_failure'}
         
