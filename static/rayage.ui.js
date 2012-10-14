@@ -27,6 +27,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         
         var pane = new ContentPane({ title: title, content: tab_body, iconClass:'rayage_icon rayage_icon_src_cpp' });
         rayage_ui.editor.tab_container.addChild(pane);
+        rayage_ui.editor.tab_container.selectChild(pane);
         
         var editor = CodeMirror(tab_body, {
             value: code,
