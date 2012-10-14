@@ -88,17 +88,19 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         TODO: Theme the messages using CSS based on severity (Toaster.css)
         """
-        severities = ["fatal", "error", "warning", "message"]
+        severities = ["notice", "info", "success", "error"]
         if severity not in severities:
-            severity = "message"
+            severity = "notice"
 
         notification = {'type': 'notification',
                          'message': msg,
-                         'duration': duration*1000}
+                         'duration': duration*1000,
+                         'severity': severity}
         self.write_message(json.dumps(notification))
 
     def open(self):
         print "WebSocket opened"
+        self.notify("Test notification from server");
         
     def access_denied(self):
         self.write_message(json.dumps({"type": "access_denied", "reason": "not authenticated"}))

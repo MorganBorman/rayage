@@ -101,7 +101,7 @@ function(topic, cookie){
         });
         
         topic.subscribe("ws/message/login_failure", function() {
-            alert("login failed, try again.");
+            topic.publish("notify/error", {message: "Login failed. Please try again.", duration: 5000});
         });
         
         topic.subscribe("ws/message/logout_acknowledge", function() {
