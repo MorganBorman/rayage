@@ -7,93 +7,93 @@
 }
 
 .rayage_icon_clear {
-    background: url(/images/clear.png);
+    background: url(/images/oxygen/clear.png);
 }
 
 .rayage_icon_search {
-    background: url(/images/search.png);
+    background: url(/images/oxygen/search.png);
 }
 
 .rayage_icon_console {
-    background: url(/images/console.png);
+    background: url(/images/oxygen/console.png);
 }
 
 .rayage_icon_build {
-    background: url(/images/build.png);
+    background: url(/images/oxygen/build.png);
 }
 
 .rayage_icon_help {
-    background: url(/images/help.png);
+    background: url(/images/oxygen/help.png);
 }
 
 .rayage_icon_authenticate {
-    background: url(/images/authenticate.png);
+    background: url(/images/oxygen/authenticate.png);
 }
 
 .rayage_icon_open_project {
-    background: url(/images/open-project.png);
+    background: url(/images/oxygen/open-project.png);
 }
 
 .rayage_icon_new_project {
-    background: url(/images/new-project.png);
+    background: url(/images/oxygen/new-project.png);
 }
 
 .rayage_icon_new_source {
-    background: url(/images/new-src.png);
+    background: url(/images/oxygen/new-src.png);
 }
 
 .rayage_icon_delete_project {
-    background: url(/images/delete-project.png);
+    background: url(/images/oxygen/delete-project.png);
 }
 
 .rayage_icon_delete_source {
-    background: url(/images/delete-src.png);
+    background: url(/images/oxygen/delete-src.png);
 }
 
 .rayage_icon_edit_copy {
-    background: url(/images/edit-copy.png);
+    background: url(/images/oxygen/edit-copy.png);
 }
 
 .rayage_icon_edit_cut {
-    background: url(/images/edit-cut.png);
+    background: url(/images/oxygen/edit-cut.png);
 }
 
 .rayage_icon_edit_paste {
-    background: url(/images/edit-paste.png);
+    background: url(/images/oxygen/edit-paste.png);
 }
 
 .rayage_icon_edit_select_all {
-    background: url(/images/edit-select-all.png);
+    background: url(/images/oxygen/edit-select-all.png);
 }
 
 .rayage_icon_src_c {
-    background: url(/images/text-x-csrc.png);
+    background: url(/images/oxygen/text-x-csrc.png);
 }
 
 .rayage_icon_src_cpp {
-    background: url(/images/text-x-cppsrc.png);
+    background: url(/images/oxygen/text-x-cppsrc.png);
 }
 
 .rayage_icon_src_txt {
-    background: url(/images/text-x-generic.png);
+    background: url(/images/oxygen/text-x-generic.png);
 }
 
 .rayage_icon_notify_info {
-    background: url(/images/notify-info.png);
+    background: url(/images/oxygen/notify-info.png);
 }
 
 .rayage_icon_notify_warning {
-    background: url(/images/notify-warning.png);
+    background: url(/images/oxygen/notify-warning.png);
 }
 
 .rayage_icon_notify_error {
-    background: url(/images/notify-error.png);
+    background: url(/images/oxygen/notify-error.png);
 }
 
 .rayage_icon_socket_connected {
-    background: url(/images/socket-connected.png);
+    background: url(/images/oxygen/socket-connected.png);
 }
 
 .rayage_icon_socket_disconnected {
-    background: url(/images/socket-disconnected.png);
+    background: url(/images/oxygen/socket-disconnected.png);
 }
