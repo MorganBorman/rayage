@@ -1,12 +1,19 @@
 // This is where we hook up the correct dojo topics to the pnotify messages.
 
+$.pnotify.defaults.styling = "jqueryui";
+$.pnotify.defaults.history = false;
+
 require(["dojo/topic"],
 function(topic){
-    $(function(){
-	    $.pnotify({
-		    pnotify_title: 'Sticky Notice',
-		    pnotify_text: 'I\'m a sticky notice.',
-		    pnotify_hide: false
-	    });
+    topic.subscribe("console/log", function(message) {
+        $(function(){
+	        $.pnotify({
+	            pnotify_type: "info",
+		        pnotify_title: 'console.log',
+		        pnotify_text: message.message,
+		        pnotify_delay: message.duration,
+		        pnotify_width: "500px"
+	        });
+        });
     });
 });

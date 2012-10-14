@@ -8,6 +8,11 @@
 
 		<link rel="stylesheet" href="/styles/style.css" media="screen">
         <link rel="stylesheet" href="/styles/icons.css" media="screen">
+        
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+        <script type="text/javascript" src="jquery.pnotify.js"></script>
+		<link type="text/css" rel="stylesheet" href="/styles/jquery.pnotify.default.css" />
 		
 		<script src="/sha256.js"></script>
         
@@ -24,6 +29,7 @@
 		<script src="development-mode.js"></script>
 
 		<script src="rayage.js"></script>
+		<script src="rayage.notify.js"></script>
 		<script src="rayage.ui.js"></script>
 		<script src="rayage.ws.js"></script>
 
@@ -34,9 +40,6 @@
 
 	</head>
 	<body class="claro">
-
-        <div data-dojo-type="dojox.widget.Toaster" data-dojo-props="positionDirection:'br-left', messageTopic:'ws/message/notification'" id="notifications"></div>
-        <div data-dojo-type="dojox.widget.Toaster" data-dojo-props="positionDirection:'tr-left', messageTopic:'console/log'" id="debug"></div>
 
         <div data-dojo-type="dijit/MenuBar" id="ui_menus">
             <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_project">
