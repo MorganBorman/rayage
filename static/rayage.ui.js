@@ -168,6 +168,19 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
                 rayage_ui.dialogs.new_project.selection.setStore(rayage_ui.dialogs.new_project.selection_object_store);
             },
         },
+        new_file: {
+            dialog: registry.byId("ui_dialogs_new_file"),
+            selection: registry.byId("ui_dialogs_new_file_selection"),
+            name: registry.byId("ui_dialogs_new_file_name"),
+            selection_store: template_selection_store,
+            selection_object_store: template_selection_object_store,
+            new_file: registry.byId("ui_dialogs_new_file_new"),
+            cancel: registry.byId("ui_dialogs_new_file_cancel"),
+            setSelections: function(selections) {
+                rayage_ui.dialogs.new_file.selection_store.setData(selections);
+                rayage_ui.dialogs.new_file.selection.setStore(rayage_ui.dialogs.new_file.selection_object_store);
+            },
+        },
         open_project: {
             dialog: registry.byId("ui_dialogs_open_project"),
             selection: registry.byId("ui_dialogs_open_project_selection"),
@@ -182,17 +195,18 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         }
     };
     
+    // Open project dialog
     on(rayage_ui.dialogs.open_project.open, "click", function(evt){
         var value = rayage_ui.dialogs.open_project.selection.get("value");
         topic.publish("ui/dialogs/open_project/open", value);
     });
+    
     on(rayage_ui.dialogs.open_project.cancel, "click", function(evt){
         var value = rayage_ui.dialogs.open_project.dialog.hide();
     });
 
-
+    // New project dialog
     on(rayage_ui.dialogs.new_project.new_project, "click", function(evt){
-        // we can reuse open's code I think
         var name = rayage_ui.dialogs.new_project.name.get("value")
         var template = rayage_ui.dialogs.new_project.selection.get("value");
         topic.publish("ui/dialogs/new_project/new", name, template);
@@ -200,6 +214,17 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     
     on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
         var value = rayage_ui.dialogs.new_project.dialog.hide();
+    });
+    
+    // New file dialog
+    on(rayage_ui.dialogs.new_file.new_file, "click", function(evt){
+        var name = rayage_ui.dialogs.new_file.name.get("value")
+        var type = rayage_ui.dialogs.new_file.selection.get("value");
+        topic.publish("ui/dialogs/new_file/new", name, type);
+    });
+    
+    on(rayage_ui.dialogs.new_file.cancel, "click", function(evt){
+        var value = rayage_ui.dialogs.new_file.dialog.hide();
     });
     
     // Let the rest of the application know our UI is set up

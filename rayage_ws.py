@@ -252,6 +252,18 @@ def handle_template_list_request(socket_connection, message):
     result_message = {'type': 'template_list', 
                       'templates': templates}
     socket_connection.write_message(json.dumps(result_message))
+    
+@messageHandler("file_type_list_request")
+def handle_file_type_list_request(socket_connection, message):
+    """
+    Writes a JSON structure representing the available file types which may be created to our socket.
+    """                
+    types = [{'label': t, 'id': t} for t in PROJECT_DATA_EXTENSIONS]
+         
+    result_message = {'type': 'file_type_list',
+                      'types': types}
+                      
+    socket_connection.write_message(json.dumps(result_message))
 
 @messageHandler("new_project_request", ["name", "template"], True)
 def handle_new_project_request(socket_connection, message):
@@ -271,16 +283,18 @@ def handle_new_project_request(socket_connection, message):
         else:
             os.makedirs(new_project_dir)
         # TODO: Acknowledge success
-        socket_connection.notify("You made a new project!")
+        socket_connection.notify("You made a new project!", "success")
         socket_connection.write_message(json.dumps("TODO: Successful New Project"))
     except shutil.Error as e:
         # copytree error
         # This exception collects exceptions that are raised during a multi-file operation. 
         # For copytree(), the exception argument is a list of 3-tuples (srcname, dstname, exception).
         # TODO: Double check this. Existing project folder always falls into OSError.
+        socket_connection.notify("Unknown project template.", "error")
         socket_connection.write_message(json.dumps("TODO: Missing template"))
     except OSError as e:
         # makedirs error
+        socket_connection.notify("Project already exists.", "error")
         socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
 
 @messageHandler("open_project_request", ["id"], True)

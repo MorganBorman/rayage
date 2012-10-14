@@ -42,6 +42,15 @@ function(topic, cookie){
         	rayage_ws.send({"type": "template_list_request"});
         });
         
+        topic.subscribe("ui/menus/project/new_file", function() {
+        	rayage_ws.send({"type": "file_type_list_request"});
+        });
+        
+        topic.subscribe("ws/message/file_type_list", function(data) {
+            rayage_ui.dialogs.new_file.setSelections(data.types);
+            rayage_ui.dialogs.new_file.dialog.show();
+        });
+        
         topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
             rayage_ws.send({"type": "new_project_request", "name": name, "template": template});
             rayage_ui.dialogs.new_project.dialog.hide();
