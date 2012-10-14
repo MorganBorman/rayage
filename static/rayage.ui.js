@@ -2,7 +2,7 @@
 
 require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dojo/domReady!", "dijit/MenuBar", 
          "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", 
-         "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
+         "dijit/Dialog", "dijit/form/Select", "dojox/widget/Toaster", "dijit/TooltipDialog", "dijit/form/TextBox"],
 function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     parser.parse();
     
