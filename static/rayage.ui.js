@@ -18,6 +18,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     ///////////////////////////////////////////////////////////////////////////
     
     rayage_ui.editor = {
+        welcome_tab: registry.byId("ui_editor_welcome_tab"),
         tab_container: registry.byId("ui_editor_tab_container"),
         tabs: [], // Will hold high level references to the contents of each tab (like the code mirror instance
     };
@@ -59,7 +60,10 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
             menu: registry.byId("ui_menus_project"),
             new_project: registry.byId("ui_menus_project_new_project"),
             open_project: registry.byId("ui_menus_project_open_project"),
+            delete_project: registry.byId("ui_menus_project_delete_project"),
             new_file: registry.byId("ui_menus_project_new_file"),
+            delete_file: registry.byId("ui_menus_project_delete_file"),
+            close_project: registry.byId("ui_menus_project_close_project"),
         },
         edit: {
             menu: registry.byId("ui_menus_edit"),
@@ -99,8 +103,20 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         topic.publish("ui/menus/project/open_project");
     });
 
+    on(rayage_ui.menus.project.delete_project, "click", function(evt){
+        topic.publish("ui/menus/project/delete_project");
+    });
+
     on(rayage_ui.menus.project.new_file, "click", function(evt){
         topic.publish("ui/menus/project/new_file");
+    });
+
+    on(rayage_ui.menus.project.delete_file, "click", function(evt){
+        topic.publish("ui/menus/project/delete_file");
+    });
+
+    on(rayage_ui.menus.project.close_project, "click", function(evt){
+        topic.publish("ui/menus/project/close_project");
     });
 
     // Edit menu

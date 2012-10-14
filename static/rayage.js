@@ -73,6 +73,8 @@ function(topic, cookie){
                 rayage_ui.editor.addEditorTab(files[i].filename, files[i].data);
             }
             
+            rayage_ui.editor.tab_container.removeChild(rayage_ui.editor.welcome_tab);
+            
             rayage_ui.dialogs.open_project.dialog.hide();
         });
 

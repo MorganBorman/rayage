@@ -34,6 +34,10 @@
     background: url(/images/oxygen/open-project.png);
 }
 
+.rayage_icon_close_project {
+    background: url(/images/oxygen/close-project.png);
+}
+
 .rayage_icon_new_project {
     background: url(/images/oxygen/new-project.png);
 }
