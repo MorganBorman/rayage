@@ -73,3 +73,27 @@
 .rayage_icon_src_cpp {
     background: url(/images/text-x-cppsrc.png);
 }
+
+.rayage_icon_src_txt {
+    background: url(/images/text-x-generic.png);
+}
+
+.rayage_icon_notify_info {
+    background: url(/images/notify-info.png);
+}
+
+.rayage_icon_notify_warning {
+    background: url(/images/notify-warning.png);
+}
+
+.rayage_icon_notify_error {
+    background: url(/images/notify-error.png);
+}
+
+.rayage_icon_socket_connected {
+    background: url(/images/socket-connected.png);
+}
+
+.rayage_icon_socket_disconnected {
+    background: url(/images/socket-disconnected.png);
+}
