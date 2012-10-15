@@ -19,18 +19,24 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     
     rayage_ui.editor = {
         welcome_tab: registry.byId("ui_editor_welcome_tab"),
-        tab_container: registry.byId("ui_editor_tab_container"),
-        tabs: [], // Will hold high level references to the contents of each tab (like the code mirror instance
+        tab_container: registry.byId("ui_editor_tab_container")
     };
     
+    on(rayage_ui.editor.tab_container, "selectChild", function() {
+        var nval = rayage_ui.editor.tab_container.selectedChildWidget;
+        topic.publish("ui/editor/tab_change", nval);
+    });
+    
+    rayage_ui.editor.tab_container.watch("selectedChildWidget", function(name, oval, nval){
+        topic.publish("ui/editor/tab_change", nval);
+    });
+    
     rayage_ui.editor.addEditorTab = function(title, code) {
-        var tab_body = document.createElement('div');
+        var pane = new ContentPane({ title: title, content: "", iconClass:'rayage_icon rayage_icon_src_cpp' });
         
-        var pane = new ContentPane({ title: title, content: tab_body, iconClass:'rayage_icon rayage_icon_src_cpp' });
         rayage_ui.editor.tab_container.addChild(pane);
-        rayage_ui.editor.tab_container.selectChild(pane);
         
-        var editor = CodeMirror(tab_body, {
+        var editor = CodeMirror(pane.domNode, {
             value: code,
             lineNumbers: true,
             matchBrackets: true,
@@ -38,13 +44,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
             theme: "neat",
         });
         
-        var tab = {
-            pane: pane,
-            editor: editor,
-            tab_body: tab_body,
-        };
-        
-        rayage_ui.editor.tabs.push(tab);
+        pane.editor = editor;
+        rayage_ui.editor.tab_container.selectChild(pane);
     };
     
     rayage_ui.output = {

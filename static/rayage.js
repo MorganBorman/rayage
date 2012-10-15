@@ -65,13 +65,18 @@ function(topic, cookie){
             rayage_ws.send({"type": "close_project_request"});
         });
         
+        topic.subscribe("ui/editor/tab_change", function(current_tab) {
+            window.setTimeout(function(){
+                var disable_edit_menu = (current_tab.editor == undefined);
+                rayage_ui.menus.edit.menu.set("disabled", disable_edit_menu);
+            }, 1);
+        });
+        
         topic.subscribe("ws/message/close_project_acknowledge", function() {
             var editor_tab_children = rayage_ui.editor.tab_container.getChildren();
             for(var i = 0; i < editor_tab_children.length; i++) {
                 rayage_ui.editor.tab_container.removeChild(editor_tab_children[i]);
             }
-            
-            rayage_ui.editor.tabs.length = 0;
         
             rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
         });
