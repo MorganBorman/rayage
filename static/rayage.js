@@ -61,11 +61,31 @@ function(topic, cookie){
             rayage_ui.dialogs.new_project.dialog.show();
         });
         
+        topic.subscribe("ui/menus/project/close_project", function() {
+            rayage_ws.send({"type": "close_project_request"});
+        });
+        
+        topic.subscribe("ws/message/close_project_acknowledge", function() {
+            var editor_tab_children = rayage_ui.editor.tab_container.getChildren();
+            for(var i = 0; i < editor_tab_children.length; i++) {
+                rayage_ui.editor.tab_container.removeChild(editor_tab_children[i]);
+            }
+            
+            rayage_ui.editor.tabs.length = 0;
+        
+            rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
+        });
+        
         topic.subscribe("ui/menus/project/open_project", function() {
             rayage_ws.send({"type": "project_list_request"});
         });
         
         topic.subscribe("ws/message/project_state", function(data) {
+            var editor_tab_children = rayage_ui.editor.tab_container.getChildren();
+            for(var i = 0; i < editor_tab_children.length; i++) {
+                rayage_ui.editor.tab_container.removeChild(editor_tab_children[i]);
+            }
+        
             var project_id = data.id;
             var files = data.files;
             
@@ -73,9 +93,8 @@ function(topic, cookie){
                 rayage_ui.editor.addEditorTab(files[i].filename, files[i].data);
             }
             
-            rayage_ui.editor.tab_container.removeChild(rayage_ui.editor.welcome_tab);
-            
             rayage_ui.dialogs.open_project.dialog.hide();
+            rayage_ui.dialogs.new_project.dialog.hide();
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {

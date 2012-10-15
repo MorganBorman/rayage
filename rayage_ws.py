@@ -234,6 +234,16 @@ def handle_project_list_request(socket_connection, message):
     result_message = {'type': 'project_list',
                       'projects': projects}
     socket_connection.write_message(json.dumps(result_message))
+    
+@messageHandler("close_project_request")
+def handle_logout_request(socket_connection, message):
+    """
+    Sets the current project for the given socket_connection to None and returns an
+    acknowledgement that the project has been closed.
+    """
+    socket_connection.project = None
+    result_message = {'type': 'close_project_acknowledge'}
+    socket_connection.write_message(json.dumps(result_message))
 
 @messageHandler("template_list_request")
 def handle_template_list_request(socket_connection, message):
