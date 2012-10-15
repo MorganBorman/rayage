@@ -71,6 +71,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
             cut: registry.byId("ui_menus_edit_cut"),
             copy: registry.byId("ui_menus_edit_copy"),
             paste: registry.byId("ui_menus_edit_paste"),
+            select_all: registry.byId("ui_menus_edit_select_all"),
         },
         login: {
             menu: registry.byId("ui_menus_login"),
@@ -131,6 +132,10 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     
     on(rayage_ui.menus.edit.paste, "click", function(evt){
         topic.publish("ui/menus/edit/paste");
+    });
+    
+    on(rayage_ui.menus.edit.select_all, "click", function(evt){
+        topic.publish("ui/menus/edit/select_all");
     });
     
     // Login/Logout

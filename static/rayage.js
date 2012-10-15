@@ -51,6 +51,16 @@ function(topic, cookie){
             rayage_ui.dialogs.new_file.dialog.show();
         });
         
+        topic.subscribe("ui/menus/edit/select_all", function() {
+        	var editor = rayage_ui.editor.tab_container.selectedChildWidget.editor;
+        	var lines = editor.lineCount();
+        	
+        	start = {line: 0, ch: 0};
+        	end = {line: lines, ch: 0};
+        	
+        	editor.setSelection(start, end);
+        });
+        
         topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
             rayage_ws.send({"type": "new_project_request", "name": name, "template": template});
             rayage_ui.dialogs.new_project.dialog.hide();
@@ -145,6 +155,10 @@ function(topic, cookie){
             rayage_ui.menus.login.menu.setVisible(true);
             
             cookie("rayage_session", null, { expires: -1, secure: true });
+        });
+        
+        topic.subscribe("ws/connection/closed", function() {
+            topic.publish("notify/disconnected");
         });
         
         topic.subscribe("ws/connection/opened", function() {

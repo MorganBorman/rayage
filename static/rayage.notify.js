@@ -59,4 +59,15 @@ function(topic){
 	        });
         });
     });
+    
+    topic.subscribe("notify/disconnected", function(message) {
+        $(function(){
+	        $.pnotify({
+	            type: "error",
+		        text: "The connection to the server has been lost.\nTry reloading the page.",
+		        icon: 'rayage_icon rayage_icon_socket_disconnected',
+		        hide: false
+	        });
+        });
+    });
 });
