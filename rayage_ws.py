@@ -192,8 +192,7 @@ def handle_continue_session(socket_connection, message):
             result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
             socket_connection.write_message(json.dumps(result_message))
             return
-    result_message = {'type': 'login_failure'}
-    socket_connection.write_message(json.dumps(result_message))
+    socket_connection.notify("Session expired. Please login again.", "error")
     
 @messageHandler("login_request", ["username", "password"], False)
 def handle_login_request(socket_connection, message):
@@ -206,11 +205,10 @@ def handle_login_request(socket_connection, message):
         session_cookie = generate_session_cookie(secret_key, username, session_timeout)
         sessions[username] = session_cookie
         result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
+        socket_connection.write_message(json.dumps(result_message))
         socket_connection.notify("Now logged in.", "success")
     else:
-        result_message = {'type': 'login_failure'}
-        
-    socket_connection.write_message(json.dumps(result_message))
+        socket_connection.notify("Login failed. Please try again.", "error")
 
 @messageHandler("logout_request")
 def handle_logout_request(socket_connection, message):

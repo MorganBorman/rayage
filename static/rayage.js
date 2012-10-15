@@ -155,10 +155,6 @@ function(topic, cookie){
             cookie("rayage_session", data.session_cookie, { expires: expiry_date, secure: true });
         });
         
-        topic.subscribe("ws/message/login_failure", function() {
-            topic.publish("notify/error", {message: "Login failed. Please try again.", duration: 5000});
-        });
-        
         topic.subscribe("ws/message/logout_acknowledge", function() {
             rayage_ui.menus.project.menu.set("disabled", true);
             rayage_ui.menus.logout.setVisible(false);
