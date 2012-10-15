@@ -68,6 +68,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         },
         edit: {
             menu: registry.byId("ui_menus_edit"),
+            undo: registry.byId("ui_menus_edit_undo"),
+            redo: registry.byId("ui_menus_edit_redo"),
             cut: registry.byId("ui_menus_edit_cut"),
             copy: registry.byId("ui_menus_edit_copy"),
             paste: registry.byId("ui_menus_edit_paste"),
@@ -122,6 +124,14 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     });
 
     // Edit menu
+    on(rayage_ui.menus.edit.undo, "click", function(evt){
+        topic.publish("ui/menus/edit/undo");
+    });
+    
+    on(rayage_ui.menus.edit.redo, "click", function(evt){
+        topic.publish("ui/menus/edit/redo");
+    });
+    
     on(rayage_ui.menus.edit.cut, "click", function(evt){
         topic.publish("ui/menus/edit/cut");
     });

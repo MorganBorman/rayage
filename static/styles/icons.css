@@ -54,6 +54,14 @@
     background: url(/images/oxygen/delete-src.png);
 }
 
+.rayage_icon_edit_undo {
+    background: url(/images/oxygen/edit-undo.png);
+}
+
+.rayage_icon_edit_redo {
+    background: url(/images/oxygen/edit-redo.png);
+}
+
 .rayage_icon_edit_copy {
     background: url(/images/oxygen/edit-copy.png);
 }

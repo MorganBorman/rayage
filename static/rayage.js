@@ -51,6 +51,16 @@ function(topic, cookie){
             rayage_ui.dialogs.new_file.dialog.show();
         });
         
+        topic.subscribe("ui/menus/edit/undo", function() {
+        	var editor = rayage_ui.editor.tab_container.selectedChildWidget.editor;
+        	editor.undo();
+        });
+        
+        topic.subscribe("ui/menus/edit/redo", function() {
+        	var editor = rayage_ui.editor.tab_container.selectedChildWidget.editor;
+        	editor.redo();
+        });
+        
         topic.subscribe("ui/menus/edit/select_all", function() {
         	var editor = rayage_ui.editor.tab_container.selectedChildWidget.editor;
         	var lines = editor.lineCount();
