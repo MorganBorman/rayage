@@ -1,3 +1,16 @@
+var icon_mimes = ["text-x-csrc", "text-x-chdr", "text-x-cppsrc", "text-x-cpphdr", "text-x-generic"];
+
+//Gets the rayage icon class based on the mimetype
+var get_icon_class = function(mimetype) {
+    var safemime = mimetype.replace("/", "-").replace("+", "p");
+    
+    if ($.inArray(safemime, icon_mimes) == -1) {
+        safemime = "text-x-generic";
+    }
+    
+    return 'rayage_icon rayage_icon_src_' + safemime;
+}
+
 require(["dojo/topic", "dojo/cookie"],
 function(topic, cookie){
     
@@ -115,7 +128,9 @@ function(topic, cookie){
             var files = data.files;
             
             for(var i = 0; i < files.length; i++) {
-                rayage_ui.editor.addEditorTab(files[i].filename, files[i].data);
+                var iconClass = get_icon_class(files[i].mimetype);
+                
+                rayage_ui.editor.addEditorTab(files[i].filename, files[i].data, iconClass);
             }
             
             rayage_ui.dialogs.open_project.dialog.hide();

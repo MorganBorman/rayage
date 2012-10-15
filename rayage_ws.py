@@ -9,6 +9,21 @@ import shutil
 from constants import *
 
 try:
+    import magic
+    def get_mime_type(full_filename):
+        "Returns the mimetype for a file given its fully qualified filename."
+        return magic.from_file(full_filename, mime=True)
+    
+except ImportError:
+    import mimetypes
+    mimetypes.init()
+    print("Warning python-magic unnavailable. Mimetypes will be guessed from filenames.")
+    def get_mime_type(full_filename):
+        "Returns the mimetype for a file given its fully qualified filename."
+        mime, encoding = mimetypes.guess_type(full_filename)
+        return mime
+
+try:
     import Crypto.Random
     import Crypto.Util.number
     def get_random_bytes(b):
@@ -332,6 +347,7 @@ def handle_open_project_request(socket_connection, message):
     for filename in project_files:
         with open(os.path.join(project_dir, filename), "r") as f:
             project_file_data.append({'filename': filename, 
+                                      'mimetype': get_mime_type(os.path.join(project_dir, filename)),
                                       'data': f.read(), 
                                       'modified': False, 
                                       'undo_data': None})

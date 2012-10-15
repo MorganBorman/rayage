@@ -31,8 +31,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         topic.publish("ui/editor/tab_change", nval);
     });
     
-    rayage_ui.editor.addEditorTab = function(title, code) {
-        var pane = new ContentPane({ title: title, content: "", iconClass:'rayage_icon rayage_icon_src_cpp' });
+    rayage_ui.editor.addEditorTab = function(title, code, iconClass) {
+        var pane = new ContentPane({ title: title, content: "", iconClass: iconClass });
         
         rayage_ui.editor.tab_container.addChild(pane);
         

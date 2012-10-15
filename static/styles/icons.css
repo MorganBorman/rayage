@@ -6,14 +6,6 @@
   text-align: center;
 }
 
-.rayage_icon_clear {
-    background: url(/images/oxygen/clear.png);
-}
-
-.rayage_icon_search {
-    background: url(/images/oxygen/search.png);
-}
-
 .rayage_icon_console {
     background: url(/images/oxygen/console.png);
 }
@@ -30,6 +22,7 @@
     background: url(/images/oxygen/authenticate.png);
 }
 
+/* Project menu icons */
 .rayage_icon_open_project {
     background: url(/images/oxygen/open-project.png);
 }
@@ -54,6 +47,7 @@
     background: url(/images/oxygen/delete-src.png);
 }
 
+/* Edit menu icons */
 .rayage_icon_edit_undo {
     background: url(/images/oxygen/edit-undo.png);
 }
@@ -78,18 +72,28 @@
     background: url(/images/oxygen/edit-select-all.png);
 }
 
-.rayage_icon_src_c {
+/* Filetypes */
+.rayage_icon_src_text-x-csrc {
     background: url(/images/oxygen/text-x-csrc.png);
 }
 
-.rayage_icon_src_cpp {
-    background: url(/images/oxygen/text-x-cppsrc.png);
+.rayage_icon_src_text-x-chdr {
+    background: url(/images/oxygen/text-x-chdr.png);
 }
 
-.rayage_icon_src_txt {
+.rayage_icon_src_text-x-cppsrc {
+    background: url(/images/oxygen/text-x-c++src.png);
+}
+
+.rayage_icon_src_text-x-cpphdr {
+    background: url(/images/oxygen/text-x-c++hdr.png);
+}
+
+.rayage_icon_src_text-x-generic {
     background: url(/images/oxygen/text-x-generic.png);
 }
 
+/* Notification icons */
 .rayage_icon_notify_info {
     background: url(/images/oxygen/notify-info.png);
 }
