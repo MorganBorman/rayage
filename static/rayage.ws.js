@@ -16,7 +16,7 @@ function(topic, cookie){
     var rayage_ws = new Object();
     
     rayage_ws.connect = function (){
-        rayage_ws.ws = new WebSocket("wss://localhost:8080/ws");
+        rayage_ws.ws = new WebSocket("wss://" + document.domain + ":8080/ws");
     
         rayage_ws.ws.onopen = function() {
             topic.publish("ws/connection/opened");
