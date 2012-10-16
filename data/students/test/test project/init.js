@@ -1,4 +1,4 @@
-window.termbuffer = "";
+window.termbuffer = "55";
 window.termbufferindex = 0;
 
 window.Module = {
@@ -12,7 +12,8 @@ window.Module = {
     },
     stdin: function() {
         var chr = window.termbuffer.charCodeAt(window.termbufferindex) || null;
-        window.termbufferindex = Math.min(window.termbufferindex++, window.termbuffer.length);
+        window.termbufferindex = Math.min(window.termbufferindex+1, window.termbuffer.length);
+        console.log(chr);
         return chr;
     },
 };
