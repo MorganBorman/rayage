@@ -8,20 +8,13 @@ import errno
 import shutil
 from constants import *
 
-try:
-    import magic
-    def get_mime_type(full_filename):
-        "Returns the mimetype for a file given its fully qualified filename."
-        return magic.from_file(full_filename, mime=True)
-    
-except ImportError:
-    import mimetypes
-    mimetypes.init()
-    print("Warning python-magic unnavailable. Mimetypes will be guessed from filenames.")
-    def get_mime_type(full_filename):
-        "Returns the mimetype for a file given its fully qualified filename."
-        mime, encoding = mimetypes.guess_type(full_filename)
-        return mime
+import mimetypes
+mimetypes.init()
+
+def get_mime_type(full_filename):
+    "Returns the mimetype for a file given its fully qualified filename."
+    mime, encoding = mimetypes.guess_type(full_filename)
+    return mime
 
 try:
     import Crypto.Random
