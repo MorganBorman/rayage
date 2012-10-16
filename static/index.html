@@ -10,9 +10,13 @@
         <link rel="stylesheet" href="/styles/icons.css" media="screen">
         
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+        
         <script type="text/javascript" src="jquery.pnotify.js"></script>
 		<link type="text/css" rel="stylesheet" href="/styles/jquery.pnotify.default.css" />
+		
+        <script type="text/javascript" src="jquery.terminal.js"></script>
+		<link type="text/css" rel="stylesheet" href="/styles/jquery.terminal.css" />
 		
 		<script src="/sha256.js"></script>
         
@@ -92,7 +96,9 @@
                     </div>
                     
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props='title:"Run output", iconClass:"rayage_icon rayage_icon_console", tooltip:"Run output shows up here."'>
-                        run output goes here
+                        Warning: if you click on this terminal demo you can't focus any other text box.<br>
+                        Need to fix this!
+                        <div id="term_demo"></div>
                     </div>
                 </div>
 		    </div>

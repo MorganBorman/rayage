@@ -259,6 +259,30 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
         var value = rayage_ui.dialogs.new_file.dialog.hide();
     });
     
-    // Let the rest of the application know our UI is set up
-    topic.publish("ui/ready", rayage_ui);
+    jQuery(function($, undefined) {
+        $('#term_demo').terminal(function(command, term) {
+            if (command !== '') {
+                var result = window.eval(command);
+                if (result != undefined) {
+                    term.echo(String(result));
+                }
+            }
+        }, {
+            greetings: 'Javascript Interpreter',
+            name: 'js_demo',
+            height: 200,
+            width: 450,
+            prompt: 'js> ',
+            enabled: false,
+            onBlur: function(term) {
+                    console.log("onBlur");
+                },
+            onFocus: function(term) {
+                    console.log("onFocus");
+                },
+            });
+            
+        // Let the rest of the application know our UI is set up
+        topic.publish("ui/ready", rayage_ui);
+    });
 });
