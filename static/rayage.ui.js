@@ -1,9 +1,9 @@
 // This file will contain publishers and subscriber to topics for all direct manipulation of the UI (that is the public interface to the UI)
 
-require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dojo/domReady!", "dijit/MenuBar", 
-         "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", 
-         "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
-function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
+require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "custom/BasicTerminal", 
+         "dojo/domReady!", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", 
+         "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
+function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTerminal){
     parser.parse();
     
     // Hook up all the subscribers which provide ways to manipulate the UI here
@@ -258,31 +258,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane){
     on(rayage_ui.dialogs.new_file.cancel, "click", function(evt){
         var value = rayage_ui.dialogs.new_file.dialog.hide();
     });
-    
-    jQuery(function($, undefined) {
-        $('#term_demo').terminal(function(command, term) {
-            if (command !== '') {
-                var result = window.eval(command);
-                if (result != undefined) {
-                    term.echo(String(result));
-                }
-            }
-        }, {
-            greetings: 'Javascript Interpreter',
-            name: 'js_demo',
-            height: 200,
-            width: 450,
-            prompt: 'js> ',
-            enabled: false,
-            onBlur: function(term) {
-                    console.log("onBlur");
-                },
-            onFocus: function(term) {
-                    console.log("onFocus");
-                },
-            });
             
-        // Let the rest of the application know our UI is set up
-        topic.publish("ui/ready", rayage_ui);
-    });
+    // Let the rest of the application know our UI is set up
+    topic.publish("ui/ready", rayage_ui);
 });

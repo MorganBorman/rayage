@@ -11,9 +11,10 @@
     position: fixed;
 }
 .terminal {
-    padding: 10px;
+    padding: 0px;
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 .cmd {
     padding: 0;
@@ -39,6 +40,13 @@
 .terminal .cmd span.inverted {
     background-color: #aaa;
     color: #000;
+}
+.terminal .cmd span.boxed {
+    background-color: #000;
+    color: #000;
+    border-style:solid;
+    border-width: 1px;
+    border-color: #aaa;
 }
 .terminal div::-moz-selection, .terminal span::-moz-selection {
     background-color: #aaa;

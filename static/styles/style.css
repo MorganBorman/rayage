@@ -20,3 +20,7 @@ html, body {
     width: 550px;
     height: 550px;
 }
+
+#ui_output_tab_run {
+    background-color: #000;
+}
