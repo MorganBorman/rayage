@@ -46,6 +46,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
         
         pane.editor = editor;
         rayage_ui.editor.tab_container.selectChild(pane);
+        editor.refresh();
     };
     
     rayage_ui.output = {
