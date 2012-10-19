@@ -85,6 +85,7 @@ function(topic, cookie){
         });
 
         topic.subscribe("ui/dialogs/new_file/new", function(name, type) {
+            // TODO: synchronize the project state (get latest undo state)
             rayage_ws.send({"type": "new_file_request", "name": name, "filetype": type});
             rayage_ui.dialogs.new_file.dialog.hide();
         });
