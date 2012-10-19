@@ -38,17 +38,13 @@ function(topic, cookie){
         
         rayage_ui.menus.edit.menu.set("disabled", true);
         rayage_ui.menus.project.menu.set("disabled", true);
-        rayage_ui.menus.logout.setVisible(false);
         
-        topic.subscribe("ui/menus/login", function(username, password) {
-            var pwhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            rayage_ws.send({"type": "login_request",
-                             "username": username,
-                             "password": pwhash});
+        topic.subscribe("ws/message/redirect", function(data) {
+            window.location = data.target;
         });
         
         topic.subscribe("ui/menus/logout", function() {
-            rayage_ws.send({"type": "logout_request"});
+            window.location = "/logout";
         });
         
         topic.subscribe("ui/menus/project/new_project", function() {
@@ -82,6 +78,13 @@ function(topic, cookie){
         	end = {line: lines, ch: 0};
         	
         	editor.setSelection(start, end);
+        });
+        
+
+        topic.subscribe("ui/dialogs/new_file/new", function(name, type) {
+            // TODO: synchronize the project state (get latest undo state)
+            rayage_ws.send({"type": "new_file_request", "name": name, "filetype": type});
+            rayage_ui.dialogs.new_file.dialog.hide();
         });
         
         topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
@@ -161,36 +164,12 @@ function(topic, cookie){
             rayage_ui.dialogs.open_project.dialog.show();
         });
         
-        topic.subscribe("ws/message/login_success", function(data) {
+        topic.subscribe("ws/message/login_success", function() {
             rayage_ui.menus.project.menu.set("disabled", false);
-            rayage_ui.menus.logout.setVisible(true);
-            rayage_ui.menus.login.menu.setVisible(false);
-            
-            var expiry_date = new Date( data.session_timeout*1000);
-            cookie("rayage_session", data.session_cookie, { expires: expiry_date, secure: true });
-        });
-        
-        topic.subscribe("ws/message/logout_acknowledge", function() {
-            rayage_ui.menus.project.menu.set("disabled", true);
-            rayage_ui.menus.logout.setVisible(false);
-            rayage_ui.menus.login.menu.setVisible(true);
-            
-            cookie("rayage_session", null, { expires: -1, secure: true });
         });
         
         topic.subscribe("ws/connection/closed", function() {
             topic.publish("notify/disconnected");
-        });
-        
-        topic.subscribe("ws/connection/opened", function() {
-            var session_cookie = cookie("rayage_session");
-            
-            if (session_cookie != null) {
-                var continue_session = {"type": "continue_session",
-                                        "cookie_value": session_cookie};
-                cookie("rayage_session", null, { expires: -1, secure: true });
-                rayage_ws.send(continue_session);
-            }
         });
     };
 });

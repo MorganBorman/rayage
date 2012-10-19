@@ -1,4 +1,6 @@
 import tornado.websocket
+import tornado.web
+
 import json
 import hashlib
 import hmac
@@ -15,25 +17,6 @@ def get_mime_type(full_filename):
     "Returns the mimetype for a file given its fully qualified filename."
     mime, encoding = mimetypes.guess_type(full_filename)
     return mime
-
-try:
-    import Crypto.Random
-    import Crypto.Util.number
-    def get_random_bytes(b):
-        return Crypto.Util.number.getRandomNBitInteger(b*8, Crypto.Random.get_random_bytes)
-except ImportError:
-    import random
-    print("Warning using non-cryptographically random session keys. Please install pycrypto.")
-    def get_random_bytes(b):
-        return random.getrandbits(b*8)
-
-def sign_cookie(signing_key, value):
-    hm = hmac.new(signing_key, value, hashlib.sha256)
-    return hm.hexdigest()
-    
-def check_cookie(signing_key, full_cookie_value):
-    cookie_value, cookie_signature = full_cookie_value.rsplit("&", 1)
-    return sign_cookie(signing_key, cookie_value)
 
 class MalformedMessage(Exception):
     '''A message is missing fields or fields are invalid.'''
@@ -82,19 +65,24 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.username is None:
             return None
             
-        return _project
+        return self._project
         
     @project.setter
     def project(self, value):
         "Sets the current project for the currently authenticated user."
         self._project = value
 
+    def project_dir(self, *args):
+        "Returns paths within the current user's current project directory (or None if no project or user)."
+        if self.project is None:
+            return None
+
+        return self.user_dir( *((self.project,) + args) )
+
     def notify(self, msg, severity="message", duration=1.5):
         """
         Displays a non-blocking message to the user with a duration in seconds
         and one of the following severities: ["fatal", "error", "warning", "message"]
-
-        TODO: Theme the messages using CSS based on severity (Toaster.css)
         """
         severities = ["notice", "info", "success", "error"]
         if severity not in severities:
@@ -105,9 +93,29 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                          'duration': duration*1000,
                          'severity': severity}
         self.write_message(json.dumps(notification))
+        
+    def redirect(self, target, permanent):
+        redirection = {'type': 'redirect',
+                         'target': target}
+        self.write_message(json.dumps(redirection))
 
     def open(self):
-        print "WebSocket opened"
+        username = self.get_secure_cookie("user", max_age_days=1)
+        
+        if username is not None:
+            self.authenticated = True
+            self.username = username
+
+            # Check if "new" user and create a project dir for them if needed.
+            if not os.path.exists(self.user_dir()):
+                os.makedirs(self.user_dir())
+
+            result_message = {'type': 'login_success'}
+            self.write_message(json.dumps(result_message))
+        else:
+            self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
+            
+            self.notify("Session expired. Please login again.", "error")
         
     def access_denied(self):
         self.write_message(json.dumps({"type": "access_denied", "reason": "not authenticated"}))
@@ -160,73 +168,6 @@ class messageHandler(object):
         WebSocketHandler.message_handlers[self.message_type] = handler
         
         return f
-    
-
-secret_key = "foobarbaz" # A (hopefully) long string used to sign the session key cookie to prevent tampering
-
-users = {"test": hashlib.sha256("password").hexdigest()}
-
-session_timeout = 600
-
-# In the future these would need to be stored as seperate components rather than just the session cookie string
-# ... and in a DB obviously
-sessions = {}
-
-def generate_session_cookie(secret_key, username, expiry_length):
-    # Example of how signing of the session keys could work
-    
-    # A random key used to identify a client session across seperate websocket connections without re-verifying their password
-    session_key = format(get_random_bytes(16), 'X')
-    
-    # Store this in the database with the user credentials. Later when the client sends the cookie back we see whether it matches
-    cookie_value = "username=%s&expires=%d&key=%s" %(username, int(time.time()) + expiry_length, session_key)
-    
-    # This is the value we send to the client for them to store in a cookie
-    return cookie_value + "&" + sign_cookie(secret_key, cookie_value)
-
-@messageHandler("continue_session", ["cookie_value"], False)
-def handle_continue_session(socket_connection, message):
-    cookie_value = message['cookie_value']
-    
-    # use this to theck the validity of the cookie when the client sends it back later. 
-    # This in combination with verifying the session key against the database and checking whether it has expired should ensure that only valid sessions can be resumed.
-    if check_cookie(secret_key, cookie_value):
-        username = cookie_value.split("&", 1)[0].split("=", 1)[1]
-        if username in sessions.keys() and sessions[username] == cookie_value:
-            socket_connection.authenticated = True
-            socket_connection.username = username
-            session_cookie = generate_session_cookie(secret_key, username, session_timeout)
-            sessions[username] = session_cookie
-            result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
-            socket_connection.write_message(json.dumps(result_message))
-            return
-    socket_connection.notify("Session expired. Please login again.", "error")
-    
-@messageHandler("login_request", ["username", "password"], False)
-def handle_login_request(socket_connection, message):
-    username = message['username']
-    password = message['password']
-    
-    if username in users.keys() and password == users[username]:
-        socket_connection.authenticated = True
-        socket_connection.username = username
-        session_cookie = generate_session_cookie(secret_key, username, session_timeout)
-        sessions[username] = session_cookie
-        result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
-        socket_connection.write_message(json.dumps(result_message))
-        socket_connection.notify("Now logged in.", "success")
-    else:
-        socket_connection.notify("Login failed. Please try again.", "error")
-
-@messageHandler("logout_request")
-def handle_logout_request(socket_connection, message):
-    """
-    Handles logout requests.
-    """
-    socket_connection.authenticated = False
-    # Need to use the stored (should be stored) username to clear any current sessions for that user
-    result_message = {'type': 'logout_acknowledge'}
-    socket_connection.write_message(json.dumps(result_message))
 
 @messageHandler("project_list_request")
 def handle_project_list_request(socket_connection, message):
@@ -242,7 +183,7 @@ def handle_project_list_request(socket_connection, message):
     socket_connection.write_message(json.dumps(result_message))
     
 @messageHandler("close_project_request")
-def handle_logout_request(socket_connection, message):
+def handle_close_project_list(socket_connection, message):
     """
     Sets the current project for the given socket_connection to None and returns an
     acknowledgement that the project has been closed.
@@ -250,6 +191,7 @@ def handle_logout_request(socket_connection, message):
     socket_connection.project = None
     result_message = {'type': 'close_project_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
+    socket_connection.notify("You've closed your project!", "success")
 
 @messageHandler("template_list_request")
 def handle_template_list_request(socket_connection, message):
@@ -298,23 +240,20 @@ def handle_new_project_request(socket_connection, message):
             shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
         else:
             os.makedirs(new_project_dir)
-        # TODO: Acknowledge success
+
         socket_connection.notify("You made a new project!", "success")
-        socket_connection.write_message(json.dumps("TODO: Successful New Project"))
     except shutil.Error as e:
         # copytree error
         # This exception collects exceptions that are raised during a multi-file operation. 
         # For copytree(), the exception argument is a list of 3-tuples (srcname, dstname, exception).
         # TODO: Double check this. Existing project folder always falls into OSError.
         socket_connection.notify("Unknown project template.", "error")
-        socket_connection.write_message(json.dumps("TODO: Missing template"))
     except OSError as e:
         # makedirs error
         socket_connection.notify("Project already exists.", "error")
-        socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
 
 @messageHandler("open_project_request", ["id"], True)
-def handle_open_project_request(socket_connection, message):
+def handle_open_project_request(socket_connection, message, notify=True):
     """
     Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
     """
@@ -350,5 +289,21 @@ def handle_open_project_request(socket_connection, message):
                      'files': project_file_data}
     
     socket_connection.write_message(json.dumps(project_state))
+    socket_connection.notify("You've opened %s!" % socket_connection.project, "success")
 
+@messageHandler("new_file_request", ["name", "filetype"], True)
+def handle_new_file_request(socket_connection, message):
+    """
+    Handles new file requests - does not allow overwriting files.
+    """
+    filename = "%s%s" % (message['name'], message['filetype'])
+    dst = socket_connection.project_dir(filename)
 
+    if os.path.exists(dst):
+        socket_connection.notify("%s already exists!" % filename, "error")
+        return
+
+    file(dst, 'w').close()
+    # reopen the project with newly created file.
+    handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
+    socket_connection.notify("You just created %s!" % filename, "success")

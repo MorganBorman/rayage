@@ -12,6 +12,38 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                 this.clipboardNode.focus();
             },
             
+            render_clipboard: function(clipboard_value) {
+                var output = "";
+                
+                for (var i=0; i<clipboard_value.length; i++) {
+                    switch(clipboard_value[i]) {
+                        case ' ':
+                          output += "&nbsp;";
+                          break;
+                        default:
+                          output += clipboard_value[i];
+                          break;
+                    }
+                }
+                
+                return output;
+            },
+            
+            clipboard_onkeyup: function(evt) {
+                //console.log(evt.keyCode, String.fromCharCode(evt.keyCode));
+                //http://dojotoolkit.org/api/1.8/dojo/keys
+                
+                this.clipdataNode.innerHTML = this.render_clipboard(this.clipboardNode.value);
+                
+                switch(evt.keyCode) {
+                    case dojo.keys.ENTER:
+                      break;
+                    default:
+                      break;
+                }
+                
+            },
+            
             // Our template - important!
             templateString: template,
  
