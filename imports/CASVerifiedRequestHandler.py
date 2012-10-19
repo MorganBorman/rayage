@@ -16,31 +16,24 @@ import uuid
 import urllib2
 import xml.etree.ElementTree
 
+from constants import SERVICE_URL, CAS_SERVER
 from VerifiedHTTPSHandler import VerifiedHTTPSHandler
 
-class RequestHandler(tornado.web.RequestHandler):
-    def get(self, line):
+class CASVerifiedRequestHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        return self.get_secure_cookie("user")
         
-        cas_server  = "https://websso.wwu.edu:443"
-        service_url = "https://localhost:8080/"
-    
-        session_cookie = self.get_secure_cookie("test_cas_session_cookie")
+    def logout_user(self):
+        self.clear_cookie("user")
+        self.redirect(CAS_SERVER + "/cas/logout", permanent=False)
         
-        if self.get_argument('logout', default=None):
-            self.clear_cookie("test_cas_session_cookie")
-            self.redirect(cas_server + "/cas/logout", permanent=False)
-            
-        elif session_cookie is not None:
-            print "session_cookie =", session_cookie
-            self.write("Logged in!<br><a href=\"?logout=1\">logout</a>")
-            self.finish()
-            
-        elif self.get_argument('ticket', default=None):
+    def validate_user(self):
+        if self.get_argument('ticket', default=None):
             #need to validate ticket
             ticket = self.get_argument('ticket')
             
             #generate URL for ticket validation 
-            cas_validate = cas_server + "/cas/serviceValidate?ticket=" + ticket + "&service=" + service_url
+            cas_validate = CAS_SERVER + "/cas/serviceValidate?ticket=" + ticket + "&service=" + SERVICE_URL
             #f_xml_assertion = urllib.urlopen(cas_validate)
             
             https_handler = VerifiedHTTPSHandler()
@@ -86,23 +79,40 @@ class RequestHandler(tornado.web.RequestHandler):
                 self.send_error(status_code=401)
                 return
                 
-            self.set_secure_cookie("test_cas_session_cookie", user_name)
+            self.set_secure_cookie("user", user_name)
             
-            self.redirect(service_url, permanent=False)
+            self.redirect(SERVICE_URL, permanent=False)
         else:
-            self.redirect(cas_server + "/cas/login?service=" + service_url, permanent=False)
-
-handlers = [        
-    (r"/(.*)", RequestHandler),
-]
-
-#cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
-cookie_secret = "g9Usc0wTSMWxV5a7G5o5YcXPb3ftcUBwhUoFT62KJks="
-
-if __name__ == "__main__":
-        tornado_app = tornado.web.Application(handlers, cookie_secret=cookie_secret)
+            self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
         
-        tornado_http = tornado.httpserver.HTTPServer(tornado_app, ssl_options= {"certfile": "misc/server.crt", "keyfile": "misc/server.key"})
-        tornado_http.bind(8080, family=socket.AF_INET)
-        tornado_http.start()
-        tornado.ioloop.IOLoop.instance().start()
+if __name__ == "__main__":
+    class MyRequestHandler(CASVerifiedRequestHandler):
+        def get(self, action):
+            print "action =", action
+        
+            if action == "logout":
+                self.logout_user()
+            else:
+                if self.get_current_user() is None:
+                    self.validate_user()
+                    return
+                    
+                self.write("Logged in as %s!<br><a href=\"/logout\">logout</a>" % self.get_current_user())
+                self.finish()
+                
+
+
+    handlers = [
+        (r"/(.*)", MyRequestHandler),
+    ]
+
+    #cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+    cookie_secret = "g9Usc0wTSMWxV5a7G5o5YcXPb3ftcUBwhUoFT62KJks="
+
+    if __name__ == "__main__":
+            tornado_app = tornado.web.Application(handlers, cookie_secret=cookie_secret)
+            
+            tornado_http = tornado.httpserver.HTTPServer(tornado_app, ssl_options= {"certfile": "misc/server.crt", "keyfile": "misc/server.key"})
+            tornado_http.bind(8080, family=socket.AF_INET)
+            tornado_http.start()
+            tornado.ioloop.IOLoop.instance().start()
