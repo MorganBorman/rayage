@@ -106,6 +106,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.authenticated = True
             self.username = username
 
+            # Check if "new" user and create a project dir for them if needed.
+            if not os.path.exists(self.user_dir()):
+                os.makedirs(self.user_dir())
+
             result_message = {'type': 'login_success'}
             self.write_message(json.dumps(result_message))
         else:
