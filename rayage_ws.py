@@ -82,19 +82,24 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.username is None:
             return None
             
-        return _project
+        return self._project
         
     @project.setter
     def project(self, value):
         "Sets the current project for the currently authenticated user."
         self._project = value
 
+    def project_dir(self, *args):
+        "Returns paths within the current user's current project directory (or None if no project or user)."
+        if self.project is None:
+            return None
+
+        return self.user_dir( *((self.project,) + args) )
+
     def notify(self, msg, severity="message", duration=1.5):
         """
         Displays a non-blocking message to the user with a duration in seconds
         and one of the following severities: ["fatal", "error", "warning", "message"]
-
-        TODO: Theme the messages using CSS based on severity (Toaster.css)
         """
         severities = ["notice", "info", "success", "error"]
         if severity not in severities:
@@ -298,9 +303,8 @@ def handle_new_project_request(socket_connection, message):
             shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
         else:
             os.makedirs(new_project_dir)
-        # TODO: Acknowledge success
+
         socket_connection.notify("You made a new project!", "success")
-        socket_connection.write_message(json.dumps("TODO: Successful New Project"))
     except shutil.Error as e:
         # copytree error
         # This exception collects exceptions that are raised during a multi-file operation. 
@@ -351,4 +355,17 @@ def handle_open_project_request(socket_connection, message):
     
     socket_connection.write_message(json.dumps(project_state))
 
+@messageHandler("new_file_request", ["name", "filetype"], True)
+def handle_new_file_request(socket_connection, message):
+    """
+    Handles new file requests - does not allow overwriting files.
+    """
+    filename = "%s%s" % (message['name'], message['filetype'])
+    dst = socket_connection.project_dir(filename)
 
+    if os.path.exists(dst):
+        socket_connection.notify("%s already exists!" % filename, "error")
+        return
+
+    file(dst, 'w').close()
+    socket_connection.notify("You just created %s!" % filename, "success")

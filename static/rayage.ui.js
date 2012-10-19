@@ -235,7 +235,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.open_project.cancel, "click", function(evt){
-        var value = rayage_ui.dialogs.open_project.dialog.hide();
+        rayage_ui.dialogs.open_project.dialog.hide();
     });
 
     // New project dialog
@@ -246,7 +246,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
-        var value = rayage_ui.dialogs.new_project.dialog.hide();
+        rayage_ui.dialogs.new_project.dialog.hide();
     });
     
     // New file dialog
@@ -257,7 +257,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.new_file.cancel, "click", function(evt){
-        var value = rayage_ui.dialogs.new_file.dialog.hide();
+        rayage_ui.dialogs.new_file.dialog.hide();
     });
             
     // Let the rest of the application know our UI is set up

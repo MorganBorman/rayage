@@ -83,6 +83,11 @@ function(topic, cookie){
         	
         	editor.setSelection(start, end);
         });
+
+        topic.subscribe("ui/dialogs/new_file/new", function(name, type) {
+            rayage_ws.send({"type": "new_file_request", "name": name, "filetype": type});
+            rayage_ui.dialogs.new_file.dialog.hide();
+        });
         
         topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
             rayage_ws.send({"type": "new_project_request", "name": name, "template": template});
