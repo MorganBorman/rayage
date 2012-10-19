@@ -34,8 +34,6 @@ class CASVerifiedRequestHandler(tornado.web.RequestHandler):
             
             #generate URL for ticket validation 
             cas_validate = CAS_SERVER + "/cas/serviceValidate?ticket=" + ticket + "&service=" + SERVICE_URL
-            #f_xml_assertion = urllib.urlopen(cas_validate)
-            
             https_handler = VerifiedHTTPSHandler()
             url_opener = urllib2.build_opener(https_handler)
             

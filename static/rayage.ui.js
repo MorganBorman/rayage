@@ -76,26 +76,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             paste: registry.byId("ui_menus_edit_paste"),
             select_all: registry.byId("ui_menus_edit_select_all"),
         },
-        login: {
-            menu: registry.byId("ui_menus_login"),
-            dialog: registry.byId("ui_menus_login_dialog"),
-            username: registry.byId("ui_menus_login_username"),
-            password: registry.byId("ui_menus_login_password"),
-            button: registry.byId("ui_menus_login_button"),
-        },
         logout:  registry.byId("ui_menus_logout"),
     };
-                      
-    // Add some convenience methods to the login/logout items to show/hide them
-    
-    rayage_ui.menus.login.menu.setVisible = function(value) {
-        rayage_ui.menus.login.menu.domNode.style.display = (value ? "inline" : "none");
-        rayage_ui.menus.login.dialog.domNode.style.display = (value ? "inline" : "none");;
-    }
-    
-    rayage_ui.menus.logout.setVisible = function(value) {
-        rayage_ui.menus.logout.domNode.style.display = (value ? "inline" : "none");
-    }
 
     // Hook up the topic publishers
 
@@ -151,30 +133,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     
     // Login/Logout
     
-    var login_method = function(evt){
-        var username = rayage_ui.menus.login.username.value;
-        var password = rayage_ui.menus.login.password.value;
-        
-        topic.publish("ui/menus/login", username, password);
-    }
-    on(rayage_ui.menus.login.button, "click", login_method);
-    
     on(rayage_ui.menus.logout, "click", function(evt){
         topic.publish("ui/menus/logout");
-    });
-    
-    // some handlers to make the login tooltipdialog respond to pressing the enter key correctly
-    on(rayage_ui.menus.login.username, "keyup", function(evt){
-        if (evt.keyCode == dojo.keys.ENTER) {
-            rayage_ui.menus.login.password.focus();
-        }
-    });
-    
-    on(rayage_ui.menus.login.password, "keyup", function(evt){
-        if (evt.keyCode == dojo.keys.ENTER) {
-            rayage_ui.menus.login.button.focus();
-            login_method();
-        }
     });
     
     ///////////////////////////////////////////////////////////////////////////
@@ -235,7 +195,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.open_project.cancel, "click", function(evt){
-        rayage_ui.dialogs.open_project.dialog.hide();
+        var value = rayage_ui.dialogs.open_project.dialog.hide();
     });
 
     // New project dialog
@@ -246,7 +206,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.new_project.cancel, "click", function(evt){
-        rayage_ui.dialogs.new_project.dialog.hide();
+        var value = rayage_ui.dialogs.new_project.dialog.hide();
     });
     
     // New file dialog
@@ -257,7 +217,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     on(rayage_ui.dialogs.new_file.cancel, "click", function(evt){
-        rayage_ui.dialogs.new_file.dialog.hide();
+        var value = rayage_ui.dialogs.new_file.dialog.hide();
     });
             
     // Let the rest of the application know our UI is set up
