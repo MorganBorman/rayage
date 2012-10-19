@@ -204,8 +204,9 @@ def handle_continue_session(socket_connection, message):
             sessions[username] = session_cookie
             result_message = {'type': 'login_success', 'session_cookie': session_cookie, 'session_timeout': int(time.time())+session_timeout}
             socket_connection.write_message(json.dumps(result_message))
+            socket_connection.notify("Welcome back!", "success")
             return
-    socket_connection.notify("Session expired. Please login again.", "error")
+    socket_connection.notify("Please login.", "error")
     
 @messageHandler("login_request", ["username", "password"], False)
 def handle_login_request(socket_connection, message):
@@ -221,7 +222,7 @@ def handle_login_request(socket_connection, message):
         socket_connection.write_message(json.dumps(result_message))
         socket_connection.notify("Now logged in.", "success")
     else:
-        socket_connection.notify("Login failed. Please try again.", "error")
+        socket_connection.notify("Incorrect username or password. Please try again.", "error")
 
 @messageHandler("logout_request")
 def handle_logout_request(socket_connection, message):
@@ -232,6 +233,7 @@ def handle_logout_request(socket_connection, message):
     # Need to use the stored (should be stored) username to clear any current sessions for that user
     result_message = {'type': 'logout_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
+    socket_connection.notify("You've logged out!", "success")
 
 @messageHandler("project_list_request")
 def handle_project_list_request(socket_connection, message):
@@ -247,7 +249,7 @@ def handle_project_list_request(socket_connection, message):
     socket_connection.write_message(json.dumps(result_message))
     
 @messageHandler("close_project_request")
-def handle_logout_request(socket_connection, message):
+def handle_close_project_list(socket_connection, message):
     """
     Sets the current project for the given socket_connection to None and returns an
     acknowledgement that the project has been closed.
@@ -255,6 +257,7 @@ def handle_logout_request(socket_connection, message):
     socket_connection.project = None
     result_message = {'type': 'close_project_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
+    socket_connection.notify("You've closed your project!", "success")
 
 @messageHandler("template_list_request")
 def handle_template_list_request(socket_connection, message):
@@ -311,11 +314,9 @@ def handle_new_project_request(socket_connection, message):
         # For copytree(), the exception argument is a list of 3-tuples (srcname, dstname, exception).
         # TODO: Double check this. Existing project folder always falls into OSError.
         socket_connection.notify("Unknown project template.", "error")
-        socket_connection.write_message(json.dumps("TODO: Missing template"))
     except OSError as e:
         # makedirs error
         socket_connection.notify("Project already exists.", "error")
-        socket_connection.write_message(json.dumps("TODO: Existing Project" + str(e)))
 
 @messageHandler("open_project_request", ["id"], True)
 def handle_open_project_request(socket_connection, message):
@@ -354,6 +355,7 @@ def handle_open_project_request(socket_connection, message):
                      'files': project_file_data}
     
     socket_connection.write_message(json.dumps(project_state))
+    socket_connection.notify("You've opened %s!" % socket_connection.project, "success")
 
 @messageHandler("new_file_request", ["name", "filetype"], True)
 def handle_new_file_request(socket_connection, message):
