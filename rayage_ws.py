@@ -249,7 +249,7 @@ def handle_new_project_request(socket_connection, message):
         socket_connection.notify("Project already exists.", "error")
 
 @messageHandler("open_project_request", ["id"], True)
-def handle_open_project_request(socket_connection, message):
+def handle_open_project_request(socket_connection, message, notify=True):
     """
     Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
     """
@@ -300,4 +300,6 @@ def handle_new_file_request(socket_connection, message):
         return
 
     file(dst, 'w').close()
+    # reopen the project with newly created file.
+    handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just created %s!" % filename, "success")
