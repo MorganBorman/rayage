@@ -171,15 +171,5 @@ function(topic, cookie){
         topic.subscribe("ws/connection/closed", function() {
             topic.publish("notify/disconnected");
         });
-        
-        topic.subscribe("ws/connection/opened", function() {
-            var session_cookie = cookie("user");
-            
-            if (session_cookie != null) {
-                var continue_session = {"type": "continue_session",
-                                        "cookie_value": session_cookie};
-                rayage_ws.send(continue_session);
-            }
-        });
     };
 });
