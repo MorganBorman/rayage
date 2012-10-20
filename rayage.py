@@ -29,8 +29,12 @@ class RequestHandler(CASVerifiedRequestHandler):
                 return
                 
             if action == "admin":
-                self.write("Admin page<br>Logged in as %s!<br><a href=\"/logout\">logout</a>" % self.get_current_user())
-                self.finish()
+                with open(system_directory+'/static/admin.html') as f:
+                    self.write(f.read())
+                    self.finish()
+                    
+                #self.write("Admin page<br>Logged in as %s!<br><a href=\"/logout\">logout</a>" % self.get_current_user())
+                #self.finish()
             else:
                 with open(system_directory+'/static/index.html') as f:
                     self.write(f.read())
