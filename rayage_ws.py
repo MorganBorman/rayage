@@ -299,6 +299,10 @@ def handle_new_file_request(socket_connection, message):
     filename = "%s%s" % (message['name'], message['filetype'])
     dst = socket_connection.project_dir(filename)
 
+    if not dst:
+        socket_connection.notify("You need a project open!", "error")
+        return
+
     if os.path.exists(dst):
         socket_connection.notify("%s already exists!" % filename, "error")
         return
