@@ -100,7 +100,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(redirection))
 
     def open(self):
-        username = self.get_secure_cookie("user", max_age_days=1)
+        username = self.get_secure_cookie("user")
         
         if username is not None:
             self.authenticated = True
