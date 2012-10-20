@@ -17,6 +17,8 @@ import constants
 from rayage_ws import WebSocketHandler
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
+import admin_handlers
+
 class RequestHandler(CASVerifiedRequestHandler):
     def get(self, action):
         print "action =", action
