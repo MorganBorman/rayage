@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Rayage IDE</title>
+
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+
+		<link rel="stylesheet" href="/styles/style.css" media="screen">
+        <link rel="stylesheet" href="/styles/icons.css" media="screen">
+        
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+        
+        <script type="text/javascript" src="jquery.pnotify.js"></script>
+		<link type="text/css" rel="stylesheet" href="/styles/jquery.pnotify.default.css" />
+        
+		<script>
+			var base = location.href.split("/");
+			base.pop();
+			base = base.join("/");
+		
+			 var dojoConfig = {
+					async: true,
+					isDebug: true,
+					packages: [{
+						name: "custom",
+						location: base + '/custom'
+					}]
+			};
+		</script>
+        
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
+
+		<script src="development-mode.js"></script>
+
+		<script src="rayage.js"></script>
+		<script src="rayage.notify.js"></script>
+		<script src="rayage.ui.js"></script>
+		<script src="rayage.ws.js"></script>
+
+        <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="/codemirror/theme/neat.css">
+        <script src="/codemirror/lib/codemirror.js"></script>
+        <script src="/codemirror/mode/clike/clike.js"></script>
+
+	</head>
+	<body class="claro">
+
+        <div data-dojo-type="dojo/store/Memory" data-dojo-id="myStore">
+            <script type="dojo/method">
+                 this.setData([
+                    { id: 'world', name:'The earth', type:'planet', population: '6 billion'},
+                    { id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km',
+                            timezone: '-1 UTC to +4 UTC', parent: 'world'},
+                        { id: 'EG', name:'Egypt', type:'country', parent: 'AF' },
+                        { id: 'KE', name:'Kenya', type:'country', parent: 'AF' },
+                            { id: 'Nairobi', name:'Nairobi', type:'city', parent: 'KE' },
+                            { id: 'Mombasa', name:'Mombasa', type:'city', parent: 'KE' },
+                        { id: 'SD', name:'Sudan', type:'country', parent: 'AF' },
+                            { id: 'Khartoum', name:'Khartoum', type:'city', parent: 'SD' },
+                    { id: 'AS', name:'Asia', type:'continent', parent: 'world' },
+                        { id: 'CN', name:'China', type:'country', parent: 'AS' },
+                        { id: 'IN', name:'India', type:'country', parent: 'AS' },
+                        { id: 'RU', name:'Russia', type:'country', parent: 'AS' },
+                        { id: 'MN', name:'Mongolia', type:'country', parent: 'AS' },
+                    { id: 'OC', name:'Oceania', type:'continent', population:'21 million', parent: 'world'},
+                    { id: 'EU', name:'Europe', type:'continent', parent: 'world' },
+                        { id: 'DE', name:'Germany', type:'country', parent: 'EU' },
+                        { id: 'FR', name:'France', type:'country', parent: 'EU' },
+                        { id: 'ES', name:'Spain', type:'country', parent: 'EU' },
+                        { id: 'IT', name:'Italy', type:'country', parent: 'EU' },
+                    { id: 'NA', name:'North America', type:'continent', parent: 'world' },
+                    { id: 'SA', name:'South America', type:'continent', parent: 'world' }
+                ]);
+            </script>
+            <script type="dojo/method" data-dojo-event="getChildren" data-dojo-args="object">
+                 // Supply a getChildren() method to store for the data model where
+                 // children objects point to their parent (aka relational model)
+                 return this.query({parent: object.id});
+            </script>
+        </div>
+
+        <!-- Create the model bridging the store and the Tree -->
+        <div data-dojo-type="dijit/tree/ObjectStoreModel" data-dojo-id="myModel"
+          data-dojo-props="store: myStore, query: {id: 'world'}"></div>
+
+
+        <div data-dojo-type="dijit/MenuBar" id="ui_menus">
+            <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
+                Logout
+            </div>
+        </div>
+        
+		<div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%">
+		
+            <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'" id="ui_editor_tab_container">
+                <div id="ui_editor_welcome_tab" data-dojo-type="dijit/layout/ContentPane" href="/welcome.html" data-dojo-props='title:"Welcome", iconClass:"rayage_icon rayage_icon_help", tooltip:"Welcome to Rayage IDE"'>
+                </div>
+            </div>
+            
+		    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:true, minSize: 200, maxSize: 600" id="ui_nav_pane">
+                <div data-dojo-type="dijit/Tree" id="myTree" data-dojo-props="model: myModel, showRoot: false"></div>
+		    </div>
+		</div>
+	</body>
+</html>
+
