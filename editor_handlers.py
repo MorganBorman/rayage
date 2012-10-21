@@ -67,7 +67,7 @@ def handle_file_type_list_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
-@messageHandler("new_project_request", ["name", "template"], True)
+@messageHandler("new_project_request", ["name", "template"])
 def handle_new_project_request(socket_connection, message):
     """
     Handles new project requests by creating a directory in the user's projects folder.
@@ -96,7 +96,7 @@ def handle_new_project_request(socket_connection, message):
         # makedirs error
         socket_connection.notify("Project already exists.", "error")
 
-@messageHandler("open_project_request", ["id"], True)
+@messageHandler("open_project_request", ["id"])
 def handle_open_project_request(socket_connection, message, notify=True):
     """
     Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
@@ -135,7 +135,7 @@ def handle_open_project_request(socket_connection, message, notify=True):
     socket_connection.write_message(json.dumps(project_state))
     socket_connection.notify("You've opened %s!" % socket_connection.project, "success")
 
-@messageHandler("new_file_request", ["name", "filetype"], True)
+@messageHandler("new_file_request", ["name", "filetype"])
 def handle_new_file_request(socket_connection, message):
     """
     Handles new file requests - does not allow overwriting files.
