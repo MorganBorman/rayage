@@ -10,6 +10,7 @@ First run:
 ```bash
 git submodule init
 git submodule update
+python set_user_permission_level.py *username* 2
 ```
 
 To run:

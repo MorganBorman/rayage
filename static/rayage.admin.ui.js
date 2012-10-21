@@ -48,8 +48,6 @@ function(parser, on, topic, registry, ObjectStore, Memory, Observable, ObjectSto
         tree: ui_admin_module_tree,
     };
     
-    console.log(rayage_ui.module_tree.store);
-    
     // Let the rest of the application know our UI is set up
     topic.publish("ui/ready", rayage_ui);
 });
