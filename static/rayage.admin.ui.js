@@ -7,6 +7,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, Observable, ObjectSto
     rayage_ui = new Object();
     
     rayage_ui.nav_pane = registry.byId("ui_nav_pane");
+    rayage_ui.tab_container = registry.byId("ui_admin_tab_container");
     
     var ui_admin_module_store = new Memory({
         data: [{ id: 'admin_modules', name:'Admin Modules', type:'folder'}],
@@ -24,7 +25,13 @@ function(parser, on, topic, registry, ObjectStore, Memory, Observable, ObjectSto
     });
     
     var ui_admin_module_tree = new Tree({
-        model: ui_admin_module_store_model
+        model: ui_admin_module_store_model,
+        getIconClass: function(/*dojo.store.Item*/ item, /*Boolean*/ opened){
+            return "rayage_icon rayage_icon_admin_" + item.iconClass;
+        },
+        onClick: function(item) {
+            topic.publish("ui/nav_menu/click", item);
+        },
     });
     ui_admin_module_tree.placeAt(rayage_ui.nav_pane);
     ui_admin_module_tree.startup();

@@ -21,8 +21,6 @@ import admin_handlers
 
 class RequestHandler(CASVerifiedRequestHandler):
     def get(self, action):
-        print "action =", action
-    
         if action == "logout":
             self.logout_user()
         else:
