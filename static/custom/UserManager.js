@@ -12,8 +12,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
             // Stuff to do after the widget is created
             postCreate: function(){
                 var self = this;
-                
-                console.log(this);
             },
             
             // The constructor

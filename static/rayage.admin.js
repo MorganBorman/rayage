@@ -35,7 +35,6 @@ function(topic){
             // if the tab for that nav item is already open, switch to it
             var module_open = false;
             dojo.forEach(open_modules, function(module) {
-                console.log("comparing:", module.id, " to ", item.id);
                 if (module.id == item.id) {
                     rayage_ui.tab_container.selectChild(module);
                     module_open = true;
@@ -57,7 +56,6 @@ function(topic){
                 
                 rayage_ui.tab_container.addChild(module_instance);
                 rayage_ui.tab_container.selectChild(module_instance);
-                console.log(module_instance);
             });
         });
         
