@@ -39,6 +39,11 @@ function(topic){
         rayage_ui.menus.edit.menu.set("disabled", true);
         rayage_ui.menus.project.menu.set("disabled", true);
         
+        rayage_ui.menus.project.new_file.set("disabled", true);
+        rayage_ui.menus.project.delete_file.set("disabled", true);
+        rayage_ui.menus.project.close_project.set("disabled", true);
+        rayage_ui.menus.project.delete_project.set("disabled", true);
+        
         topic.subscribe("ws/message/redirect", function(data) {
             window.location = data.target;
         });
@@ -130,6 +135,11 @@ function(topic){
             }
         
             rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
+            
+            rayage_ui.menus.project.new_file.set("disabled", true);
+            rayage_ui.menus.project.delete_file.set("disabled", true);
+            rayage_ui.menus.project.close_project.set("disabled", true);
+            rayage_ui.menus.project.delete_project.set("disabled", true);
         });
         
         topic.subscribe("ui/menus/project/open_project", function() {
@@ -153,6 +163,11 @@ function(topic){
             
             rayage_ui.dialogs.open_project.dialog.hide();
             rayage_ui.dialogs.new_project.dialog.hide();
+            
+            rayage_ui.menus.project.new_file.set("disabled", false);
+            rayage_ui.menus.project.delete_file.set("disabled", false);
+            rayage_ui.menus.project.close_project.set("disabled", false);
+            rayage_ui.menus.project.delete_project.set("disabled", false);
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
