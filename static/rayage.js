@@ -54,6 +54,10 @@ function(topic, cookie){
         topic.subscribe("ui/menus/project/new_file", function() {
         	rayage_ws.send({"type": "file_type_list_request"});
         });
+
+        topic.subscribe("ui/menus/project/delete_project", function() {
+            rayage_ws.send({"type": "delete_project_request"});
+        });
         
         topic.subscribe("ws/message/file_type_list", function(data) {
             rayage_ui.dialogs.new_file.setSelections(data.types);

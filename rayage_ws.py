@@ -183,7 +183,7 @@ def handle_project_list_request(socket_connection, message):
     socket_connection.write_message(json.dumps(result_message))
     
 @messageHandler("close_project_request")
-def handle_close_project_list(socket_connection, message):
+def handle_close_project_list(socket_connection, message, notify=True):
     """
     Sets the current project for the given socket_connection to None and returns an
     acknowledgement that the project has been closed.
@@ -191,7 +191,8 @@ def handle_close_project_list(socket_connection, message):
     socket_connection.project = None
     result_message = {'type': 'close_project_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
-    socket_connection.notify("You've closed your project!", "success")
+    if notify:
+        socket_connection.notify("You've closed your project!", "success")
 
 @messageHandler("template_list_request")
 def handle_template_list_request(socket_connection, message):
@@ -311,3 +312,14 @@ def handle_new_file_request(socket_connection, message):
     # reopen the project with newly created file.
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just created %s!" % filename, "success")
+
+@messageHandler("delete_project_request", [], True)
+def handle_delete_project_request(socket_connection, message):
+    src = socket_connection.project_dir()
+    # move to trash
+    # trash/username/projectname/timestamp/
+    dst = os.path.join(TRASH_DIR, socket_connection.username, socket_connection.project, str(int(time.time())))
+    shutil.move(src, dst)
+    # notify on deletion and close their windows
+    socket_connection.notify("You just deleted %s." % socket_connection.project, "success")
+    handle_close_project_list(socket_connection, {}, False)
