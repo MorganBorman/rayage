@@ -10,7 +10,10 @@ First run:
 ```bash
 git submodule init
 git submodule update
+python set_user_permission_level.py potterh 2
 ```
+
+Replace _potterh_ with your CAS username.
 
 To run:
 ```bash

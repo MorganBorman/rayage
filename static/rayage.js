@@ -11,8 +11,8 @@ var get_icon_class = function(mimetype) {
     return 'rayage_icon rayage_icon_src_' + safemime;
 }
 
-require(["dojo/topic", "dojo/cookie"],
-function(topic, cookie){
+require(["dojo/topic"],
+function(topic){
     
     var rayage_ws = null;
     var rayage_ui = null;

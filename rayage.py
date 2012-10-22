@@ -12,15 +12,17 @@ import tornado.web
 import tornado.httpserver
 import tornado.ioloop
 
+import database
 import constants
 
 from rayage_ws import WebSocketHandler
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
+import editor_handlers
+import admin_handlers
+
 class RequestHandler(CASVerifiedRequestHandler):
     def get(self, action):
-        print "action =", action
-    
         if action == "logout":
             self.logout_user()
         else:

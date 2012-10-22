@@ -2,21 +2,11 @@ import tornado.websocket
 import tornado.web
 
 import json
-import hashlib
-import hmac
-import time
 import os
-import errno
 import shutil
+
+from database.User import User
 from constants import *
-
-import mimetypes
-mimetypes.init()
-
-def get_mime_type(full_filename):
-    "Returns the mimetype for a file given its fully qualified filename."
-    mime, encoding = mimetypes.guess_type(full_filename)
-    return mime
 
 class MalformedMessage(Exception):
     '''A message is missing fields or fields are invalid.'''
@@ -31,21 +21,27 @@ class InsufficientPermissions(Exception):
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
 
+    user = None
     authenticated = False
-    _username = None
-    _project = None
+    project = None
     
     @property
     def username(self):
-        "Gets the currently authenticated username for this connection."
-        if not self.authenticated:
-            return None
-        return self._username
+        """
+        Returns the username associated with this connection.
+        """
+        if self.user is not None:
+            return self.user.username
+        return None
         
-    @username.setter
-    def username(self, value):
-        "Sets the currently authenticated username for this connection."
-        self._username = value
+    @property
+    def permission_level(self):
+        """
+        Returns the permission_level associated with this connection.
+        """
+        if self.user is not None:
+            return self.user.permission_level
+        return 0
     
     def user_dir(self, *args):
         """
@@ -58,19 +54,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             return os.path.join(STUDENTS_DIR, self.username)
             
         return os.path.join(STUDENTS_DIR, self.username, os.path.join(*args))
-        
-    @property
-    def project(self):
-        "Gets the current project for the currently authenticated user."
-        if self.username is None:
-            return None
-            
-        return self._project
-        
-    @project.setter
-    def project(self, value):
-        "Sets the current project for the currently authenticated user."
-        self._project = value
 
     def project_dir(self, *args):
         "Returns paths within the current user's current project directory (or None if no project or user)."
@@ -103,8 +86,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         username = self.get_secure_cookie("user")
         
         if username is not None:
-            self.authenticated = True
-            self.username = username
+            self.user = User.get_user(username)
 
             # Check if "new" user and create a project dir for them if needed.
             if not os.path.exists(self.user_dir()):
@@ -112,16 +94,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
             result_message = {'type': 'login_success'}
             self.write_message(json.dumps(result_message))
+            
+            print "User '{}' has connected.".format(self.username)
         else:
             self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
             
             self.notify("Session expired. Please login again.", "error")
         
     def access_denied(self):
-        self.write_message(json.dumps({"type": "access_denied", "reason": "not authenticated"}))
+        self.notify("Access denied.", "error")
         
     def malformed_message(self):
-        self.write_message(json.dumps({"type": "error", "detail": "invalid message"}))
+        self.notify("Invalid message.", "error")
 
     def on_message(self, message):
         try:
@@ -144,13 +128,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.malformed_message()
 
     def on_close(self):
-        print "WebSocket closed"
+        if self.username is not None:
+            print "User '{}' has disconnected.".format(self.username)
 
 class messageHandler(object):
-    def __init__(self, message_type, required_fields=[], require_auth=True):
+    def __init__(self, message_type, required_fields=[], minimum_permission_level=1):
         self.message_type = message_type
         self.required_fields = required_fields
-        self.require_auth = require_auth
+        self.minimum_permission_level = minimum_permission_level
 
     def __call__(self, f):
         def handler(socket_connection, message):
@@ -158,7 +143,7 @@ class messageHandler(object):
                 if not field in message.keys():
                     raise MalformedMessage()
                     
-            if self.require_auth and not socket_connection.authenticated:
+            if self.minimum_permission_level > socket_connection.permission_level:
                 raise InsufficientPermissions()
                 
             f(socket_connection, message)
@@ -169,6 +154,7 @@ class messageHandler(object):
         
         return f
 
+<<<<<<< HEAD
 @messageHandler("project_list_request")
 def handle_project_list_request(socket_connection, message):
     """
@@ -324,3 +310,6 @@ def handle_delete_project_request(socket_connection, message):
     # notify on deletion and close their windows
     socket_connection.notify("You just deleted %s." % socket_connection.project, "success")
     handle_close_project_list(socket_connection, {}, False)
+=======
+
+>>>>>>> b59d9a1f16e4d8f07a81ca56a17ba46e444a2e0d
