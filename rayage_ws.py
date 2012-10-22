@@ -243,6 +243,7 @@ def handle_new_project_request(socket_connection, message):
             os.makedirs(new_project_dir)
 
         socket_connection.notify("You made a new project!", "success")
+        handle_open_project_request(socket_connection, {'id': name})
     except shutil.Error as e:
         # copytree error
         # This exception collects exceptions that are raised during a multi-file operation. 
