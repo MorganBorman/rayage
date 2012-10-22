@@ -99,7 +99,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
 
     on(rayage_ui.menus.project.delete_file, "click", function(evt){
-        topic.publish("ui/menus/project/delete_file");
+        var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
+        topic.publish("ui/menus/project/delete_file", filename);
     });
 
     on(rayage_ui.menus.project.close_project, "click", function(evt){

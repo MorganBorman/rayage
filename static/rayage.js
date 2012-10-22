@@ -58,6 +58,11 @@ function(topic){
         topic.subscribe("ui/menus/project/delete_project", function() {
             rayage_ws.send({"type": "delete_project_request"});
         });
+
+        topic.subscribe("ui/menus/project/delete_file", function(filename) {
+            // TODO: Synchronize project state (before tabs refresh)
+            rayage_ws.send({"type": "delete_file_request", "file": filename});
+        });
         
         topic.subscribe("ws/message/file_type_list", function(data) {
             rayage_ui.dialogs.new_file.setSelections(data.types);
