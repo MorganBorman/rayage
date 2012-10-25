@@ -161,7 +161,7 @@ def handle_new_file_request(socket_connection, message):
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just created %s!" % filename, "success")
 
-@messageHandler("delete_project_request", [], True)
+@messageHandler("delete_project_request", [])
 def handle_delete_project_request(socket_connection, message):
     src = socket_connection.project_dir()
     # move to trash
@@ -172,7 +172,7 @@ def handle_delete_project_request(socket_connection, message):
     socket_connection.notify("You just deleted %s." % socket_connection.project, "success")
     handle_close_project(socket_connection, {}, False)
 
-@messageHandler("delete_file_request", ["file"], True)
+@messageHandler("delete_file_request", ["file"])
 def handle_delete_file_request(socket_connection, message):
     f = message["file"]
     src = socket_connection.project_dir(f)
@@ -183,3 +183,8 @@ def handle_delete_file_request(socket_connection, message):
 
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just deleted %s." % f, "success")
+    
+@messageHandler("run_project_request", ["args"])
+def handle_run_project_request(socket_connection, message):
+    executable = socket_connection.project_dir("a.out")
+    print executable
