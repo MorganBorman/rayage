@@ -1,8 +1,6 @@
-import sys 
-import os
-import shlex
 import re
 import subprocess
+import ntpath
 
 class ClangCompiler:
     """
@@ -32,11 +30,15 @@ class ClangCompiler:
     def parse_id_line(line):
         '''Parses a clang line and returns a dict containing the appropriate info'''
         #Todo: this will fail if the filename contains ":"
+        def path_leaf(path):
+            head, tail = ntpath.split(path)
+            return tail or ntpath.basename(head)
+
         elements = line.split(":",4)
         retval = {}
-        retval['filename'] = elements[0]
-        retval['line_no'] = elements[1]
-        retval['char_no'] = elements[2]
+        retval['filename'] = path_leaf(elements[0])
+        retval['line_no'] = int(elements[1])
+        retval['char_no'] = int(elements[2])
         retval['error_type'] = elements[3].strip()
         retval['error_msg'] = elements[4].strip()
         return retval
