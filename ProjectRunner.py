@@ -21,11 +21,12 @@ class ProjectRunner(threading.Thread):
         
         self.input_queue = []
         
+    def queue_input(self, data):
+        self.input_queue.append(data)
+        
     def run(self):
         return_value = self.proc.poll()
         while return_value is None:
-            return_value = self.proc.poll()
-            
             outputs, inputs, _ = select.select([self.proc.stdout, self.proc.stderr], [self.proc.stdin], [], 1.0)
             
             if outputs is not None:
@@ -38,3 +39,7 @@ class ProjectRunner(threading.Thread):
             if inputs is not None and len(self.input_queue) > 0:
                 stdin = inputs[0]
                 self.proc.stdin.write(self.input_queue.pop(0))
+            
+            return_value = self.proc.poll()
+        
+        self.exited_cb(return_value)

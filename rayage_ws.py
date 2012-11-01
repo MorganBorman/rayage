@@ -24,6 +24,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     user = None
     authenticated = False
     project = None
+    project_runner = None
     
     @property
     def username(self):

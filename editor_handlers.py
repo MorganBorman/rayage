@@ -15,6 +15,8 @@ from rayage_ws import messageHandler
 
 from constants import *
 
+from ProjectRunner import ProjectRunner
+
 @messageHandler("project_list_request")
 def handle_project_list_request(socket_connection, message):
     """
@@ -186,5 +188,28 @@ def handle_delete_file_request(socket_connection, message):
     
 @messageHandler("run_project_request", ["args"])
 def handle_run_project_request(socket_connection, message):
+    args = message['args']
     executable = socket_connection.project_dir("a.out")
-    print executable
+    
+    print "run_project_request:", executable
+    
+    if socket_connection.project_runner is not None:
+        socket_connection.notify("This project is already running! Check the run console.", "error")
+        return
+    
+    if not os.path.exists(executable):
+        socket_connection.notify("The project must be built before running!", "error")
+        return
+    
+    def stdout_cb(data):
+        socket_connection.notify("data", "info")
+    
+    def stderr_cb(data):
+        socket_connection.notify("data", "error")
+    
+    def exited_cb(return_value):
+        socket_connection.notify("{} exited with return value of {}".format(executable, return_value), "info")
+    
+    socket_connection.project_runner = ProjectRunner(executable, args, stdout_cb, stderr_cb, exited_cb)
+    socket_connection.project_runner.start()
+    
