@@ -2,6 +2,7 @@ import os
 import json
 import time
 import shutil
+import glob
 
 import mimetypes
 mimetypes.init()
@@ -12,7 +13,7 @@ def get_mime_type(full_filename):
     return mime
 
 from rayage_ws import messageHandler
-
+from ClangCompiler import ClangCompiler
 from constants import *
 
 from ProjectRunner import ProjectRunner
@@ -185,7 +186,25 @@ def handle_delete_file_request(socket_connection, message):
 
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just deleted %s." % f, "success")
-    
+
+@messageHandler("build_project_request", [])
+def handle_build_project_request(socket_connection, message):
+    if socket_connection.project_dir():
+        # we might only need one of these? do we get more/better multiprocessing this way?
+        c = ClangCompiler()
+        cpp_files = list(glob.glob(socket_connection.project_dir("*.cpp")))
+        c.compile(cpp_files, socket_connection.project_dir("a.out"))
+
+        if len(c.errors()):
+            # return compiler errors
+            errors = {"type": "build_error_list", "errors": c.errors()}
+            socket_connection.write_message(json.dumps(errors))
+        else:
+            # return success message (possibly pass to build).
+            socket_connection.notify("You just built %s." % socket_connection.project, "success")
+
+
+
 @messageHandler("run_project_request", ["args"])
 def handle_run_project_request(socket_connection, message):
     args = message['args']

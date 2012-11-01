@@ -71,6 +71,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                 };
                 
                 this._cursor_timer.start();
-            },
+            }
         });
 });

@@ -19,7 +19,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     
     rayage_ui.editor = {
         welcome_tab: registry.byId("ui_editor_welcome_tab"),
-        tab_container: registry.byId("ui_editor_tab_container")
+        tab_container: registry.byId("ui_editor_tab_container"),
+        editor_instances: {}
     };
     
     on(rayage_ui.editor.tab_container, "selectChild", function() {
@@ -41,16 +42,18 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             lineNumbers: true,
             matchBrackets: true,
             mode: "clike",
-            theme: "neat",
+            theme: "neat"
         });
         
         pane.editor = editor;
         rayage_ui.editor.tab_container.selectChild(pane);
         editor.refresh();
+
+        rayage_ui.editor.editor_instances[title] = editor;
     };
     
     rayage_ui.output = {
-        tab_container: registry.byId("ui_output_tab_container"),
+        tab_container: registry.byId("ui_output_tab_container")
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -65,7 +68,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             delete_project: registry.byId("ui_menus_project_delete_project"),
             new_file: registry.byId("ui_menus_project_new_file"),
             delete_file: registry.byId("ui_menus_project_delete_file"),
-            close_project: registry.byId("ui_menus_project_close_project"),
+            close_project: registry.byId("ui_menus_project_close_project")
         },
         edit: {
             menu: registry.byId("ui_menus_edit"),
@@ -74,9 +77,10 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             cut: registry.byId("ui_menus_edit_cut"),
             copy: registry.byId("ui_menus_edit_copy"),
             paste: registry.byId("ui_menus_edit_paste"),
-            select_all: registry.byId("ui_menus_edit_select_all"),
+            select_all: registry.byId("ui_menus_edit_select_all")
         },
-        logout:  registry.byId("ui_menus_logout"),
+        build:   registry.byId("ui_menus_build"),
+        logout:  registry.byId("ui_menus_logout")
     };
 
     // Hook up the topic publishers
@@ -131,6 +135,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     on(rayage_ui.menus.edit.select_all, "click", function(evt){
         topic.publish("ui/menus/edit/select_all");
     });
+
+    // Build project
+    on(rayage_ui.menus.build, "click", function(evt){
+        topic.publish("ui/menus/build");
+    });
     
     // Login/Logout
     
@@ -160,7 +169,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             setSelections: function(selections) {
                 rayage_ui.dialogs.new_project.selection_store.setData(selections);
                 rayage_ui.dialogs.new_project.selection.setStore(rayage_ui.dialogs.new_project.selection_object_store);
-            },
+            }
         },
         new_file: {
             dialog: registry.byId("ui_dialogs_new_file"),
@@ -173,7 +182,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             setSelections: function(selections) {
                 rayage_ui.dialogs.new_file.selection_store.setData(selections);
                 rayage_ui.dialogs.new_file.selection.setStore(rayage_ui.dialogs.new_file.selection_object_store);
-            },
+            }
         },
         open_project: {
             dialog: registry.byId("ui_dialogs_open_project"),
@@ -185,7 +194,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             setSelections: function(selections) {
                 rayage_ui.dialogs.open_project.selection_store.setData(selections);
                 rayage_ui.dialogs.open_project.selection.setStore(rayage_ui.dialogs.open_project.selection_object_store);
-            },
+            }
         }
     };
     

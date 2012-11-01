@@ -43,6 +43,7 @@ function(topic){
         rayage_ui.menus.project.delete_file.set("disabled", true);
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
+        rayage_ui.menus.build.set("disabled", true);
         
         topic.subscribe("ws/message/redirect", function(data) {
             window.location = data.target;
@@ -140,6 +141,7 @@ function(topic){
             rayage_ui.menus.project.delete_file.set("disabled", true);
             rayage_ui.menus.project.close_project.set("disabled", true);
             rayage_ui.menus.project.delete_project.set("disabled", true);
+            rayage_ui.menus.build.set("disabled", true);
         });
         
         topic.subscribe("ui/menus/project/open_project", function() {
@@ -168,10 +170,15 @@ function(topic){
             rayage_ui.menus.project.delete_file.set("disabled", false);
             rayage_ui.menus.project.close_project.set("disabled", false);
             rayage_ui.menus.project.delete_project.set("disabled", false);
+            rayage_ui.menus.build.set("disabled", false);
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
             rayage_ws.send({"type": "open_project_request", 'id': data});
+        });
+
+        topic.subscribe("ui/menus/build", function() {
+            rayage_ws.send({"type": "build_project_request"});
         });
 
         topic.subscribe("ws/message/project_list", function(data) {
@@ -196,6 +203,18 @@ function(topic){
         
         topic.subscribe("ws/message/login_success", function() {
             rayage_ui.menus.project.menu.set("disabled", false);
+        });
+
+        topic.subscribe("ws/message/build_error_list", function(data) {
+            for(var i=0, len=data.errors.length; i < len; i++) {
+                var err = data.errors[i];
+                var editor = rayage_ui.editor.editor_instances[err.filename];
+                var line = editor.getLineHandle(err.line_no - 1); // code mirror starts at line 0
+                editor.setLineClass(line, "error-text error-text-"+i, "error-bg error-bg-"+i);
+                editor.onDeleteLine(err.line_no, function() {
+                    editor.setLineClass(line, "", "");
+                });
+            }
         });
         
         topic.subscribe("ws/connection/closed", function() {

@@ -24,3 +24,10 @@ html, body {
 #ui_output_tab_run {
     background-color: #000;
 }
+
+.error-bg {
+    background-color: #fce5ef !important;
+}
+.error-text {
+    font-weight: bold !important;
+}
