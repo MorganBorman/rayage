@@ -40,15 +40,29 @@ class ProjectRunner(threading.Thread):
                 for output in outputs:
                     if output == self.master:
                         data = os.read(self.master, 1024)
-                        self.stdout_cb(data)
+                        if len(data) > 0:
+                            self.stdout_cb(data)
                     elif output == self.proc.stderr:
                         data = self.proc.stderr.read(1024)
-                        self.stderr_cb(data)
+                        if len(data) > 0:
+                            self.stderr_cb(data)
             
             if len(self.input_queue) > 0:
                 os.write(self.master, self.input_queue.pop(0))
-                continue
             
             return_value = self.proc.poll()
+        
+        outputs, _, _ = select.select([self.master, self.proc.stderr], [], [], 1.0)
+        
+        if outputs is not None:
+            for output in outputs:
+                if output == self.master:
+                    data = os.read(self.master, 1024)
+                    if len(data) > 0:
+                        self.stdout_cb(data)
+                elif output == self.proc.stderr:
+                    data = self.proc.stderr.read(1024)
+                    if len(data) > 0:
+                        self.stderr_cb(data)
         
         self.exited_cb(return_value)
