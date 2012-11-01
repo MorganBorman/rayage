@@ -20,9 +20,10 @@
     padding: 0;
     margin: 0;
     height: 1.3em;
+    display: inline;
 }
 .terminal .terminal-output div {
-    display: block;
+    display: inline;
 }
 .terminal {
     font-family: FreeMono, monospace;
@@ -32,10 +33,10 @@
     line-height: 14px;
 }
 .terminal .terminal-output div span {
-    display: inline-block;
+    display: inline;
 }
 .terminal .cmd span {
-    display: inline-block;
+    display: inline;
 }
 .terminal .cmd span.inverted {
     background-color: #aaa;
@@ -58,16 +59,6 @@
 }
 .terminal .terminal-output div.error, .terminal .terminal-output div.error div {
     color: red;
-}
-.tilda {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1100;
-}
-.clear {
-    clear: both;
 }
 .terminal a {
     color: #0F60FF;

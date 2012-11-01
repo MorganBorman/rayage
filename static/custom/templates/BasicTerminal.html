@@ -1,9 +1,8 @@
 <div class="terminal" data-dojo-attach-event="onclick: focus_terminal">
-    <div data-dojo-attach-point="outputNode" class="terminal-output">
-    </div>
-    <div class="cmd" style="width: 100%;">
+    <span data-dojo-attach-point="outputNode" class="terminal-output">
+    </span>
+    <div class="cmd">
         <span class="prompt"></span><span data-dojo-attach-point="clipdataNode"></span><span data-dojo-attach-point="cursorNode" class="cursor boxed">&nbsp;</span>
-        <span></span>
         <textarea data-dojo-attach-point="clipboardNode" data-dojo-attach-event="onkeyup: clipboard_onkeyup" class="clipboard"></textarea>
     </div>
 </div>

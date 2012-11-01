@@ -39,7 +39,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                     case dojo.keys.ENTER:
                       this.outputNode.innerHTML += this.clipdataNode.innerHTML + "<br>";
                       this.clipdataNode.innerHTML = "";
-                      data = this.clipboardNode.value
+                      data = this.clipboardNode.value;
                       this.clipboardNode.value = "";
                       this._onInputLine({'data': data});
                       break;
@@ -49,7 +49,26 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                 
             },
             
-            _onInputLine: function( /*Event*/ e){
+            outputErrLine: function(data) {
+                var node = document.createElement("div");
+                node.class = "error";
+                node.innerHTML = data;
+                this.outputNode.appendChild(node);
+                // Go for line in data
+                // Create divs for each line
+                // Last line goes into solid line buffer if it is not terminated with a newline.
+            },
+            
+            outputOutLine: function(data) {
+                var node = document.createElement("div");
+                node.innerHTML = data;
+                this.outputNode.appendChild(node);
+                // Go for line in data
+                // Create divs for each line
+                // Last line goes into solid line buffer if it is not terminated with a newline.
+            },
+            
+            _onInputLine: function( /*Event*/ e) {
               this.emit('inputLine', e);
             },
             

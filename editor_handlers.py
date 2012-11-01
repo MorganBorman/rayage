@@ -232,10 +232,14 @@ def handle_run_project_request(socket_connection, message):
         return
     
     def stdout_cb(data):
-        socket_connection.notify(data, "info")
+        result_message = {'type': 'run_stdout_data', 
+                          'data': data}
+        socket_connection.write_message(json.dumps(result_message))
     
     def stderr_cb(data):
-        socket_connection.notify(data, "error")
+        result_message = {'type': 'run_stderr_data', 
+                          'data': data}
+        socket_connection.write_message(json.dumps(result_message))
     
     def exited_cb(return_value):
         socket_connection.notify("{} exited with return value of {}".format(executable, return_value), "info")

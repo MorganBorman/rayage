@@ -191,6 +191,14 @@ function(topic){
         topic.subscribe("ui/output/terminal/input_line", function(data) {
             rayage_ws.send({"type": "run_stdin_data", "data": data});
         });
+        
+        topic.subscribe("ws/message/run_stdout_data", function(data) {
+            rayage_ui.output.terminal.outputOutLine(data.data);
+        });
+        
+        topic.subscribe("ws/message/run_stderr_data", function(data) {
+            rayage_ui.output.terminal.outputErrLine(data.data);
+        });
 
         topic.subscribe("ws/message/project_list", function(data) {
             rayage_ui.dialogs.open_project.setSelections(data.projects);

@@ -31,27 +31,7 @@ class ProjectRunner(threading.Thread):
     def queue_input(self, data):
         self.input_queue.append(data)
         
-    def run(self):
-        return_value = self.proc.poll()
-        while return_value is None:
-            outputs, _, _ = select.select([self.master, self.proc.stderr], [], [], 1.0)
-            
-            if outputs is not None:
-                for output in outputs:
-                    if output == self.master:
-                        data = os.read(self.master, 1024)
-                        if len(data) > 0:
-                            self.stdout_cb(data)
-                    elif output == self.proc.stderr:
-                        data = self.proc.stderr.read(1024)
-                        if len(data) > 0:
-                            self.stderr_cb(data)
-            
-            if len(self.input_queue) > 0:
-                os.write(self.master, self.input_queue.pop(0))
-            
-            return_value = self.proc.poll()
-        
+    def process_pipes(self):
         outputs, _, _ = select.select([self.master, self.proc.stderr], [], [], 1.0)
         
         if outputs is not None:
@@ -64,5 +44,17 @@ class ProjectRunner(threading.Thread):
                     data = self.proc.stderr.read(1024)
                     if len(data) > 0:
                         self.stderr_cb(data)
+        
+    def run(self):
+        return_value = self.proc.poll()
+        while return_value is None:
+            self.process_pipes()
+            
+            if len(self.input_queue) > 0:
+                os.write(self.master, self.input_queue.pop(0))
+            
+            return_value = self.proc.poll()
+        
+        self.process_pipes()
         
         self.exited_cb(return_value)
