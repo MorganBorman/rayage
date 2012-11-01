@@ -205,6 +205,17 @@ def handle_build_project_request(socket_connection, message):
 
 
 
+
+@messageHandler("run_stdin_data", ["data"])
+def handle_run_stdin_data(socket_connection, message):
+    data = message['data']
+
+    if socket_connection.project_runner is None:
+        socket_connection.notify("There is no project running. Nowhere to send input.", "error")
+        return
+        
+    socket_connection.project_runner.queue_input(data)
+
 @messageHandler("run_project_request", ["args"])
 def handle_run_project_request(socket_connection, message):
     args = message['args']

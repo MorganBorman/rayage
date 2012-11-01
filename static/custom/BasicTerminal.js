@@ -1,8 +1,8 @@
 // custom.BasicTerminal
 define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo/text!./templates/BasicTerminal.html", "dojo/dom-style", "dojo/_base/fx", "dojo/_base/lang",
-        "dojox/timing", "dojo/on"],
-    function(declare, WidgetBase, TemplatedMixin, template, domStyle, baseFx, lang, timing, on){
-        return declare([WidgetBase, TemplatedMixin], {
+        "dojox/timing", "dojo/Evented", "dojo/on"],
+    function(declare, WidgetBase, TemplatedMixin, template, domStyle, baseFx, lang, timing, Evented, on){
+        return declare([WidgetBase, TemplatedMixin, Evented], {
             _cursor_timer: new dojox.timing.Timer(750),
             _cursor_inverted: false,
             
@@ -37,11 +37,20 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                 
                 switch(evt.keyCode) {
                     case dojo.keys.ENTER:
+                      this.outputNode.innerHTML += this.clipdataNode.innerHTML + "<br>";
+                      this.clipdataNode.innerHTML = "";
+                      data = this.clipboardNode.value
+                      this.clipboardNode.value = "";
+                      this._onInputLine({'data': data});
                       break;
                     default:
                       break;
                 }
                 
+            },
+            
+            _onInputLine: function( /*Event*/ e){
+              this.emit('inputLine', e);
             },
             
             // Our template - important!

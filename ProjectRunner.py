@@ -46,7 +46,8 @@ class ProjectRunner(threading.Thread):
                         self.stderr_cb(data)
             
             if len(self.input_queue) > 0:
-                os.write(master, self.input_queue.pop(0))
+                os.write(self.master, self.input_queue.pop(0))
+                continue
             
             return_value = self.proc.poll()
         

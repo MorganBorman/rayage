@@ -53,8 +53,14 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     };
     
     rayage_ui.output = {
-        tab_container: registry.byId("ui_output_tab_container")
+        tab_container: registry.byId("ui_output_tab_container"),
+        terminal: registry.byId("ui_output_terminal")
+        
     };
+    
+    on(rayage_ui.output.terminal, "inputLine", function(evt){
+        topic.publish("ui/output/terminal/input_line", evt.data);
+    });
 
     ///////////////////////////////////////////////////////////////////////////
     // Setup our menus

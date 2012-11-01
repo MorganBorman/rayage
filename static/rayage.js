@@ -187,6 +187,10 @@ function(topic){
         topic.subscribe("ui/menus/run", function() {
             rayage_ws.send({"type": "run_project_request", "args": []});
         });
+        
+        topic.subscribe("ui/output/terminal/input_line", function(data) {
+            rayage_ws.send({"type": "run_stdin_data", "data": data});
+        });
 
         topic.subscribe("ws/message/project_list", function(data) {
             rayage_ui.dialogs.open_project.setSelections(data.projects);
