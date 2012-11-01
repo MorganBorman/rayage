@@ -44,6 +44,7 @@ function(topic){
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
         rayage_ui.menus.build.set("disabled", true);
+        rayage_ui.menus.run.set("disabled", true);
         
         topic.subscribe("ws/message/redirect", function(data) {
             window.location = data.target;
@@ -142,6 +143,7 @@ function(topic){
             rayage_ui.menus.project.close_project.set("disabled", true);
             rayage_ui.menus.project.delete_project.set("disabled", true);
             rayage_ui.menus.build.set("disabled", true);
+            rayage_ui.menus.run.set("disabled", true);
         });
         
         topic.subscribe("ui/menus/project/open_project", function() {
@@ -171,6 +173,7 @@ function(topic){
             rayage_ui.menus.project.close_project.set("disabled", false);
             rayage_ui.menus.project.delete_project.set("disabled", false);
             rayage_ui.menus.build.set("disabled", false);
+            rayage_ui.menus.run.set("disabled", false);
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
@@ -179,6 +182,10 @@ function(topic){
 
         topic.subscribe("ui/menus/build", function() {
             rayage_ws.send({"type": "build_project_request"});
+        });
+
+        topic.subscribe("ui/menus/run", function() {
+            rayage_ws.send({"type": "run_project_request", "args": []});
         });
 
         topic.subscribe("ws/message/project_list", function(data) {

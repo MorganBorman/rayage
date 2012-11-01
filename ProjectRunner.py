@@ -7,13 +7,20 @@ Provides a method by which stdin data may be queued to pipe to the running progr
 import subprocess
 import threading
 import select
+import pty
+import os
 
 class ProjectRunner(threading.Thread):
     def __init__(self, path, args, stdout_cb, stderr_cb, exited_cb):
         threading.Thread.__init__(self)
         
         self.path = path
-        self.proc = subprocess.Popen([path].extend(args), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.arguments = [path]
+        self.arguments.extend(args)
+        
+        self.master, slave = pty.openpty()
+        
+        self.proc = subprocess.Popen(self.arguments, stdin=slave, stdout=slave, stderr=subprocess.PIPE, close_fds=True)
         
         self.stdout_cb = stdout_cb
         self.stderr_cb = stderr_cb
@@ -27,18 +34,19 @@ class ProjectRunner(threading.Thread):
     def run(self):
         return_value = self.proc.poll()
         while return_value is None:
-            outputs, inputs, _ = select.select([self.proc.stdout, self.proc.stderr], [self.proc.stdin], [], 1.0)
+            outputs, _, _ = select.select([self.master, self.proc.stderr], [], [], 1.0)
             
             if outputs is not None:
                 for output in outputs:
-                    if output == self.proc.stdout:
-                        self.stdout_cb(self.proc.stdout.read())
+                    if output == self.master:
+                        data = os.read(self.master, 1024)
+                        self.stdout_cb(data)
                     elif output == self.proc.stderr:
-                        self.stderr_cb(self.proc.stderr.read())
+                        data = self.proc.stderr.read(1024)
+                        self.stderr_cb(data)
             
-            if inputs is not None and len(self.input_queue) > 0:
-                stdin = inputs[0]
-                self.proc.stdin.write(self.input_queue.pop(0))
+            if len(self.input_queue) > 0:
+                os.write(master, self.input_queue.pop(0))
             
             return_value = self.proc.poll()
         

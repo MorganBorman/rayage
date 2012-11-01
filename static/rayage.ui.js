@@ -80,6 +80,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
             select_all: registry.byId("ui_menus_edit_select_all")
         },
         build:   registry.byId("ui_menus_build"),
+        run:   registry.byId("ui_menus_run"),
         logout:  registry.byId("ui_menus_logout")
     };
 
@@ -139,6 +140,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     // Build project
     on(rayage_ui.menus.build, "click", function(evt){
         topic.publish("ui/menus/build");
+    });
+
+    // Run project
+    on(rayage_ui.menus.run, "click", function(evt){
+        topic.publish("ui/menus/run");
     });
     
     // Login/Logout

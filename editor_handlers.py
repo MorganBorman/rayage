@@ -210,7 +210,7 @@ def handle_run_project_request(socket_connection, message):
     args = message['args']
     executable = socket_connection.project_dir("a.out")
     
-    print "run_project_request:", executable
+    print "run_project_request:", executable, " with args:", args
     
     if socket_connection.project_runner is not None:
         socket_connection.notify("This project is already running! Check the run console.", "error")
@@ -221,10 +221,10 @@ def handle_run_project_request(socket_connection, message):
         return
     
     def stdout_cb(data):
-        socket_connection.notify("data", "info")
+        socket_connection.notify(data, "info")
     
     def stderr_cb(data):
-        socket_connection.notify("data", "error")
+        socket_connection.notify(data, "error")
     
     def exited_cb(return_value):
         socket_connection.notify("{} exited with return value of {}".format(executable, return_value), "info")
