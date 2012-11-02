@@ -49,16 +49,20 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
                 
             },
             
+            format_output_data: function(data) {
+                return data.replace(/\r\n/g, "<br>").replace(/\n/g, "<br>").replace(/\r/g, "<br>").replace(/ /g, "&nbsp;")
+            },  
+            
             outputErrLine: function(data) {
                 var node = document.createElement("div");
                 node.class = "error";
-                node.innerHTML = data.replace("\r\n", "<br>");
+                node.innerHTML = this.format_output_data(data);
                 this.outputNode.appendChild(node);
             },
             
             outputOutLine: function(data) {
                 var node = document.createElement("div");
-                node.innerHTML = data.replace("\r\n", "<br>");
+                node.innerHTML = this.format_output_data(data);
                 this.outputNode.appendChild(node);
             },
             

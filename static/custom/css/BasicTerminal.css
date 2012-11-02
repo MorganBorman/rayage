@@ -13,7 +13,7 @@
 .terminal {
     padding: 0px;
     position: relative;
-    overflow: hidden;
+    overflow: scroll;
     height: 100%;
 }
 .cmd {
