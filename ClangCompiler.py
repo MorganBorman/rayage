@@ -22,7 +22,7 @@ class ClangCompiler:
     @staticmethod
     def is_id_line(line):
         '''Takes a line and checks to see if it is a clang error message'''
-        if len(re.findall(".*:[0-9]+:[0-9]+: (error|warning):.*", line)) == 1:
+        if len(re.findall(".*:[0-9]+:[0-9]+: (fatal error|error|warning):.*", line)) == 1:
             return True
         return False
 
