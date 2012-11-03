@@ -152,9 +152,11 @@ function(topic){
         
         topic.subscribe("ws/message/project_state", function(data) {
             var editor_tab_children = rayage_ui.editor.tab_container.getChildren();
+
             for(var i = 0; i < editor_tab_children.length; i++) {
                 rayage_ui.editor.tab_container.removeChild(editor_tab_children[i]);
             }
+            rayage_ui.editor.editor_instances = {};
         
             var project_id = data.id;
             var files = data.files;
@@ -229,10 +231,14 @@ function(topic){
                 var err = data.errors[i];
                 var editor = rayage_ui.editor.editor_instances[err.filename];
                 var line = editor.getLineHandle(err.line_no - 1); // code mirror starts at line 0
+
                 editor.setLineClass(line, "error-text error-text-"+i, "error-bg error-bg-"+i);
-                editor.onDeleteLine(err.line_no, function() {
-                    editor.setLineClass(line, "", "");
+                CodeMirror.on(line, "delete", function() {
+                    delete rayage_ui.editor.error_widget_instances[i];
                 });
+                rayage_ui.editor.addEditorErrorWidget(editor, i, line, err.error_msg);
+
+                editor.refresh();
             }
         });
         

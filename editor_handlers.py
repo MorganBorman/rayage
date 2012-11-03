@@ -190,7 +190,8 @@ def handle_delete_file_request(socket_connection, message):
 @messageHandler("build_project_request", [])
 def handle_build_project_request(socket_connection, message):
     if socket_connection.project_dir():
-        # we might only need one of these? do we get more/better multiprocessing this way?
+        # ClangCompiler basically just encapsulates a few functions
+        # It spawns off a subprocess for clang++.
         c = ClangCompiler()
         cpp_files = list(glob.glob(socket_connection.project_dir("*.cpp")))
         c.compile(cpp_files, socket_connection.project_dir("a.out"))
@@ -198,6 +199,7 @@ def handle_build_project_request(socket_connection, message):
         if len(c.errors()):
             # return compiler errors
             errors = {"type": "build_error_list", "errors": c.errors()}
+            socket_connection.notify("You had build errors...", "error")
             socket_connection.write_message(json.dumps(errors))
         else:
             # return success message (possibly pass to build).

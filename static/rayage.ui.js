@@ -1,9 +1,9 @@
 // This file will contain publishers and subscriber to topics for all direct manipulation of the UI (that is the public interface to the UI)
 
-require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "custom/BasicTerminal", 
+require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dijit/TooltipDialog", "custom/BasicTerminal",
          "dojo/domReady!", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", 
-         "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
-function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTerminal){
+         "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/form/TextBox"],
+function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip, BasicTerminal){
     parser.parse();
     
     // Hook up all the subscribers which provide ways to manipulate the UI here
@@ -20,7 +20,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     rayage_ui.editor = {
         welcome_tab: registry.byId("ui_editor_welcome_tab"),
         tab_container: registry.byId("ui_editor_tab_container"),
-        editor_instances: {}
+        editor_instances: {},
+        error_widget_instances: {}
     };
     
     on(rayage_ui.editor.tab_container, "selectChild", function() {
@@ -29,6 +30,10 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
     });
     
     rayage_ui.editor.tab_container.watch("selectedChildWidget", function(name, oval, nval){
+        if (rayage_ui.editor.editor_instances.hasOwnProperty(nval.title)) {
+            var editor = rayage_ui.editor.editor_instances[nval.title];
+            editor.refresh();
+        }
         topic.publish("ui/editor/tab_change", nval);
     });
     
@@ -50,6 +55,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, BasicTer
         editor.refresh();
 
         rayage_ui.editor.editor_instances[title] = editor;
+    };
+
+    rayage_ui.editor.addEditorErrorWidget = function(editor, id, line, errMsg) {
+        var node = dojo.create("div", { innerHTML: errMsg });
+        rayage_ui.editor.error_widget_instances[id] = editor.addLineWidget(line, node, {coverGutter: false, noHScroll: true});
     };
     
     rayage_ui.output = {
