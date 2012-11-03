@@ -34,16 +34,22 @@ class ProjectRunner(threading.Thread):
     def process_pipes(self):
         outputs, _, _ = select.select([self.master, self.proc.stderr], [], [], 1.0)
         
+        gotdata = False
+        
         if outputs is not None:
             for output in outputs:
                 if output == self.master:
                     data = os.read(self.master, 1024)
                     if len(data) > 0:
+                        gotdata = True
                         self.stdout_cb(data)
                 elif output == self.proc.stderr:
                     data = self.proc.stderr.read(1024)
                     if len(data) > 0:
+                        gotdata = True
                         self.stderr_cb(data)
+        
+        return gotdata
         
     def run(self):
         return_value = self.proc.poll()
@@ -55,6 +61,7 @@ class ProjectRunner(threading.Thread):
             
             return_value = self.proc.poll()
         
-        self.process_pipes()
+        while self.process_pipes():
+            pass
         
         self.exited_cb(return_value)
