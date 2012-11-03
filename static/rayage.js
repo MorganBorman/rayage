@@ -11,6 +11,26 @@ var get_icon_class = function(mimetype) {
     return 'rayage_icon rayage_icon_src_' + safemime;
 }
 
+// Used to debounce a given function and reduce the amount of data
+// sent on the socket.
+var debounce = function(func, threshold) {
+    var timeout;
+
+    return function debounced() {
+        var obj = this, args = arguments;
+        function delayed() {
+            if (threshold !== 0)
+                func.apply(obj, args);
+            timeout = null;
+        }
+        if (timeout)
+            clearTimeout(timeout);
+        else if (threshold === 0)
+            func.apply(obj, args);
+        timeout = setTimeout(delayed, threshold);
+    };
+};
+
 require(["dojo/topic"],
 function(topic){
     
@@ -40,6 +60,7 @@ function(topic){
         rayage_ui.menus.project.menu.set("disabled", true);
         
         rayage_ui.menus.project.new_file.set("disabled", true);
+        rayage_ui.menus.project.save_file.set("disabled", true);
         rayage_ui.menus.project.delete_file.set("disabled", true);
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
@@ -60,6 +81,11 @@ function(topic){
         
         topic.subscribe("ui/menus/project/new_file", function() {
         	rayage_ws.send({"type": "file_type_list_request"});
+        });
+
+        topic.subscribe("ui/menus/project/save_file", function(filename) {
+            // TODO: Synchronize state
+            rayage_ws.send({"type": "save_file_request", "filename": filename});
         });
 
         topic.subscribe("ui/menus/project/delete_project", function() {
@@ -139,6 +165,7 @@ function(topic){
             rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
             
             rayage_ui.menus.project.new_file.set("disabled", true);
+            rayage_ui.menus.project.save_file.set("disabled", true);
             rayage_ui.menus.project.delete_file.set("disabled", true);
             rayage_ui.menus.project.close_project.set("disabled", true);
             rayage_ui.menus.project.delete_project.set("disabled", true);
@@ -157,25 +184,35 @@ function(topic){
                 rayage_ui.editor.tab_container.removeChild(editor_tab_children[i]);
             }
             rayage_ui.editor.editor_instances = {};
+            rayage_ui.editor.dirty_document_widget_instances = {};
         
             var project_id = data.id;
             var files = data.files;
-            
+
             for(var i = 0; i < files.length; i++) {
                 var iconClass = get_icon_class(files[i].mimetype);
                 
-                rayage_ui.editor.addEditorTab(files[i].filename, files[i].data, iconClass);
+                rayage_ui.editor.addEditorTab(files[i].filename, files[i].data, files[i].undo_data, iconClass, files[i].selected);
+                // Adding a rayageDirty property to each editor because marking a CodeMirror instance as
+                // dirty is non-trivial.
+                rayage_ui.editor.editor_instances[files[i].filename].rayageDirty = files[i].modified;
             }
+
+            topic.publish("ui/editor/state_change");
             
             rayage_ui.dialogs.open_project.dialog.hide();
             rayage_ui.dialogs.new_project.dialog.hide();
-            
+
             rayage_ui.menus.project.new_file.set("disabled", false);
             rayage_ui.menus.project.delete_file.set("disabled", false);
             rayage_ui.menus.project.close_project.set("disabled", false);
             rayage_ui.menus.project.delete_project.set("disabled", false);
             rayage_ui.menus.build.set("disabled", false);
             rayage_ui.menus.run.set("disabled", false);
+            if (files.length > 0)
+                rayage_ui.menus.project.save_file.set("disabled", false);
+            else
+                rayage_ui.menus.project.save_file.set("disabled", true);
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
@@ -220,6 +257,34 @@ function(topic){
             }
 
             rayage_ui.dialogs.open_project.dialog.show();
+        });
+
+        topic.subscribe("ui/editor/state_change", function(delay) {
+            // delay is by default 250 ms
+            // but it can optionally be set to 0 for things like saving.
+            delay = typeof delay !== 'undefined' ? delay : 250;
+            debounce(function() {
+                var serialized = {"files": Array(), "type": "project_state_push"};
+                for (var filename in rayage_ui.editor.editor_instances) {
+                    var editor = rayage_ui.editor.editor_instances[filename];
+
+                    if ((!editor.isClean() || editor.rayageDirty === true)
+                        && rayage_ui.editor.dirty_document_widget_instances[filename] === undefined) {
+                        var dirty = dojo.create("div", { style: "text-align: center;",
+                                                         class: "error-bg",
+                                                         innerHTML: "This document is unsaved." });
+                        var w = editor.addLineWidget(0, dirty, {coverGutter: true, noHScroll: true, above: true});
+                        rayage_ui.editor.dirty_document_widget_instances[filename] = w;
+                    }
+
+                    var file = { "data": editor.getValue(),
+                                 "filename": filename,
+                                 "modified": !editor.isClean(),
+                                 "undo_data": editor.getHistory()};
+                    serialized.files.push(file);
+                }
+                rayage_ws.send(serialized);
+            }, delay)();
         });
         
         topic.subscribe("ws/message/login_success", function() {

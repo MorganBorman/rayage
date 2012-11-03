@@ -104,7 +104,7 @@ def handle_new_project_request(socket_connection, message):
         socket_connection.notify("Project already exists.", "error")
 
 @messageHandler("open_project_request", ["id"])
-def handle_open_project_request(socket_connection, message, notify=True):
+def handle_open_project_request(socket_connection, message, notify=True, selected=""):
     """
     Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
     """
@@ -128,12 +128,17 @@ def handle_open_project_request(socket_connection, message, notify=True):
     
     project_file_data = []
     for filename in project_files:
-        with open(os.path.join(project_dir, filename), "r") as f:
+        with \
+        open(os.path.join(project_dir, filename), "r") as file,\
+        open(os.path.join(project_dir, "%s.swp" % filename), "r") as swap,\
+        open(os.path.join(project_dir, "%s~" % filename), "r") as undo:
+            f, s, u = (file.read(), swap.read(), undo.read())
             project_file_data.append({'filename': filename, 
                                       'mimetype': get_mime_type(os.path.join(project_dir, filename)),
-                                      'data': f.read(), 
-                                      'modified': False, 
-                                      'undo_data': None})
+                                      'data': s,
+                                      'modified': f != s,
+                                      'undo_data': json.loads(u or "null"),
+                                      'selected': selected == filename})
     
     project_state = {'type': 'project_state',
                      'id': project_id,
@@ -142,6 +147,22 @@ def handle_open_project_request(socket_connection, message, notify=True):
     socket_connection.write_message(json.dumps(project_state))
     if notify:
         socket_connection.notify("You've opened %s!" % socket_connection.project, "success")
+
+@messageHandler("project_state_push", ["files"])
+def handle_project_state_push(socket_connection, message):
+    if socket_connection.project is None:
+        socket_connection.notify("There's been a catastrophic failure. Please manually save any data to your local machine (copy/paste) and refresh.", "error")
+        return
+
+    for file in message['files']:
+        # if modified, overwrite the .swp file with new data
+        if file['modified']:
+            with open(socket_connection.project_dir("%s.swp" % file['filename']), 'w+') as f:
+                f.write(file['data'])
+
+        # overwrite the undo history - stored as JSON in FILENAME.cpp~
+        with open(socket_connection.project_dir("%s~" % file['filename']), 'w+') as f:
+            f.write(json.dumps(file['undo_data']))
 
 @messageHandler("new_file_request", ["name", "filetype"])
 def handle_new_file_request(socket_connection, message):
@@ -160,9 +181,21 @@ def handle_new_file_request(socket_connection, message):
         return
 
     file(dst, 'w').close()
+    file("%s.swp" % dst, 'w').close()
+    file("%s~" % dst, 'w').close()
+
     # reopen the project with newly created file.
-    handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
+    handle_open_project_request(socket_connection, {'id': socket_connection.project}, False, filename)
     socket_connection.notify("You just created %s!" % filename, "success")
+
+@messageHandler("save_file_request", ["filename"])
+def handle_save_file_request(socket_connection, message):
+    filename = message['filename']
+    src = socket_connection.project_dir("%s.swp" % filename)
+    dst = socket_connection.project_dir(filename)
+    shutil.copyfile(src, dst)
+    handle_open_project_request(socket_connection, {'id': socket_connection.project}, False, filename)
+    socket_connection.notify("You just saved %s!" % filename, "success")
 
 @messageHandler("delete_project_request", [])
 def handle_delete_project_request(socket_connection, message):
@@ -183,13 +216,15 @@ def handle_delete_file_request(socket_connection, message):
     if not os.path.exists(dst):
         os.makedirs(dst)
     shutil.move(src, dst)
+    shutil.move(src+".swp", dst)
+    shutil.move(src+"~", dst)
 
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just deleted %s." % f, "success")
 
 @messageHandler("build_project_request", [])
 def handle_build_project_request(socket_connection, message):
-    if socket_connection.project_dir():
+    if socket_connection.project:
         # ClangCompiler basically just encapsulates a few functions
         # It spawns off a subprocess for clang++.
         c = ClangCompiler()

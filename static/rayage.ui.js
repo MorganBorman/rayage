@@ -21,7 +21,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
         welcome_tab: registry.byId("ui_editor_welcome_tab"),
         tab_container: registry.byId("ui_editor_tab_container"),
         editor_instances: {},
-        error_widget_instances: {}
+        error_widget_instances: {},
+        dirty_document_widget_instances: {}
     };
     
     on(rayage_ui.editor.tab_container, "selectChild", function() {
@@ -37,7 +38,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
         topic.publish("ui/editor/tab_change", nval);
     });
     
-    rayage_ui.editor.addEditorTab = function(title, code, iconClass) {
+    rayage_ui.editor.addEditorTab = function(title, code, undo, iconClass, selected) {
         var pane = new ContentPane({ title: title, content: "", iconClass: iconClass });
         
         rayage_ui.editor.tab_container.addChild(pane);
@@ -51,13 +52,24 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
         });
         
         pane.editor = editor;
-        rayage_ui.editor.tab_container.selectChild(pane);
+        if (selected)
+            rayage_ui.editor.tab_container.selectChild(pane);
+        if (undo !== null)
+            editor.setHistory(undo);
         editor.refresh();
+
+        editor.on("change", function() {
+            topic.publish("ui/editor/state_change");
+        });
 
         rayage_ui.editor.editor_instances[title] = editor;
     };
 
     rayage_ui.editor.addEditorErrorWidget = function(editor, id, line, errMsg) {
+        if (rayage_ui.editor.error_widget_instances[id] !== undefined) {
+            editor.removeLineWidget(rayage_ui.editor.error_widget_instances[id]);
+            delete rayage_ui.editor.error_widget_instances[id];
+        }
         var node = dojo.create("div", { innerHTML: errMsg });
         rayage_ui.editor.error_widget_instances[id] = editor.addLineWidget(line, node, {coverGutter: false, noHScroll: true});
     };
@@ -83,6 +95,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
             open_project: registry.byId("ui_menus_project_open_project"),
             delete_project: registry.byId("ui_menus_project_delete_project"),
             new_file: registry.byId("ui_menus_project_new_file"),
+            save_file: registry.byId("ui_menus_project_save_file"),
             delete_file: registry.byId("ui_menus_project_delete_file"),
             close_project: registry.byId("ui_menus_project_close_project")
         },
@@ -117,6 +130,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
 
     on(rayage_ui.menus.project.new_file, "click", function(evt){
         topic.publish("ui/menus/project/new_file");
+    });
+
+    on(rayage_ui.menus.project.save_file, "click", function(evt) {
+        var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
+        topic.publish("ui/menus/project/save_file", filename);
     });
 
     on(rayage_ui.menus.project.delete_file, "click", function(evt){
