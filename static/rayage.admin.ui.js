@@ -1,6 +1,7 @@
 require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dojo/store/Observable", "dijit/tree/ObjectStoreModel", 
          "dijit/Tree", "dijit/layout/ContentPane", "dojo/domReady!", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", 
-         "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox"],
+         "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/TooltipDialog", "dijit/form/TextBox",
+         "custom/UserManager", "custom/StatisticsViewer", "custom/TemplateManager"],
 function(parser, on, topic, registry, ObjectStore, Memory, Observable, ObjectStoreModel, Tree, ContentPane){
     parser.parse();
     

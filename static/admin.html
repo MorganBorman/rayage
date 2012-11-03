@@ -33,7 +33,11 @@
         
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
-
+        
+        <link type="text/css" rel="stylesheet" href="/custom/css/UserManager.css" />
+        <link type="text/css" rel="stylesheet" href="/custom/css/StatisticsViewer.css" />
+        <link type="text/css" rel="stylesheet" href="/custom/css/TemplateManager.css" />
+        
 		<script src="development-mode.js"></script>
 
         <script src="rayage.admin.js"></script>
@@ -43,15 +47,17 @@
 
 	</head>
 	<body class="claro">
-        <div data-dojo-type="dijit/MenuBar" id="ui_menus">
-            <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_open_rayage">
-                Open Rayage
+		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:true, liveSplitters:true" style="width: 100%; height: 100%">
+		
+            <div data-dojo-type="dijit/MenuBar" id="ui_menus" data-dojo-props="region:'top'">
+                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_open_rayage">
+                    Open Rayage
+                </div>
+                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
+                    Logout
+                </div>
             </div>
-            <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
-                Logout
-            </div>
-        </div>
-		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" style="width: 100%; height: 100%">
+
 		    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'leading', splitter:true, minSize: 200" id="ui_nav_pane" style="width: 300px;">
 		    </div>
             <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center', splitter:true" id="ui_admin_tab_container">
