@@ -232,7 +232,7 @@ function(topic){
                 var editor = rayage_ui.editor.editor_instances[err.filename];
                 var line = editor.getLineHandle(err.line_no - 1); // code mirror starts at line 0
 
-                editor.setLineClass(line, "error-text error-text-"+i, "error-bg error-bg-"+i);
+                editor.addLineClass(line, "wrap", "error-bg");
                 CodeMirror.on(line, "delete", function() {
                     delete rayage_ui.editor.error_widget_instances[i];
                 });
