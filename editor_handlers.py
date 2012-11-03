@@ -127,7 +127,16 @@ def handle_open_project_request(socket_connection, message, notify=True, selecte
     project_files = filter(is_project_file, os.listdir(project_dir))
     
     project_file_data = []
+
     for filename in project_files:
+        # create state files if they don't exist for some reason.
+        if not os.path.exists(os.path.join(project_dir, "%s.swp" % filename)):
+            dst = socket_connection.project_dir("%s.swp" % filename)
+            src = socket_connection.project_dir(filename)
+            shutil.copyfile(src, dst)
+        if not os.path.exists(os.path.join(project_dir, "%s~" % filename)):
+            open(os.path.join(project_dir, "%s~" % filename), 'w').close()
+
         with \
         open(os.path.join(project_dir, filename), "r") as file,\
         open(os.path.join(project_dir, "%s.swp" % filename), "r") as swap,\
