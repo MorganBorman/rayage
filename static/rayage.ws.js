@@ -2,8 +2,8 @@
 
 // Hook up all the publishers which convey information from the websocket to the rest of the application here
 
-require(["dojo/topic", "dojo/cookie"],
-function(topic, cookie){
+require(["dojo/topic", "dojo/cookie", "dojo/json"],
+function(topic, cookie, JSON){
     /*
     // published topics
     ws/connection/opened

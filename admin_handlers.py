@@ -19,3 +19,18 @@ def handle_admin_module_tree_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
+
+@messageHandler("RayageJsonStore/Users")
+def handle_admin_module_tree_request(socket_connection, message):
+    """
+    Writes a JSON structure representing the available admin modules tree to our socket.
+    """
+    print message
+    
+    result_message = {'type': message['type'],
+                      'response': [{ 'id': 0, 'username': "bormanm", 'permissions': 'admin'}, { 'id': 1, 'username': "bjorgep", 'permissions': 'admin'}],
+                      'deferredId': message['deferredId'],
+                     }
+                      
+    socket_connection.write_message(json.dumps(result_message))
+

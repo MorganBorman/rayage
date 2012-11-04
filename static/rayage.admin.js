@@ -51,6 +51,7 @@ function(topic){
                 instantiation_params.title = item.name;
                 instantiation_params.closable = true;
                 instantiation_params.iconClass = "rayage_icon rayage_icon_admin_" + item.iconClass;
+                instantiation_params.ws = rayage_ws;
                 
                 var module_instance = module(instantiation_params);
                 

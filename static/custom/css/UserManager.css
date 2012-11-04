@@ -1,5 +1,6 @@
 @import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/resources/Grid.css";
 @import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/resources/claroGrid.css";
+@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/enhanced/resources/claro/EnhancedGrid.css";
 
 .dojoxGrid table {
   margin: 0;
@@ -11,5 +12,5 @@
 }
 
 #grid {
-    height: 400px;
+    height: 100%;
 }
