@@ -32,15 +32,15 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 /*set up data store*/
                 var objectStore = new RayageJsonStore({target:"/Users", ws:this.ws});
                 var dataStore = new ObjectStore({objectStore: objectStore});
-
+                
                 /*set up layout*/
                 var layout = [[
-                  {'name': 'Id', 'field': 'id', 'width': '30px'},
-                  {'name': 'Username', 'field': 'username', 'width': '100px'},
-                  {'name': 'Permissions', 'field': 'permissions', 'width': '100px'}
+                  {'name': 'Id', 'field': 'id', 'width': '60px'},
+                  {'name': 'Username', 'field': 'username', 'width': '175px'},
+                  {'name': 'Permissions', 'field': 'permissions', 'width': '125px'}
                 ]];
-
-                /*create a new grid*/
+                /*
+                /*create a new grid*
                 var grid = new EnhancedGrid({
                     id: 'grid',
                     store: dataStore,
@@ -62,11 +62,21 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                     
                     //grid.showFilterBar(true);
 
-                    /*append the new grid to the div*/
+                    /*append the new grid to the div*
                     grid.placeAt(this.userList);
-
-                    /*Call startup() to render the grid*/
-                    grid.startup();
+                */
+                
+                this.userGrid.set("structure", layout);
+                
+                this.userGrid.set("plugins", {filter: {closeFilterbarButton: false, itemsName: "users"}});
+                
+                /*Call startup() to render the grid*/
+                this.userGrid.startup();
+                
+                this.userGrid.setStore(dataStore);
+                
+                this.userGrid.showFilterBar(true);
+                //this.userGrid.set("query", "");
             },
             
             // The constructor

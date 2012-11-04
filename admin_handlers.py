@@ -1,4 +1,5 @@
 import json
+import random
 
 from rayage_ws import messageHandler
 
@@ -19,6 +20,14 @@ def handle_admin_module_tree_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
+from names import names
+            
+user_table = []
+
+i = 0
+for name in names:
+    user_table.append({'id': i, 'username': name, 'permissions': random.randrange(0,3)})
+    i += 1
 
 @messageHandler("RayageJsonStore/Users")
 def handle_admin_module_tree_request(socket_connection, message):
@@ -27,10 +36,29 @@ def handle_admin_module_tree_request(socket_connection, message):
     """
     print message
     
-    result_message = {'type': message['type'],
-                      'response': [{ 'id': 0, 'username': "bormanm", 'permissions': 'admin'}, { 'id': 1, 'username': "bjorgep", 'permissions': 'admin'}],
+    options = {}
+    if u'options' in message.keys():
+        options = message[u'options']
+    
+    count = 1000
+    if u'count' in options.keys():
+        print "foo"
+        count = int(options[u'count'])
+        
+    start = 0
+    if u'start' in options.keys():
+        print "bar"
+        start = int(options[u'start'])
+        
+    end_index = min(start+count, len(user_table))
+    
+    print start, end_index
+    
+    result_message = {'type': message[u'type'],
+                      'response': user_table[start:end_index],
+                      'total': len(user_table),
                       'deferredId': message['deferredId'],
                      }
-                      
+    
     socket_connection.write_message(json.dumps(result_message))
 

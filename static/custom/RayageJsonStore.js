@@ -42,6 +42,7 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		        if (data.hasOwnProperty("deferredId") && data.hasOwnProperty("response")) {
 		            if (self.pendingDeferreds.hasOwnProperty(data.deferredId)) {
 		                console.log("data: ", data);
+		                self.pendingDeferreds[data.deferredId].raw_data = data
 		                self.pendingDeferreds[data.deferredId].resolve(data.response);
 		            }
 		        }
@@ -179,9 +180,10 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    //		The optional arguments to apply to the resultset.
 		    // returns: dojo/store/api/Store.QueryResults
 		    //		The results of the query, extended with iterative methods.
-		    //options = {options.count, options.sort, options.query, options.queryOptions, options.start};
 		    
-		    options = jQuery.extend(true, {}, options);
+		    options = {count: options.count, sort: options.sort, query: options.query, queryOptions: options.queryOptions, start: options.start};
+		    
+		    //options = jQuery.extend(true, {}, options);
 		    
 		    console.log("RayageJsonStore.query(", query, options, ")");
 		    
@@ -193,6 +195,10 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    // Create and send the request
 		    var obj = {type: this.messageType, deferredId: def_id, action: "QUERY", options: options};
 		    this.ws.send(obj);
+		    
+		    def.total = def.then(function(){
+			    return def.raw_data.total;
+		    });
 		    
 		    // Return the deferred
 		    return QueryResults(def);
