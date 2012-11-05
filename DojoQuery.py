@@ -3,7 +3,7 @@ from sqlalchemy import and_, or_
 statement_types = {}
 
 class MalformedDojoQuery(Exception):
-    '''A message is missing fields or fields are invalid.'''
+    '''A dojo sort dictionary is missing fields or fields are invalid.'''
     def __init__(self, value=''):
         Exception.__init__(self, value)
 

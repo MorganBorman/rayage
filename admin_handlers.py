@@ -8,6 +8,7 @@ from database.User import User
 from database.SessionFactory import SessionFactory
 
 from DojoQuery import DojoQuery
+from DojoSort import DojoSort
 
 admin_modules = [
     { 'id': 'admin_modules', 'name': 'Admin Modules', 'type':'folder', 'iconClass': 'modules'},
@@ -45,6 +46,10 @@ def handle_admin_module_tree_request(socket_connection, message):
     if u'start' in options.keys():
         start = int(options[u'start'])
         
+    dojo_sort = None
+    if u'sort' in options.keys():
+        dojo_sort = options[u'sort']
+        
     dojo_query = None
     if u'query' in options.keys():
         dojo_query = options[u'query']
@@ -53,11 +58,15 @@ def handle_admin_module_tree_request(socket_connection, message):
     try:
         query = session.query(User.id, User.username, User.permission_level)
     
+        column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
+    
         if dojo_query is not None:
-            column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
-            
             dojo_query_obj = DojoQuery(dojo_query)
             query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+            
+        if dojo_sort is not None:
+            dojo_sort_obj = DojoSort(dojo_sort)
+            query = dojo_sort_obj.apply_to_sqla_query(query, column_map)
         
         user_count = query.count()
         user_list = query.offset(start).limit(count).all()
