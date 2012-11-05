@@ -21,6 +21,8 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
             postCreate: function(){
             },
             
+            current_user: undefined,
+            
             startup: function() {
                 this.border_container.startup();
                 this.resize();
@@ -28,10 +30,19 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 this.setupGrid();
             },
             
+            click_change_permissions: function() {
+                console.log("this: ", this);
+                if (typeof this.current_user != "undefined") {
+                    this.userDataStore.setValue(this.current_user, 'permissions', this.user_info_permissions.get('value'));
+                    this.userDataStore.save();
+                }
+            },
+            
             updateUserInfo: function(userRow) {
                 if (typeof userRow != "undefined") {
                     this.user_info_username.innerHTML = userRow.username;
                     this.user_info_permissions.set('value', userRow.permissions);
+                    this.current_user = userRow;
                 }
             },
             
@@ -47,10 +58,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                   {'name': 'Permissions', 'field': 'permissions', 'width': '125px'}
                 ]];
                 
-
-                
-                console.log(this.userGrid);
-                
                 /*initialize the declaritive grid with the programmatic parameters*/
                 this.userGrid.set("structure", layout);
                 this.userGrid.set("selectionMode", "single");
@@ -64,7 +71,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 
                 on(this.userGrid, "rowClick", function(e) {
                     var userRow = self.userGrid.getItem(e.rowIndex);
-                    console.log("A row was clicked: ", userRow);
                     self.updateUserInfo(userRow);
                 });
             },

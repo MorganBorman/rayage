@@ -2,7 +2,7 @@ import json
 import random
 from sqlalchemy import func
 
-from rayage_ws import messageHandler
+from rayage_ws import messageHandler, MalformedMessage
 
 from database.User import User
 from database.SessionFactory import SessionFactory
@@ -27,58 +27,82 @@ def handle_admin_module_tree_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
-@messageHandler("RayageJsonStore/Users")
+@messageHandler("RayageJsonStore/Users", ['action', 'deferredId'])
 def handle_admin_module_tree_request(socket_connection, message):
     """
     Writes a JSON structure representing the available admin modules tree to our socket.
     """
     print message
     
-    options = {}
-    if u'options' in message.keys():
-        options = message[u'options']
+    action = message[u'action']
     
-    count = 30
-    if u'count' in options.keys():
-        count = int(options[u'count'])
+    if action == u'QUERY':
         
-    start = 0
-    if u'start' in options.keys():
-        start = int(options[u'start'])
+        options = {}
+        if u'options' in message.keys():
+            options = message[u'options']
         
-    dojo_sort = None
-    if u'sort' in options.keys():
-        dojo_sort = options[u'sort']
-        
-    dojo_query = None
-    if u'query' in options.keys():
-        dojo_query = options[u'query']
-    
-    session = SessionFactory()
-    try:
-        query = session.query(User.id, User.username, User.permission_level)
-    
-        column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
-    
-        if dojo_query is not None:
-            dojo_query_obj = DojoQuery(dojo_query)
-            query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+        count = 30
+        if u'count' in options.keys():
+            count = int(options[u'count'])
             
-        if dojo_sort is not None:
-            dojo_sort_obj = DojoSort(dojo_sort)
-            query = dojo_sort_obj.apply_to_sqla_query(query, column_map)
+        start = 0
+        if u'start' in options.keys():
+            start = int(options[u'start'])
+            
+        dojo_sort = None
+        if u'sort' in options.keys():
+            dojo_sort = options[u'sort']
+            
+        dojo_query = None
+        if u'query' in options.keys():
+            dojo_query = options[u'query']
         
-        user_count = query.count()
-        user_list = query.offset(start).limit(count).all()
-        user_list = [{'id': uid, 'username': username, 'permissions': permission_level} for uid, username, permission_level in user_list]
+        session = SessionFactory()
+        try:
+            query = session.query(User.id, User.username, User.permission_level)
         
+            column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
+        
+            if dojo_query is not None:
+                dojo_query_obj = DojoQuery(dojo_query)
+                query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+                
+            if dojo_sort is not None:
+                dojo_sort_obj = DojoSort(dojo_sort)
+                query = dojo_sort_obj.apply_to_sqla_query(query, column_map)
+            
+            user_count = query.count()
+            user_list = query.offset(start).limit(count).all()
+            user_list = [{'id': uid, 'username': username, 'permissions': permission_level} for uid, username, permission_level in user_list]
+            
+            result_message = {'type': message[u'type'],
+                              'response': user_list,
+                              'total': user_count,
+                              'deferredId': message['deferredId'],
+                             }
+        finally:
+            session.close()
+            
+    elif action == u'PUT':
+        objectData = json.loads(message[u'objectData'])
+            
+        session = SessionFactory()
+        try:
+            user = User.get_user(objectData[u'username'])
+            user.permission_level = objectData[u'permissions']
+            session.add(user)
+            session.commit()
+        finally:
+            session.close()
+            
         result_message = {'type': message[u'type'],
-                          'response': user_list,
-                          'total': user_count,
+                          'response': [],
                           'deferredId': message['deferredId'],
                          }
-    finally:
-        session.close()
+    else:
+        print "Unsupported store action: {}".format(action)
+        return
     
     socket_connection.write_message(json.dumps(result_message))
 
