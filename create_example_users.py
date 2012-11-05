@@ -16,7 +16,7 @@ from database.SessionFactory import SessionFactory
 session = SessionFactory()
 try:
     for username in usernames:
-        permission_level = random.randint(0,4)
+        permission_level = random.randint(0,3)
         user = User(username, permission_level)
         session.add(user)
     session.commit()

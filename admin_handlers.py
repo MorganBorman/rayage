@@ -7,6 +7,8 @@ from rayage_ws import messageHandler
 from database.User import User
 from database.SessionFactory import SessionFactory
 
+from DojoQuery import DojoQuery
+
 admin_modules = [
     { 'id': 'admin_modules', 'name': 'Admin Modules', 'type':'folder', 'iconClass': 'modules'},
     { 'id': 'view_statistics', 'name': 'View Statistics', 'type': 'custom/StatisticsViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'view_statistics'},
@@ -35,20 +37,30 @@ def handle_admin_module_tree_request(socket_connection, message):
     if u'options' in message.keys():
         options = message[u'options']
     
-    count = 1000
+    count = 30
     if u'count' in options.keys():
         count = int(options[u'count'])
         
     start = 0
     if u'start' in options.keys():
         start = int(options[u'start'])
+        
+    dojo_query = None
+    if u'query' in options.keys():
+        dojo_query = options[u'query']
     
     session = SessionFactory()
     try:
-        user_count = session.query(func.count(User.id)).scalar()
+        query = session.query(User.id, User.username, User.permission_level)
+    
+        if dojo_query is not None:
+            column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
+            
+            dojo_query_obj = DojoQuery(dojo_query)
+            query = dojo_query_obj.apply_to_sqla_query(query, column_map)
         
-        user_list = session.query(User.id, User.username, User.permission_level).offset(start).limit(count).all()
-        
+        user_count = query.count()
+        user_list = query.offset(start).limit(count).all()
         user_list = [{'id': uid, 'username': username, 'permissions': permission_level} for uid, username, permission_level in user_list]
         
         result_message = {'type': message[u'type'],
