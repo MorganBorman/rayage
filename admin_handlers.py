@@ -1,7 +1,11 @@
 import json
 import random
+from sqlalchemy import func
 
 from rayage_ws import messageHandler
+
+from database.User import User
+from database.SessionFactory import SessionFactory
 
 admin_modules = [
     { 'id': 'admin_modules', 'name': 'Admin Modules', 'type':'folder', 'iconClass': 'modules'},
@@ -20,15 +24,6 @@ def handle_admin_module_tree_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
-from names import names
-            
-user_table = []
-
-i = 0
-for name in names:
-    user_table.append({'id': i, 'username': name, 'permissions': random.randrange(0,3)})
-    i += 1
-
 @messageHandler("RayageJsonStore/Users")
 def handle_admin_module_tree_request(socket_connection, message):
     """
@@ -42,23 +37,27 @@ def handle_admin_module_tree_request(socket_connection, message):
     
     count = 1000
     if u'count' in options.keys():
-        print "foo"
         count = int(options[u'count'])
         
     start = 0
     if u'start' in options.keys():
-        print "bar"
         start = int(options[u'start'])
+    
+    session = SessionFactory()
+    try:
+        user_count = session.query(func.count(User.id)).scalar()
         
-    end_index = min(start+count, len(user_table))
-    
-    print start, end_index
-    
-    result_message = {'type': message[u'type'],
-                      'response': user_table[start:end_index],
-                      'total': len(user_table),
-                      'deferredId': message['deferredId'],
-                     }
+        user_list = session.query(User.id, User.username, User.permission_level).offset(start).limit(count).all()
+        
+        user_list = [{'id': uid, 'username': username, 'permissions': permission_level} for uid, username, permission_level in user_list]
+        
+        result_message = {'type': message[u'type'],
+                          'response': user_list,
+                          'total': user_count,
+                          'deferredId': message['deferredId'],
+                         }
+    finally:
+        session.close()
     
     socket_connection.write_message(json.dumps(result_message))
 

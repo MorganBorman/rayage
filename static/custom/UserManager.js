@@ -1,8 +1,8 @@
 // custom.UserManager
 define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/UserManager.html", "dojo/dom-style", 
         "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", 'dojox/grid/EnhancedGrid', "dojox/grid/enhanced/plugins/Filter", 'dojo/data/ObjectStore', 
-        'dojo/data/ItemFileWriteStore', "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "custom/RayageJsonStore"],
-    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, EnhancedGrid, Filter, ObjectStore, ItemFileWriteStore, BorderContainer, ContentPane, RayageJsonStore) {
+        'dojo/data/ItemFileWriteStore', "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "custom/RayageJsonStore", "dojo/on", "dojox/form/DropDownSelect"],
+    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, EnhancedGrid, Filter, ObjectStore, ItemFileWriteStore, BorderContainer, ContentPane, RayageJsonStore, on, DropDownSelect) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -25,13 +25,20 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 this.border_container.startup();
                 this.resize();
                 
-                this.createGrid();
+                this.setupGrid();
             },
             
-            createGrid: function() {
+            updateUserInfo: function(userRow) {
+                if (typeof userRow != "undefined") {
+                    this.user_info_username.innerHTML = userRow.username;
+                    this.user_info_permissions.set('value', userRow.permissions);
+                }
+            },
+            
+            setupGrid: function() {
                 /*set up data store*/
-                var objectStore = new RayageJsonStore({target:"/Users", ws:this.ws});
-                var dataStore = new ObjectStore({objectStore: objectStore});
+                this.userObjectStore = new RayageJsonStore({target:"/Users", ws:this.ws});
+                this.userDataStore = new ObjectStore({objectStore: this.userObjectStore});
                 
                 /*set up layout*/
                 var layout = [[
@@ -39,44 +46,27 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                   {'name': 'Username', 'field': 'username', 'width': '175px'},
                   {'name': 'Permissions', 'field': 'permissions', 'width': '125px'}
                 ]];
-                /*
-                /*create a new grid*
-                var grid = new EnhancedGrid({
-                    id: 'grid',
-                    store: dataStore,
-                    structure: layout,
-                    autoHeight: true,
-                    autoWidth: true,
-                    rowsPerPage: 30,
-                    rowSelector: '20px',
-                    plugins: {
-                        filter: {
-                            // Show the closeFilterbarButton at the filter bar
-                            closeFilterbarButton: false,
-                            // Set the maximum rule count to 5
-                            ruleCount: 5,
-                            // Set the name of the items
-                            itemsName: "users"
-                        }
-                    }});
-                    
-                    //grid.showFilterBar(true);
+                
 
-                    /*append the new grid to the div*
-                    grid.placeAt(this.userList);
-                */
                 
+                console.log(this.userGrid);
+                
+                /*initialize the declaritive grid with the programmatic parameters*/
                 this.userGrid.set("structure", layout);
-                
-                this.userGrid.set("plugins", {filter: {closeFilterbarButton: false, itemsName: "users"}});
-                
-                /*Call startup() to render the grid*/
+                this.userGrid.set("selectionMode", "single");
                 this.userGrid.startup();
-                
-                this.userGrid.setStore(dataStore);
-                
+                this.userGrid.setStore(this.userDataStore);
                 this.userGrid.showFilterBar(true);
-                //this.userGrid.set("query", "");
+                //this.userGrid.plugins.filter.setupFilterQuery = setupFilter;
+                this.userGrid.selection.select(0);
+                
+                var self = this;
+                
+                on(this.userGrid, "rowClick", function(e) {
+                    var userRow = self.userGrid.getItem(e.rowIndex);
+                    console.log("A row was clicked: ", userRow);
+                    self.updateUserInfo(userRow);
+                });
             },
             
             // The constructor
