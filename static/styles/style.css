@@ -25,6 +25,10 @@ html, body {
     background-color: #000;
 }
 
+#ui_bottom_pane {
+    height: 30%;
+}
+
 .error-bg {
     background-color: #fce5ef !important;
 }

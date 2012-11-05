@@ -39,6 +39,14 @@
     background: url(/images/oxygen/new-src.png);
 }
 
+.rayage_icon_save_source {
+    background: url(/images/oxygen/save.png);
+}
+
+.rayage_icon_save_all_sources {
+    background: url(/images/oxygen/save-all.png);
+}
+
 .rayage_icon_delete_project {
     background: url(/images/oxygen/delete-project.png);
 }
