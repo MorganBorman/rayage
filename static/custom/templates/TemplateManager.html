@@ -1,3 +1,15 @@
 <div class="template_manager">
-    This will be the template manager.
+    <script type="dojo/require">
+        Uploader: "dojox/form/Uploader",
+        Flash: "dojox/form/uploader/plugins/Flash"
+    </script>
+
+    <form method="post" action="/upload/template" id="myForm"
+    enctype="multipart/form-data" >
+        <fieldset>
+            <legend>Template upload Test</legend>
+            <input class="browseButton" name="the_template" multiple="true" type="file" dojoType="dojox/form/Uploader" label="Select Some Files" id="uploader" />
+            <input type="submit" label="Submit" dojoType="dijit.form.Button" />
+        </fieldset>
+    </form>
 </div>

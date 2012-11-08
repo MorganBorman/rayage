@@ -34,16 +34,25 @@ class RequestHandler(CASVerifiedRequestHandler):
                 with open(system_directory+'/static/admin.html') as f:
                     self.write(f.read())
                     self.finish()
-                    
-                #self.write("Admin page<br>Logged in as %s!<br><a href=\"/logout\">logout</a>" % self.get_current_user())
-                #self.finish()
             else:
                 with open(system_directory+'/static/index.html') as f:
                     self.write(f.read())
                     self.finish()
+                    
+class UploadHandler(CASVerifiedRequestHandler):
+    def post(self, action):
+        if self.get_current_user() is None:
+            self.validate_user()
+            return
+                
+        if action == "template":
+            the_template = self.request.files['the_template'][0]
+            print the_template
+            self.finish("Yay file uploaded!")
 
 handlers = [
     (r'/(admin|logout|)', RequestHandler),
+    (r'/upload/(.*)', UploadHandler),
     (r'/(.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
     (r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
     (r'/custom/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/custom'}),
