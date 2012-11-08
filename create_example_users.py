@@ -8,7 +8,8 @@ system_directory = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(system_directory + "/imports")
 
-from names import names as usernames
+#from names import names as usernames
+from names_from_home_directories import names as usernames
 
 from database.User import User
 from database.SessionFactory import SessionFactory
