@@ -11,7 +11,7 @@ import pty
 import os
 
 class ProjectRunner(threading.Thread):
-    def __init__(self, path, args, stdout_cb, stderr_cb, exited_cb):
+    def __init__(self, path, args, stdout_cb, stderr_cb, exited_cb, timeout_cb, timeout=15):
         threading.Thread.__init__(self)
         
         self.path = path
@@ -25,6 +25,9 @@ class ProjectRunner(threading.Thread):
         self.stdout_cb = stdout_cb
         self.stderr_cb = stderr_cb
         self.exited_cb = exited_cb
+        self.timeout_cb = timeout_cb
+        
+        self.timeout = timeout
         
         self.input_queue = []
         
@@ -56,6 +59,11 @@ class ProjectRunner(threading.Thread):
         while return_value is None:
             self.process_pipes()
             
+            if self.cpu_seconds() > self.timeout and self.proc.poll() is None:
+                print "cpu_seconds = {}".format(self.cpu_seconds())
+                self.proc.terminate()
+                self.timeout_cb()
+            
             if len(self.input_queue) > 0:
                 os.write(self.master, self.input_queue.pop(0))
             
@@ -65,3 +73,17 @@ class ProjectRunner(threading.Thread):
             pass
         
         self.exited_cb(return_value)
+        
+    def cpu_seconds(self):
+        args = ['ps', '-o"%x"', '--no-headers', '-p', str(self.proc.pid)]
+        
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, errors = p.communicate()
+        
+        output = output.strip('"').rstrip('"\n')
+        
+        cpu_hours, cpu_minutes, cpu_seconds = map(int, output.split(":"))
+        
+        cpu_seconds = (60*60*cpu_hours) + (60*cpu_minutes) + cpu_seconds
+        
+        return cpu_seconds

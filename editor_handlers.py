@@ -290,7 +290,10 @@ def handle_run_project_request(socket_connection, message):
     def exited_cb(return_value):
         socket_connection.notify("{} exited with return value of {}".format(executable, return_value), "info")
         socket_connection.project_runner = None
+        
+    def timeout_cb():
+        socket_connection.notify("Your program was taking too long to run. Check your loops.", "error")
     
-    socket_connection.project_runner = ProjectRunner(executable, args, stdout_cb, stderr_cb, exited_cb)
+    socket_connection.project_runner = ProjectRunner(executable, args, stdout_cb, stderr_cb, exited_cb, timeout_cb)
     socket_connection.project_runner.start()
     
