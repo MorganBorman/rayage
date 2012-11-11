@@ -45,7 +45,7 @@ class RequestHandler(CASVerifiedRequestHandler):
                     self.write(f.read())
                     self.finish()
             else:
-                with open(sysstem_directory+'/static/denied.html') as f:
+                with open(system_directory+'/static/denied.html') as f:
                     self.write(f.read())
                     self.finish()
                     

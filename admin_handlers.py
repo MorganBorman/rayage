@@ -88,13 +88,15 @@ def handle_admin_module_tree_request(socket_connection, message):
     elif action == u'PUT':
         objectData = json.loads(message[u'objectData'])
             
+        target_permission_level = int(objectData[u'permissions'])
+            
         session = SessionFactory()
         try:
-            user = User.get_user(objectData[u'username'])
-            user.permission_level = objectData[u'permissions']
-            
-            if objectData[u'permissions'] >= socket_connection.permission_level and not socket_connection.permission_level == PERMISSION_LEVEL_ADMIN:
+            if target_permission_level >= socket_connection.permission_level and not socket_connection.permission_level == PERMISSION_LEVEL_ADMIN:
                 raise InsufficientPermissions("Cannot elevate user permissions higher than self.")
+            
+            user = User.get_user(objectData[u'username'])
+            user.permission_level = target_permission_level
             
             session.add(user)
             session.commit()
