@@ -2,7 +2,8 @@ import json
 import random
 from sqlalchemy import func
 
-from rayage_ws import messageHandler, MalformedMessage
+from rayage_ws import messageHandler, MalformedMessage, InsufficientPermissions
+from constants import *
 
 from database.User import User
 from database.SessionFactory import SessionFactory
@@ -17,7 +18,7 @@ admin_modules = [
     { 'id': 'template_manager', 'name': 'Manage Templates', 'type': 'custom/TemplateManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
 ]
 
-@messageHandler("admin_module_tree_request")
+@messageHandler("admin_module_tree_request", minimum_permission_level=PERMISSION_LEVEL_TA)
 def handle_admin_module_tree_request(socket_connection, message):
     """
     Writes a JSON structure representing the available admin modules tree to our socket.
@@ -27,10 +28,10 @@ def handle_admin_module_tree_request(socket_connection, message):
                       
     socket_connection.write_message(json.dumps(result_message))
 
-@messageHandler("RayageJsonStore/Users", ['action', 'deferredId'])
+@messageHandler("RayageJsonStore/Users", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
 def handle_admin_module_tree_request(socket_connection, message):
     """
-    Writes a JSON structure representing the available admin modules tree to our socket.
+    Handles REST-like requests over the websocket for the lazy-loading editable table showing the users and their permissions.
     """
     print message
     
@@ -91,6 +92,10 @@ def handle_admin_module_tree_request(socket_connection, message):
         try:
             user = User.get_user(objectData[u'username'])
             user.permission_level = objectData[u'permissions']
+            
+            if objectData[u'permissions'] >= socket_connection.permission_level and not socket_connection.permission_level == PERMISSION_LEVEL_ADMIN:
+                raise InsufficientPermissions("Cannot elevate user permissions higher than self.")
+            
             session.add(user)
             session.commit()
         finally:

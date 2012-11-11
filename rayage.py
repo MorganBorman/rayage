@@ -15,6 +15,8 @@ import tornado.ioloop
 import database
 import constants
 
+from database.User import User
+
 from rayage_ws import WebSocketHandler
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
@@ -26,16 +28,24 @@ class RequestHandler(CASVerifiedRequestHandler):
         if action == "logout":
             self.logout_user()
         else:
-            if self.get_current_user() is None:
+            username = self.get_current_user()
+            
+            if username is None:
                 self.validate_user()
                 return
                 
-            if action == "admin":
+            user = User.get_user(username)
+                
+            if action == "admin" and user.permission_level >= constants.PERMISSION_LEVEL_TA:
                 with open(system_directory+'/static/admin.html') as f:
                     self.write(f.read())
                     self.finish()
-            else:
+            elif user.permission_level >= constants.PERMISSION_LEVEL_USER:
                 with open(system_directory+'/static/index.html') as f:
+                    self.write(f.read())
+                    self.finish()
+            else:
+                with open(sysstem_directory+'/static/denied.html') as f:
                     self.write(f.read())
                     self.finish()
                     

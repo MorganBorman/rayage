@@ -102,11 +102,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             
             self.notify("Session expired. Please login again.", "error")
         
-    def access_denied(self):
-        self.notify("Access denied.", "error")
+    def access_denied(self, details):
+        self.notify("Access denied. {}".format(details), "error")
         
-    def malformed_message(self):
-        self.notify("Invalid message.", "error")
+    def malformed_message(self, details):
+        self.notify("Invalid message. {}".format(details), "error")
 
     def on_message(self, message):
         try:
@@ -123,17 +123,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.message_handlers[msgtype](self, msg)
 
         except InsufficientPermissions, e:
-            self.access_denied()
+            self.access_denied(e.message)
             
         except MalformedMessage, e:
-            self.malformed_message()
+            self.malformed_message(e.message)
 
     def on_close(self):
         if self.username is not None:
             print "User '{}' has disconnected.".format(self.username)
 
 class messageHandler(object):
-    def __init__(self, message_type, required_fields=[], minimum_permission_level=1):
+    def __init__(self, message_type, required_fields=[], minimum_permission_level=PERMISSION_LEVEL_USER):
         self.message_type = message_type
         self.required_fields = required_fields
         self.minimum_permission_level = minimum_permission_level
