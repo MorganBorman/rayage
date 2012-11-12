@@ -139,6 +139,9 @@ class messageHandler(object):
         self.minimum_permission_level = minimum_permission_level
 
     def __call__(self, f):
+        if type(f) == type:
+            f = f()
+        
         def handler(socket_connection, message):
             for field in self.required_fields:
                 if not field in message.keys():

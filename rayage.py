@@ -56,9 +56,15 @@ class UploadHandler(CASVerifiedRequestHandler):
             return
                 
         if action == "template":
-            the_template = self.request.files['the_template'][0]
-            print the_template
-            self.finish("Yay file uploaded!")
+            print self.request.files[u'uploadedfiles[]'][0].keys()
+            
+            file_info = self.request.files[u'uploadedfiles[]'][0]
+            
+            import json
+            
+            data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
+            
+            self.finish(json.dumps(data))
 
 handlers = [
     (r'/(admin|logout|)', RequestHandler),

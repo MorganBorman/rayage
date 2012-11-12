@@ -1,3 +1,4 @@
+import os
 import json
 import random
 from sqlalchemy import func
@@ -27,38 +28,61 @@ def handle_admin_module_tree_request(socket_connection, message):
                       'modules': admin_modules}
                       
     socket_connection.write_message(json.dumps(result_message))
-
+    
+    
+class RayageJsonStoreHandler(object):
+    def __init__(self):
+        pass
+        
+    def __call__(self, socket_connection, message):
+        action = message[u'action']
+        
+        if action == u'QUERY':
+            options = {}
+            if u'options' in message.keys():
+                options = message[u'options']
+            
+            count = 30
+            if u'count' in options.keys():
+                count = int(options[u'count'])
+                
+            start = 0
+            if u'start' in options.keys():
+                start = int(options[u'start'])
+                
+            sort = None
+            if u'sort' in options.keys():
+                sort = options[u'sort']
+                
+            query = None
+            if u'query' in options.keys():
+                query = options[u'query']
+                
+            self.query(socket_connection, message, count, start, sort, query)
+            
+        elif action == u'PUT':
+            object_data = json.loads(message[u'objectData'])
+            
+            self.put(socket_connection, message, object_data)
+            
+        else:
+            raise Exception("Unsupported RayageJsonStore action: {}".format(action))
+            
+    def query(self, socket_connection, message, count, start, sort, query):
+        raise Exception("Not implemented RayageJsonStore action: {}".format(message[u'action']))
+        
+    def put(self, socket_connection, message, object_data):
+        raise Exception("Not implemented RayageJsonStore action: {}".format(message[u'action']))
+        
 @messageHandler("RayageJsonStore/Users", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
-def handle_admin_module_tree_request(socket_connection, message):
+class UserStoreHandler(RayageJsonStoreHandler):
     """
     Handles REST-like requests over the websocket for the lazy-loading editable table showing the users and their permissions.
     """
-    print message
-    
-    action = message[u'action']
-    
-    if action == u'QUERY':
+    def __init__(self):
+        RayageJsonStoreHandler.__init__(self)
         
-        options = {}
-        if u'options' in message.keys():
-            options = message[u'options']
-        
-        count = 30
-        if u'count' in options.keys():
-            count = int(options[u'count'])
-            
-        start = 0
-        if u'start' in options.keys():
-            start = int(options[u'start'])
-            
-        dojo_sort = None
-        if u'sort' in options.keys():
-            dojo_sort = options[u'sort']
-            
-        dojo_query = None
-        if u'query' in options.keys():
-            dojo_query = options[u'query']
-        
+    def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         session = SessionFactory()
         try:
             query = session.query(User.id, User.username, User.permission_level)
@@ -84,18 +108,19 @@ def handle_admin_module_tree_request(socket_connection, message):
                              }
         finally:
             session.close()
+        
+        socket_connection.write_message(json.dumps(result_message))
+        
+    def put(self, socket_connection, message, object_data):
             
-    elif action == u'PUT':
-        objectData = json.loads(message[u'objectData'])
-            
-        target_permission_level = int(objectData[u'permissions'])
+        target_permission_level = int(object_data[u'permissions'])
             
         session = SessionFactory()
         try:
             if target_permission_level >= socket_connection.permission_level and not socket_connection.permission_level == PERMISSION_LEVEL_ADMIN:
                 raise InsufficientPermissions("Cannot elevate user permissions higher than self.")
             
-            user = User.get_user(objectData[u'username'])
+            user = User.get_user(object_data[u'username'])
             user.permission_level = target_permission_level
             
             session.add(user)
@@ -107,9 +132,28 @@ def handle_admin_module_tree_request(socket_connection, message):
                           'response': [],
                           'deferredId': message['deferredId'],
                          }
-    else:
-        print "Unsupported store action: {}".format(action)
-        return
+        
+        socket_connection.write_message(json.dumps(result_message))
+        
+@messageHandler("RayageJsonStore/Templates", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
+class TemplateStoreHandler(RayageJsonStoreHandler):
+    """
+    Handles REST-like requests over the websocket for the lazy-loading editable table showing the templates.
+    """
+    def __init__(self):
+        RayageJsonStoreHandler.__init__(self)
+        
+    def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
+        template_list = [{'id': t, 'name': t} for t in os.listdir(TEMPLATES_DIR) 
+                                           if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
+            
+        template_count = len(template_list)
+            
+        result_message = {'type': message[u'type'],
+                          'response': template_list,
+                          'total': template_count,
+                          'deferredId': message['deferredId'],
+                         }
+        
+        socket_connection.write_message(json.dumps(result_message))
     
-    socket_connection.write_message(json.dumps(result_message))
-
