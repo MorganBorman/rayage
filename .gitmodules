@@ -4,3 +4,6 @@
 [submodule "tornado"]
 	path = tornado
 	url = https://github.com/facebook/tornado.git
+[submodule "pyinotify"]
+	path = pyinotify
+	url = https://github.com/seb-m/pyinotify.git

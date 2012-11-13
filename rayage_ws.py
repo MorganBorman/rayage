@@ -88,19 +88,21 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         
         if username is not None:
             self.user = User.get_user(username)
-
-            # Check if "new" user and create a project dir for them if needed.
-            if not os.path.exists(self.user_dir()):
-                os.makedirs(self.user_dir())
-
-            result_message = {'type': 'login_success'}
-            self.write_message(json.dumps(result_message))
             
-            print "User '{}' has connected.".format(self.username)
-        else:
-            self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
-            
-            self.notify("Session expired. Please login again.", "error")
+            if self.user is not None:
+                # Check if "new" user and create a project dir for them if needed.
+                if not os.path.exists(self.user_dir()):
+                    os.makedirs(self.user_dir())
+
+                result_message = {'type': 'login_success'}
+                self.write_message(json.dumps(result_message))
+                
+                print "User '{}' has connected.".format(self.username)
+                return
+
+        self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
+        
+        self.notify("Session expired. Please login again.", "error")
         
     def access_denied(self, details):
         self.notify("Access denied. {}".format(details), "error")

@@ -19,6 +19,7 @@ class User(Base):
         session = SessionFactory()
         try:
             user = session.query(User).filter_by(username=username).one()
+            return user
         except NoResultFound:
             user = User(username)
             session.add(user)
@@ -26,7 +27,16 @@ class User(Base):
             print "Created new user entry in the database for user '{}'.".format(username)
         finally:
             session.close()
-        return user
+            
+        # If the entry for the user was just created then retreive the committed version
+        session = SessionFactory()
+        try:
+            user = session.query(User).filter_by(username=username).one()
+            return user
+        except NoResultFound:
+            return None
+        finally:
+            session.close()
 
     def __init__(self, username, permission_level=0):
         self.username = username

@@ -1,7 +1,14 @@
 import os
+import sys
 import json
+import time
 import random
+import traceback
+
 from sqlalchemy import func
+import sqlalchemy
+
+import pyinotify
 
 from rayage_ws import messageHandler, MalformedMessage, InsufficientPermissions
 from constants import *
@@ -32,7 +39,22 @@ def handle_admin_module_tree_request(socket_connection, message):
     
 class RayageJsonStoreHandler(object):
     def __init__(self):
-        pass
+        self.listeners = []
+        
+    def broadcast(self, message_data):
+        for listener in self.listeners:
+            # Remove any disconnected listeners
+            if listener.ws_connection is None:
+                self.listeners.remove(listener)
+                continue
+                
+            try:
+                listener.write_message(message_data)
+                print listener.username, message_data
+            except:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_tb(exc_traceback)
+                self.listeners.remove(listener)
         
     def __call__(self, socket_connection, message):
         action = message[u'action']
@@ -82,7 +104,32 @@ class UserStoreHandler(RayageJsonStoreHandler):
     def __init__(self):
         RayageJsonStoreHandler.__init__(self)
         
+        def after_insert_listener(mapper, connection, target):
+            result_message = {'type': "RayageJsonStore/Users",
+                              'action': 'create',
+                              'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
+                             }
+            
+            self.broadcast(json.dumps(result_message))
+
+        sqlalchemy.event.listen(User, 'after_insert', after_insert_listener)
+        
+        def after_update_listener(mapper, connection, target):
+            result_message = {'type': "RayageJsonStore/Users",
+                              'action': 'update',
+                              'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
+                             }
+            
+            self.broadcast(json.dumps(result_message))
+
+        sqlalchemy.event.listen(User, 'after_update', after_update_listener)
+        
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
+        # Add this socket connection as a listener
+        if not socket_connection in self.listeners:
+            print "Adding socket_connection: ", socket_connection.username
+            self.listeners.append(socket_connection)
+            
         session = SessionFactory()
         try:
             query = session.query(User.id, User.username, User.permission_level)
@@ -143,7 +190,48 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
     def __init__(self):
         RayageJsonStoreHandler.__init__(self)
         
+        wm = pyinotify.WatchManager()
+        
+        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_ONLYDIR | pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM  # watched events
+
+        def on_change(pathname, action):  
+            t = os.path.basename(pathname)
+            
+            result_message = {'type': "RayageJsonStore/Templates",
+                              'action': action,
+                              'object': {'id': t, 'name': t},
+                             }
+            
+            self.broadcast(json.dumps(result_message))
+
+        class EventHandler(pyinotify.ProcessEvent):
+            def process_IN_CREATE(self, event):
+                print "Creating:", event.pathname
+                on_change(event.pathname, 'create')
+
+            def process_IN_DELETE(self, event):
+                print "Deleting:", event.pathname
+                on_change(event.pathname, 'delete')
+                
+            def process_IN_MOVED_FROM(self, event):
+                print "Moved From:", event.pathname
+                on_change(event.pathname, 'delete')
+                
+            def process_IN_MOVED_TO(self, event):
+                print "Moved To:", event.pathname
+                on_change(event.pathname, 'create')
+                
+        notifier = pyinotify.ThreadedNotifier(wm, EventHandler())
+        # Start the notifier from a new thread, without doing anything as no directory or file are currently monitored yet.
+        notifier.start()
+        # Start watching a path
+        wdd = wm.add_watch(TEMPLATES_DIR, mask, rec=False)
+        
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
+        # Add this socket connection as a listener
+        if not socket_connection in self.listeners:
+            self.listeners.append(socket_connection)
+    
         template_list = [{'id': t, 'name': t} for t in os.listdir(TEMPLATES_DIR) 
                                            if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
             
@@ -156,4 +244,5 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
                          }
         
         socket_connection.write_message(json.dumps(result_message))
+
     

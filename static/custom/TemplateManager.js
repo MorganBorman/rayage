@@ -20,8 +20,9 @@ define(["dojo/_base/declare",
         'dojox/grid/EnhancedGrid', 
         "dojox/grid/enhanced/plugins/Filter", 
         'dojo/data/ObjectStore',
+        'custom/ObservableRayageJsonStore',
         'dojo/data/ItemFileWriteStore'],
-    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, BorderContainer, ContentPane, AccordionContainer, Uploader, IFrame, Button, FileList, RayageJsonStore, EnhancedGrid, Filter, ObjectStore, ItemFileWriteStore) {
+    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, BorderContainer, ContentPane, AccordionContainer, Uploader, IFrame, Button, FileList, RayageJsonStore, EnhancedGrid, Filter, ObjectStore, ObservableRayageJsonStore, ItemFileWriteStore) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -52,8 +53,9 @@ define(["dojo/_base/declare",
             
             setupGrid: function() {
                 /*set up data store*/
-                this.userObjectStore = new RayageJsonStore({target:"/Templates", ws:this.ws});
-                this.userDataStore = new ObjectStore({objectStore: this.userObjectStore});
+                this.templateObjectStore = new RayageJsonStore({target:"/Templates", ws:this.ws});
+                this.observableTemplateStore = ObservableRayageJsonStore(this.templateObjectStore);
+                this.templateDataStore = new ObjectStore({objectStore: this.observableTemplateStore});
                 
                 /*set up layout*/
                 var layout = [[
@@ -65,7 +67,7 @@ define(["dojo/_base/declare",
                 this.templateGrid.set("structure", layout);
                 this.templateGrid.set("selectionMode", "single");
                 this.templateGrid.startup();
-                this.templateGrid.setStore(this.userDataStore);
+                this.templateGrid.setStore(this.templateDataStore);
                 this.templateGrid.showFilterBar(true);
                 //this.templateGrid.plugins.filter.setupFilterQuery = setupFilter;
                 this.templateGrid.selection.select(0);
@@ -73,8 +75,9 @@ define(["dojo/_base/declare",
                 var self = this;
                 
                 on(this.templateGrid, "rowClick", function(e) {
-                    var userRow = self.templateGrid.getItem(e.rowIndex);
-                    
+                    var templateRow = self.templateGrid.getItem(e.rowIndex);
+                    console.log(templateRow);
+                    self.observableTemplateStore.notify(undefined, templateRow.id);
                 });
             },
             

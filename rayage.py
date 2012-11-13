@@ -23,6 +23,11 @@ from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 import editor_handlers
 import admin_handlers
 
+class FakeUserRequestHandler(tornado.web.RequestHandler):
+    def get(self, username):
+        self.set_secure_cookie("user", username)
+        self.redirect(constants.SERVICE_URL, permanent=False)
+
 class RequestHandler(CASVerifiedRequestHandler):
     def get(self, action):
         if action == "logout":
@@ -67,6 +72,7 @@ class UploadHandler(CASVerifiedRequestHandler):
             self.finish(json.dumps(data))
 
 handlers = [
+    (r'/fake_user/(.*)', FakeUserRequestHandler),
     (r'/(admin|logout|)', RequestHandler),
     (r'/upload/(.*)', UploadHandler),
     (r'/(.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
