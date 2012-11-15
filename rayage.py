@@ -18,6 +18,7 @@ import constants
 from database.User import User
 
 from rayage_ws import WebSocketHandler
+from rayage_upload import UploadHandler
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
 import editor_handlers
@@ -54,23 +55,6 @@ class RequestHandler(CASVerifiedRequestHandler):
                     self.write(f.read())
                     self.finish()
                     
-class UploadHandler(CASVerifiedRequestHandler):
-    def post(self, action):
-        if self.get_current_user() is None:
-            self.validate_user()
-            return
-                
-        if action == "template":
-            print self.request.files[u'uploadedfiles[]'][0].keys()
-            
-            file_info = self.request.files[u'uploadedfiles[]'][0]
-            
-            import json
-            
-            data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
-            
-            self.finish(json.dumps(data))
-
 handlers = [
     (r'/fake_user/(.*)', FakeUserRequestHandler),
     (r'/(admin|logout|)', RequestHandler),

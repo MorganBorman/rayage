@@ -7,16 +7,7 @@ import shutil
 
 from database.User import User
 from constants import *
-
-class MalformedMessage(Exception):
-    '''A message is missing fields or fields are invalid.'''
-    def __init__(self, value=''):
-        Exception.__init__(self, value)
-        
-class InsufficientPermissions(Exception):
-    '''A message is issued without sufficient permissions.'''
-    def __init__(self, value=''):
-        Exception.__init__(self, value)
+from exceptions import *
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
@@ -42,7 +33,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         """
         if self.user is not None:
             return self.user.permission_level
-        return 0
+        return PERMISSION_LEVEL_NONE
     
     def user_dir(self, *args):
         """

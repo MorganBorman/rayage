@@ -3,6 +3,8 @@ import sys
 import json
 import time
 import random
+import tempfile
+import zipfile
 import traceback
 
 from sqlalchemy import func
@@ -10,8 +12,10 @@ import sqlalchemy
 
 import pyinotify
 
-from rayage_ws import messageHandler, MalformedMessage, InsufficientPermissions
+from rayage_ws import messageHandler
+from rayage_upload import uploadHandler
 from constants import *
+from exceptions import *
 
 from database.User import User
 from database.SessionFactory import SessionFactory
@@ -244,5 +248,35 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
                          }
         
         socket_connection.write_message(json.dumps(result_message))
+        
+@uploadHandler('template', PERMISSION_LEVEL_PROF)
+def template_upload_handler(request_handler):
+    if u'uploadedfiles[]' in request_handler.request.files.keys():
+        uploaded_files = request_handler.request.files[u'uploadedfiles[]']
+        
+        for uploaded_file in uploaded_files:
+            
+            with tempfile.TemporaryFile(mode='w+b') as tfile:
+                filename = uploaded_file['filename']
+                content_type = uploaded_file['content_type']
+                
+                # Write the template archive (hopefully an archive) to the temp file
+                tfile.write(uploaded_file['body'])
+                # Reset the file position
+                tfile.seek(0)
+                
+                if zipfile.is_zipfile(tfile):
+                    zfile = zipfile.ZipFile(tfile)
+                    
+                    
+                
+
+            print request_handler.request.files[u'uploadedfiles[]'][0].keys()
+            
+            file_info = request_handler.request.files[u'uploadedfiles[]'][0]
+            
+            data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
+            
+            request_handler.finish(json.dumps(data))
 
     
