@@ -10,8 +10,6 @@ import traceback
 from sqlalchemy import func
 import sqlalchemy
 
-import pyinotify
-
 from rayage_ws import messageHandler
 from rayage_upload import uploadHandler
 from constants import *
@@ -193,7 +191,7 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
     """
     def __init__(self):
         RayageJsonStoreHandler.__init__(self)
-        
+        """
         wm = pyinotify.WatchManager()
         
         mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_ONLYDIR | pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM  # watched events
@@ -230,6 +228,7 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         notifier.start()
         # Start watching a path
         wdd = wm.add_watch(TEMPLATES_DIR, mask, rec=False)
+        """
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         # Add this socket connection as a listener
