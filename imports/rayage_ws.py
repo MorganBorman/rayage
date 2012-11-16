@@ -7,15 +7,19 @@ import shutil
 
 from database.User import User
 from constants import *
-from exceptions import *
+from ws_exceptions import InsufficientPermissions, InvalidStateError, MalformedMessage
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
+    
+    streams = {} # key: stream name, value: minimum permission level
+    subscribers = {} # key: stream name, value: list of websocket connections
 
     user = None
     authenticated = False
     project = None
     project_runner = None
+    subscriptions = [] # holds a list stream names
     
     @property
     def username(self):
@@ -34,6 +38,41 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.user is not None:
             return self.user.permission_level
         return PERMISSION_LEVEL_NONE
+        
+    @staticmethod
+    def register_stream(stream_name, minimum_permission_level=PERMISSION_LEVEL_USER):
+        WebSocketHandler.streams[stream_name] = minimum_permission_level
+        
+    @staticmethod
+    def publish(stream_name, message_data):
+        if stream_name in WebSocketHandler.subscribers.keys():
+            for socket_connection in WebSocketHandler.subscribers[stream_name]:
+                socket_connection.write_message(message_data)
+        
+    def subscribe(self, stream_name):
+        if not stream_name in WebSocketHandler.streams.keys():
+            raise InvalidStateError("Unknown stream.")
+            
+        if self.permission_level < WebSocketHandler.streams[stream_name]:
+            raise InsufficientPermissions()
+        
+        if stream_name in self.subscriptions:
+            raise InvalidStateError("Already subscribed to this stream.")
+        
+        self.subscriptions.append(stream_name)
+        
+        if not stream_name in WebSocketHandler.subscribers.keys():
+            WebSocketHandler.subscribers[stream_name] = []
+        
+        WebSocketHandler.subscribers[stream_name].append(self)
+        
+    def unsubscribe(self, stream_name):
+        if stream_name in self.subscriptions:
+            self.subscriptions.remove(stream_name)
+            
+        if stream_name in WebSocketHandler.subscribers.keys():
+            if self in WebSocketHandler.subscribers[stream_name]:
+                WebSocketHandler.subscribers[stream_name].remove(self)
     
     def user_dir(self, *args):
         """
@@ -75,6 +114,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(redirection))
 
     def open(self):
+        self.subscriptions = [] 
         username = self.get_secure_cookie("user")
         
         if username is not None:
@@ -124,6 +164,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         if self.username is not None:
             print "User '{}' has disconnected.".format(self.username)
+            
+        if len(self.subscriptions) > 0:
+            for stream_name in self.subscriptions[:]:
+                self.unsubscribe(stream_name)
 
 class messageHandler(object):
     def __init__(self, message_type, required_fields=[], minimum_permission_level=PERMISSION_LEVEL_USER):
@@ -150,3 +194,23 @@ class messageHandler(object):
         WebSocketHandler.message_handlers[self.message_type] = handler
         
         return f
+        
+class StreamHandle(object):
+    def __init__(self, stream_name, minimum_permission_level=PERMISSION_LEVEL_USER):
+        self.stream_name = stream_name
+        
+        WebSocketHandler.register_stream(stream_name, minimum_permission_level)
+        
+    def publish(self, message_data):
+        WebSocketHandler.publish(self.stream_name, message_data)
+        
+        
+@messageHandler("subscribe_request", ['stream'])
+def handle_admin_module_tree_request(socket_connection, message):
+    """
+    Subscribes this websocket connection to a message stream.
+    """                                
+    result_message = {'type': 'subscribe_ack',
+                      'stream': message['stream']}
+                      
+    socket_connection.write_message(json.dumps(result_message))

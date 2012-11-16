@@ -1,7 +1,7 @@
 import json
 
 from constants import *
-from exceptions import *
+from ws_exceptions import *
 
 from database.User import User
 

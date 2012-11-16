@@ -13,7 +13,8 @@ import sqlalchemy
 from rayage_ws import messageHandler
 from rayage_upload import uploadHandler
 from constants import *
-from exceptions import *
+from ws_exceptions import *
+from RayageJsonStoreHandler import RayageJsonStoreHandler
 
 from database.User import User
 from database.SessionFactory import SessionFactory
@@ -37,67 +38,7 @@ def handle_admin_module_tree_request(socket_connection, message):
                       'modules': admin_modules}
                       
     socket_connection.write_message(json.dumps(result_message))
-    
-    
-class RayageJsonStoreHandler(object):
-    def __init__(self):
-        self.listeners = []
-        
-    def broadcast(self, message_data):
-        for listener in self.listeners:
-            # Remove any disconnected listeners
-            if listener.ws_connection is None:
-                self.listeners.remove(listener)
-                continue
-                
-            try:
-                listener.write_message(message_data)
-                print listener.username, message_data
-            except:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                traceback.print_tb(exc_traceback)
-                self.listeners.remove(listener)
-        
-    def __call__(self, socket_connection, message):
-        action = message[u'action']
-        
-        if action == u'QUERY':
-            options = {}
-            if u'options' in message.keys():
-                options = message[u'options']
-            
-            count = 30
-            if u'count' in options.keys():
-                count = int(options[u'count'])
-                
-            start = 0
-            if u'start' in options.keys():
-                start = int(options[u'start'])
-                
-            sort = None
-            if u'sort' in options.keys():
-                sort = options[u'sort']
-                
-            query = None
-            if u'query' in options.keys():
-                query = options[u'query']
-                
-            self.query(socket_connection, message, count, start, sort, query)
-            
-        elif action == u'PUT':
-            object_data = json.loads(message[u'objectData'])
-            
-            self.put(socket_connection, message, object_data)
-            
-        else:
-            raise Exception("Unsupported RayageJsonStore action: {}".format(action))
-            
-    def query(self, socket_connection, message, count, start, sort, query):
-        raise Exception("Not implemented RayageJsonStore action: {}".format(message[u'action']))
-        
-    def put(self, socket_connection, message, object_data):
-        raise Exception("Not implemented RayageJsonStore action: {}".format(message[u'action']))
-        
+
 @messageHandler("RayageJsonStore/Users", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
 class UserStoreHandler(RayageJsonStoreHandler):
     """
@@ -128,9 +69,9 @@ class UserStoreHandler(RayageJsonStoreHandler):
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         # Add this socket connection as a listener
-        if not socket_connection in self.listeners:
-            print "Adding socket_connection: ", socket_connection.username
-            self.listeners.append(socket_connection)
+        #if not socket_connection in self.listeners:
+        #    print "Adding socket_connection: ", socket_connection.username
+        #    self.listeners.append(socket_connection)
             
         session = SessionFactory()
         try:
@@ -232,8 +173,8 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         # Add this socket connection as a listener
-        if not socket_connection in self.listeners:
-            self.listeners.append(socket_connection)
+        #if not socket_connection in self.listeners:
+        #    self.listeners.append(socket_connection)
     
         template_list = [{'id': t, 'name': t} for t in os.listdir(TEMPLATES_DIR) 
                                            if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]
