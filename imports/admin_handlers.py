@@ -44,8 +44,8 @@ class UserStoreHandler(RayageJsonStoreHandler):
     """
     Handles REST-like requests over the websocket for the lazy-loading editable table showing the users and their permissions.
     """
-    def __init__(self):
-        RayageJsonStoreHandler.__init__(self)
+    def __init__(self, message_type, required_fields, minimum_permission_level):
+        RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
         
         def after_insert_listener(mapper, connection, target):
             result_message = {'type': "RayageJsonStore/Users",
@@ -53,7 +53,7 @@ class UserStoreHandler(RayageJsonStoreHandler):
                               'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
                              }
             
-            self.broadcast(json.dumps(result_message))
+            self.publish(json.dumps(result_message))
 
         sqlalchemy.event.listen(User, 'after_insert', after_insert_listener)
         
@@ -63,16 +63,11 @@ class UserStoreHandler(RayageJsonStoreHandler):
                               'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
                              }
             
-            self.broadcast(json.dumps(result_message))
+            self.publish(json.dumps(result_message))
 
         sqlalchemy.event.listen(User, 'after_update', after_update_listener)
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
-        # Add this socket connection as a listener
-        #if not socket_connection in self.listeners:
-        #    print "Adding socket_connection: ", socket_connection.username
-        #    self.listeners.append(socket_connection)
-            
         session = SessionFactory()
         try:
             query = session.query(User.id, User.username, User.permission_level)
@@ -130,8 +125,8 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
     """
     Handles REST-like requests over the websocket for the lazy-loading editable table showing the templates.
     """
-    def __init__(self):
-        RayageJsonStoreHandler.__init__(self)
+    def __init__(self, message_type, required_fields, minimum_permission_level):
+        RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
         """
         wm = pyinotify.WatchManager()
         
@@ -172,9 +167,6 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         """
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
-        # Add this socket connection as a listener
-        #if not socket_connection in self.listeners:
-        #    self.listeners.append(socket_connection)
     
         template_list = [{'id': t, 'name': t} for t in os.listdir(TEMPLATES_DIR) 
                                            if os.path.isdir(os.path.join(TEMPLATES_DIR, t))]

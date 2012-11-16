@@ -1,8 +1,12 @@
 from rayage_ws import StreamHandle
+import json
 
 class RayageJsonStoreHandler(object):
-    def __init__(self):
-        pass
+    def __init__(self, message_type, required_fields, minimum_permission_level):
+        self.stream_handle = StreamHandle(message_type, minimum_permission_level)
+        
+    def publish(self, message_data):
+        self.stream_handle.publish(message_data)
     
     def __call__(self, socket_connection, message):
         action = message[u'action']

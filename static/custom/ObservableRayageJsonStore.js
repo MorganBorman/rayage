@@ -7,6 +7,8 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/_ba
 var ObservableRayageJsonStore = function(store, ws) {
     var observableStore = Observable(store);
     
+    ws.send({'type': 'subscribe_request', 'stream': store.messageType});
+    
     topic.subscribe(store.topic, function(data) {
         if (!data.hasOwnProperty("deferredId") && data.hasOwnProperty("action")) {
             console.log("action:", data.action, 'data:', data)

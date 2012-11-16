@@ -54,7 +54,7 @@ define(["dojo/_base/declare",
             setupGrid: function() {
                 /*set up data store*/
                 this.templateObjectStore = new RayageJsonStore({target:"/Templates", ws:this.ws});
-                this.observableTemplateStore = ObservableRayageJsonStore(this.templateObjectStore);
+                this.observableTemplateStore = ObservableRayageJsonStore(this.templateObjectStore, this.ws);
                 this.templateDataStore = new ObjectStore({objectStore: this.observableTemplateStore});
                 
                 /*set up layout*/

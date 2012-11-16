@@ -177,7 +177,7 @@ class messageHandler(object):
 
     def __call__(self, f):
         if type(f) == type:
-            f = f()
+            f = f(self.message_type, self.required_fields, self.minimum_permission_level)
         
         def handler(socket_connection, message):
             for field in self.required_fields:
@@ -204,12 +204,13 @@ class StreamHandle(object):
     def publish(self, message_data):
         WebSocketHandler.publish(self.stream_name, message_data)
         
-        
 @messageHandler("subscribe_request", ['stream'])
 def handle_admin_module_tree_request(socket_connection, message):
     """
     Subscribes this websocket connection to a message stream.
-    """                                
+    """
+    socket_connection.subscribe(message['stream'])
+    
     result_message = {'type': 'subscribe_ack',
                       'stream': message['stream']}
                       

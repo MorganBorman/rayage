@@ -55,7 +55,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
             setupGrid: function() {
                 /*set up data store*/
                 this.userObjectStore = new RayageJsonStore({target:"/Users", ws:this.ws});
-                this.observableUserStore = ObservableRayageJsonStore(this.userObjectStore);
+                this.observableUserStore = ObservableRayageJsonStore(this.userObjectStore, this.ws);
                 this.userDataStore = new ObjectStore({objectStore: this.observableUserStore});
                 
                 function formatPermissions(datum) {
