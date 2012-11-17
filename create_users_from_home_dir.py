@@ -14,10 +14,12 @@ from names_from_home_directories import names as usernames
 from database.User import User
 from database.SessionFactory import SessionFactory
 
+import constants
+
 session = SessionFactory()
 try:
     for username in usernames:
-        permission_level = random.randint(0,3)
+        permission_level = constants.PERMISSION_LEVEL_USER
         user = User(username, permission_level)
         session.add(user)
     session.commit()

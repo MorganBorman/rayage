@@ -48,6 +48,21 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 if (typeof userRow != "undefined") {
                     this.user_info_username.innerHTML = userRow.username;
                     this.user_info_permissions.set('value', userRow.permissions);
+                    
+                    var user_since = new Date(userRow.user_since*1000);
+                    this.user_info_user_since.innerHTML = "User since: " + user_since.toString();
+                    
+                    if (typeof userRow.last_online != "undefined" && userRow.last_online != null && userRow.last_online != -1) {
+                        if (userRow.last_online != 0) {
+                            var last_online = new Date(userRow.last_online*1000);
+                            this.user_info_last_online.innerHTML = "Last online: " + last_online.toString();
+                        } else {
+                            this.user_info_last_online.innerHTML = "Last online: Now";
+                        }
+                    } else {
+                        this.user_info_last_online.innerHTML = "Last online: Never";
+                    }
+                    
                     this.current_user = userRow;
                 }
             },
@@ -110,6 +125,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 
                 on(this.userGrid, "rowClick", function(e) {
                     var userRow = self.userGrid.getItem(e.rowIndex);
+                    console.log(userRow);
                     self.updateUserInfo(userRow);
                 });
             },

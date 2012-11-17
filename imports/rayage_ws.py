@@ -144,6 +144,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                     self.active_users[self.username] = []
                 self.active_users[self.username].append(self)
                 
+                self.user.on_connect()
+                
                 result_message = {'type': 'login_success'}
                 self.write_message(json.dumps(result_message))
                 
@@ -183,6 +185,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         if self.username is not None:
             print "User '{}' has disconnected.".format(self.username)
+            
+        if self.user is not None:
+            self.user.on_disconnect()
             
         if self.username in self.active_users.keys():
             if self in self.active_users[self.username]:

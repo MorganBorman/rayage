@@ -46,7 +46,7 @@ class UserStoreHandler(RayageJsonStoreHandler):
     """
     def __init__(self, message_type, required_fields, minimum_permission_level):
         RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
-        
+        """
         def after_insert_listener(mapper, connection, target):
             result_message = {'type': "RayageJsonStore/Users",
                               'action': 'create',
@@ -66,11 +66,12 @@ class UserStoreHandler(RayageJsonStoreHandler):
             self.publish(json.dumps(result_message))
 
         sqlalchemy.event.listen(User, 'after_update', after_update_listener)
+        """
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         session = SessionFactory()
         try:
-            query = session.query(User.id, User.username, User.permission_level)
+            query = session.query(User.id, User.username, User.permission_level, User.user_since, User.last_online)
         
             column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
         
@@ -84,7 +85,7 @@ class UserStoreHandler(RayageJsonStoreHandler):
             
             user_count = query.count()
             user_list = query.offset(start).limit(count).all()
-            user_list = [{'id': uid, 'username': username, 'permissions': permission_level} for uid, username, permission_level in user_list]
+            user_list = [{'id': uid, 'username': username, 'permissions': permission_level, 'user_since': user_since, 'last_online': last_online} for uid, username, permission_level, user_since, last_online in user_list]
             
             result_message = {'type': message[u'type'],
                               'response': user_list,
@@ -127,34 +128,6 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
     """
     def __init__(self, message_type, required_fields, minimum_permission_level):
         RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
-        """
-        wm = pyinotify.WatchManager()
-        
-        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_ONLYDIR | pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM  # watched events
-
-        class EventHandler(pyinotify.ProcessEvent):
-            def process_IN_CREATE(self, event):
-                print "Creating:", event.pathname
-                on_change(event.pathname, 'create')
-
-            def process_IN_DELETE(self, event):
-                print "Deleting:", event.pathname
-                on_change(event.pathname, 'delete')
-                
-            def process_IN_MOVED_FROM(self, event):
-                print "Moved From:", event.pathname
-                on_change(event.pathname, 'delete')
-                
-            def process_IN_MOVED_TO(self, event):
-                print "Moved To:", event.pathname
-                on_change(event.pathname, 'create')
-                
-        notifier = pyinotify.ThreadedNotifier(wm, EventHandler())
-        # Start the notifier from a new thread, without doing anything as no directory or file are currently monitored yet.
-        notifier.start()
-        # Start watching a path
-        wdd = wm.add_watch(TEMPLATES_DIR, mask, rec=False)
-        """
         
     def on_change(self, pathname, action):
         t = os.path.basename(pathname)
@@ -180,8 +153,6 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
                          }
         
         socket_connection.write_message(json.dumps(result_message))
-        
-print TemplateStoreHandler
         
 @uploadHandler('template', PERMISSION_LEVEL_PROF)
 def template_upload_handler(request_handler):
