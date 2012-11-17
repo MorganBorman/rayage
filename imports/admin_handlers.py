@@ -10,7 +10,7 @@ import traceback
 from sqlalchemy import func
 import sqlalchemy
 
-from rayage_ws import messageHandler
+from rayage_ws import messageHandler, WebSocketHandler
 from rayage_upload import uploadHandler
 from constants import *
 from ws_exceptions import *
@@ -132,16 +132,6 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         
         mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_ONLYDIR | pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM  # watched events
 
-        def on_change(pathname, action):  
-            t = os.path.basename(pathname)
-            
-            result_message = {'type': "RayageJsonStore/Templates",
-                              'action': action,
-                              'object': {'id': t, 'name': t},
-                             }
-            
-            self.broadcast(json.dumps(result_message))
-
         class EventHandler(pyinotify.ProcessEvent):
             def process_IN_CREATE(self, event):
                 print "Creating:", event.pathname
@@ -166,6 +156,16 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         wdd = wm.add_watch(TEMPLATES_DIR, mask, rec=False)
         """
         
+    def on_change(self, pathname, action):
+        t = os.path.basename(pathname)
+        
+        result_message = {'type': "RayageJsonStore/Templates",
+                          'action': action,
+                          'object': {'id': t, 'name': t},
+                         }
+        
+        self.publish(json.dumps(result_message))
+        
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
     
         template_list = [{'id': t, 'name': t} for t in os.listdir(TEMPLATES_DIR) 
@@ -181,34 +181,52 @@ class TemplateStoreHandler(RayageJsonStoreHandler):
         
         socket_connection.write_message(json.dumps(result_message))
         
+print TemplateStoreHandler
+        
 @uploadHandler('template', PERMISSION_LEVEL_PROF)
 def template_upload_handler(request_handler):
     if u'uploadedfiles[]' in request_handler.request.files.keys():
-        uploaded_files = request_handler.request.files[u'uploadedfiles[]']
+        file_info = request_handler.request.files[u'uploadedfiles[]'][0]
+        response_data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
         
-        for uploaded_file in uploaded_files:
+        try:
+            uploaded_files = request_handler.request.files[u'uploadedfiles[]']
             
-            with tempfile.TemporaryFile(mode='w+b') as tfile:
-                filename = uploaded_file['filename']
-                content_type = uploaded_file['content_type']
+            for uploaded_file in uploaded_files:
                 
-                # Write the template archive (hopefully an archive) to the temp file
-                tfile.write(uploaded_file['body'])
-                # Reset the file position
-                tfile.seek(0)
-                
-                if zipfile.is_zipfile(tfile):
-                    zfile = zipfile.ZipFile(tfile)
+                with tempfile.TemporaryFile(mode='w+b') as tfile:
+                    filename = uploaded_file['filename']
+                    content_type = uploaded_file['content_type']
                     
+                    # Write the template archive (hopefully an archive) to the temp file
+                    tfile.write(uploaded_file['body'])
+                    # Reset the file position
+                    tfile.seek(0)
                     
-                
-
-            print request_handler.request.files[u'uploadedfiles[]'][0].keys()
+                    if zipfile.is_zipfile(tfile):
+                        zfile = zipfile.ZipFile(tfile)
+                        
+                        namelist = zfile.namelist()
+                        
+                        if len(namelist) == 0:
+                            raise Exception("Cannot install empty project template.")
+                        
+                        if not '/' in namelist[0]:
+                            raise Exception("All template files must be contained in a single directory within the zip file.")
+                        
+                        template_dir_prefix = namelist[0].split('/')[0]
+                        
+                        for name in namelist:
+                            if namelist[0].split('/')[0] != template_dir_prefix:
+                                raise Exception("All template files must be contained in a single directory within the zip file.")
+                        
+                        zfile.extractall(TEMPLATES_DIR)
+                        
+                        TemplateStoreHandler.on_change(template_dir_prefix, 'create')
+        except Exception, e:
+            username = request_handler.get_current_user()
+            WebSocketHandler.notify_username(username, e.message, "error")
             
-            file_info = request_handler.request.files[u'uploadedfiles[]'][0]
-            
-            data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
-            
-            request_handler.finish(json.dumps(data))
-
+        print response_data
+        request_handler.finish(json.dumps(response_data))
     

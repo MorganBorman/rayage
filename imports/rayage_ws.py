@@ -12,6 +12,8 @@ from ws_exceptions import InsufficientPermissions, InvalidStateError, MalformedM
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
     
+    active_users = {} # key: username, value: list of websocket connections
+    
     streams = {} # key: stream name, value: minimum permission level
     subscribers = {} # key: stream name, value: list of websocket connections
 
@@ -38,6 +40,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.user is not None:
             return self.user.permission_level
         return PERMISSION_LEVEL_NONE
+        
+    @staticmethod
+    def write_message_username(username, message_data):
+        if username in WebSocketHandler.active_users.keys():
+            for socket_connection in WebSocketHandler.active_users[username]:
+                socket_connection.write_message(message_data)
+                
+    @staticmethod
+    def notify_username(username, msg, severity="message", duration=1.5):
+        if username in WebSocketHandler.active_users.keys():
+            for socket_connection in WebSocketHandler.active_users[username]:
+                socket_connection.notify(msg, severity, duration)
         
     @staticmethod
     def register_stream(stream_name, minimum_permission_level=PERMISSION_LEVEL_USER):
@@ -114,7 +128,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(redirection))
 
     def open(self):
-        self.subscriptions = [] 
+        self.subscriptions = []
+        
         username = self.get_secure_cookie("user")
         
         if username is not None:
@@ -124,7 +139,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 # Check if "new" user and create a project dir for them if needed.
                 if not os.path.exists(self.user_dir()):
                     os.makedirs(self.user_dir())
-
+                
+                if not self.username in self.active_users.keys():
+                    self.active_users[self.username] = []
+                self.active_users[self.username].append(self)
+                
                 result_message = {'type': 'login_success'}
                 self.write_message(json.dumps(result_message))
                 
@@ -164,6 +183,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         if self.username is not None:
             print "User '{}' has disconnected.".format(self.username)
+            
+        if self.username in self.active_users.keys():
+            if self in self.active_users[self.username]:
+                self.active_users[self.username].remove(self)
             
         if len(self.subscriptions) > 0:
             for stream_name in self.subscriptions[:]:
