@@ -15,6 +15,11 @@ html, body {
 .claro .demoLayout .edgePanel {
     background-color: #d0e9fc;
 }
+
+.CodeMirror {
+    font-family: monospace;
+    height: 100%;
+}
  
 #viewsChart {
     width: 550px;
