@@ -220,7 +220,26 @@ function(topic){
         });
 
         topic.subscribe("ui/menus/build", function() {
-            rayage_ws.send({"type": "build_project_request"});
+            var projectDirty = false;
+            var unsavedFiles = [];
+
+            for (var filename in rayage_ui.editor.editor_instances) {
+                var editor = rayage_ui.editor.editor_instances[filename];
+
+                if (!editor.isClean() || editor.rayageDirty === true) {
+                        projectDirty = true;
+                        unsavedFiles.push(filename);
+                }
+            }
+            
+            if (!projectDirty || confirm("You have unsaved files. Continuing will save them before building.\nContinue?")) {
+                // This probably should be changed to a save all request of some kind
+                for (var i=0,len=unsavedFiles.length; i<len; i++) {
+                    var filename = unsavedFiles[i];
+                    rayage_ws.send({"type": "save_file_request", "filename": filename});
+                }
+                rayage_ws.send({"type": "build_project_request"});
+            }
         });
 
         topic.subscribe("ui/menus/run", function() {
