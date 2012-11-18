@@ -119,6 +119,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                     },
                     selectionMode: "single",
                     cellNavigation: false,
+                    pagingDelay: 500,
                     store: this.observableUserStore
                 }, this.userGrid);
                 
