@@ -1,9 +1,9 @@
 // custom.UserManager
 define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/UserManager.html", "dojo/dom-style", 
-        "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", 'dojox/grid/EnhancedGrid', "dojox/grid/enhanced/plugins/Filter", 'dojo/data/ObjectStore', 
-        'dojo/data/ItemFileWriteStore', "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
+        "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", 
+        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
         "dojox/form/DropDownSelect", "dojo/json"],
-    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, EnhancedGrid, Filter, ObjectStore, ItemFileWriteStore, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON) {
+    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -71,9 +71,10 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 /*set up data store*/
                 this.userObjectStore = new RayageJsonStore({target:"/Users", ws:this.ws});
                 this.observableUserStore = ObservableRayageJsonStore(this.userObjectStore, this.ws);
-                this.userDataStore = new ObjectStore({objectStore: this.observableUserStore});
+                //this.userDataStore = new ObjectStore({objectStore: this.observableUserStore});
                 
-                function formatPermissions(datum) {
+                function formatPermissions(object) {
+                    var datum = object.permissions;
                     
                     switch(datum) {
                         case '0':
@@ -110,21 +111,23 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 ]];
                 
                 /*initialize the declaritive grid with the programmatic parameters*/
-                this.userGrid.set("structure", layout);
-                this.userGrid.set("selectionMode", "single");
+                this.userGrid = new declare([OnDemandGrid, Keyboard, Selection])({
+                    columns: {
+                        id: { label: "ID" },
+                        username: { label: "Username" },
+                        permissions: { label: "Permissions", get: formatPermissions }
+                    },
+                    selectionMode: "single",
+                    cellNavigation: false,
+                    store: this.observableUserStore
+                }, this.userGrid);
+                
                 this.userGrid.startup();
-                this.userGrid.setStore(this.userDataStore);
-                this.userGrid.showFilterBar(true);
-                //this.userGrid.plugins.filter.setupFilterQuery = setupFilter;
-                this.userGrid.selection.select(0);
                 
                 var self = this;
                 
-                // This is a hack, it shouldn't be necessary to do this.
-                //dojo.connect(this.observableUserStore, 'notify', function(){ self.userGrid._refresh(); });
-                
-                on(this.userGrid, "rowClick", function(e) {
-                    var userRow = self.userGrid.getItem(e.rowIndex);
+                this.userGrid.on("dgrid-select", function(event){
+                    var userRow = event.rows[0].data;
                     console.log(userRow);
                     self.updateUserInfo(userRow);
                 });

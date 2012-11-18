@@ -70,9 +70,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.permission_level < WebSocketHandler.streams[stream_name]:
             raise InsufficientPermissions()
         
-        if stream_name in self.subscriptions:
-            raise InvalidStateError("Already subscribed to this stream.")
-        
         self.subscriptions.append(stream_name)
         
         if not stream_name in WebSocketHandler.subscribers.keys():

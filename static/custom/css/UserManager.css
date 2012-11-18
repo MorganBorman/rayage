@@ -1,6 +1,5 @@
-@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/resources/Grid.css";
-@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/resources/claroGrid.css";
-@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojox/grid/enhanced/resources/claro/EnhancedGrid.css";
+@import "/lib/dgrid/css/dgrid.css";
+@import "/lib/dgrid/css/skins/claro.css";
 
 .dojoxGrid table {
   margin: 0;
@@ -11,6 +10,12 @@
     height: 100%;
 }
 
-#userList {
-    height: 90%;
+.dgrid .dgrid-scroller {
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+
+#userGrid {
+    height: 99%;
 }

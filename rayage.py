@@ -62,6 +62,7 @@ handlers = [
     (r'/(.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
     (r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
     (r'/custom/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/custom'}),
+    (r'/lib/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/lib'}),
     (r'/images/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/images'}),
     (r'/styles/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/styles'}),
     (r'/ws', WebSocketHandler),

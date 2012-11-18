@@ -1,18 +1,7 @@
 <div class="user_manager" data-dojo-type="dijit/layout/ContentPane">
     <div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%" data-dojo-attach-point="border_container">
-        <div data-dojo-attach-point="userGrid" id="userGrid" dojoType="dojox/grid/EnhancedGrid" style="width: 425px;" 
-            data-dojo-props="   region:'leading', 
-                                splitter:true, 
-                                plugins:{
-                                            filter: {
-                                                        closeFilterbarButton: false, 
-                                                        itemsName: 'users', 
-                                                        isServerSide: true, 
-                                                        setupFilterQuery: function(commands, request) {
-                                                            request.query = commands.filter;
-                                                        }
-                                                    }
-                            }">
+        <div data-dojo-type="dijit/layout/ContentPane" style="width: 425px;" data-dojo-props="region:'leading', splitter:true">
+            <div data-dojo-attach-point="userGrid" id="userGrid" ></div>
         </div>
         <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center', splitter:true">
             <h1 data-dojo-attach-point="user_info_username"></h1>

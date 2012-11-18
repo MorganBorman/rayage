@@ -77,7 +77,6 @@ define(["dojo/_base/declare",
                 on(this.templateGrid, "rowClick", function(e) {
                     var templateRow = self.templateGrid.getItem(e.rowIndex);
                     console.log(templateRow);
-                    self.observableTemplateStore.notify(undefined, templateRow.id);
                 });
             },
             

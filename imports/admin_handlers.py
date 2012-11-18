@@ -68,6 +68,14 @@ class UserStoreHandler(RayageJsonStoreHandler):
         sqlalchemy.event.listen(User, 'after_update', after_update_listener)
         """
         
+    def on_update(self, user_object):
+        result_message = {'type': "RayageJsonStore/Users",
+                          'action': 'update',
+                          'object': {'id': user_object.id, 'username': user_object.username, 'permissions': user_object.permission_level},
+                         }
+        
+        self.publish(json.dumps(result_message))
+        
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         session = SessionFactory()
         try:
@@ -108,6 +116,8 @@ class UserStoreHandler(RayageJsonStoreHandler):
             
             user = User.get_user(object_data[u'username'])
             user.permission_level = target_permission_level
+            
+            self.on_update(user)
             
             session.add(user)
             session.commit()
