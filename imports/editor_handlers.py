@@ -86,6 +86,12 @@ def handle_new_project_request(socket_connection, message):
 
     try:
         new_project_dir = socket_connection.user_dir(name)
+
+        # verify the project will end up in the user's directory
+        if os.path.dirname(os.path.normpath(new_project_dir)) != os.path.normpath(socket_connection.user_dir()):
+            socket_connection.notify("%s is an illegal project name!" % name, "error")
+            return
+
         if template:
             shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
         else:
@@ -187,6 +193,11 @@ def handle_new_file_request(socket_connection, message):
 
     if os.path.exists(dst):
         socket_connection.notify("%s already exists!" % filename, "error")
+        return
+
+    # verify the file will end up in the user's directory
+    if os.path.dirname(os.path.normpath(dst)) != os.path.normpath(socket_connection.project_dir()):
+        socket_connection.notify("%s is an illegal filename!" % filename, "error")
         return
 
     file(dst, 'w').close()
