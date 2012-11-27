@@ -24,13 +24,11 @@ class DojoSort(object):
             if not u'attribute' in sort_dict.keys():
                 raise MalformedDojoSort("Missing 'attribute' key in sort dictionary.")
                 
-            if not u'descending' in sort_dict.keys():
-                raise MalformedDojoSort("Missing 'descending' key in sort dictionary.")
-                
             attribute = sort_dict[u'attribute']
-            descending = sort_dict[u'descending']
-            
-            direction = desc if descending else asc
+                
+            direction = asc
+            if u'descending' in sort_dict.keys():
+                direction = desc if sort_dict[u'descending'] else asc
             
             sorts.append(direction(column_map[attribute]))
         

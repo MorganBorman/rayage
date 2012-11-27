@@ -5,6 +5,7 @@ A simple web IDE for intro programming students.
 
 Dependencies:
 * python 2.7
+* sqlalchemy 0.7
 
 First run:
 ```bash
@@ -23,6 +24,17 @@ python rayage.py
 
 
 Then visit [https://localhost:8080](https://localhost:8080)
+
+The admin system requires the dojo _dgrid_ module and dependencies.
+
+First make sure _cpm_ is installed: https://github.com/kriszyp/cpm
+
+Then run:
+```bash
+cd static/lib/
+cpm install dgrid
+rm -rf dojo/
+```
 
 ##Making Changes:
 

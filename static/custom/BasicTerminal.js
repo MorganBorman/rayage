@@ -61,9 +61,18 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
             },
             
             outputOutLine: function(data) {
+                // Only scroll if there was no scrollbar before or we are at the bottom of the scrollheight
+                var scroll = (this.terminalNode.clientHeight == this.terminalNode.scrollHeight || 
+                                this.terminalNode.scrollTop + 1 >= (this.terminalNode.scrollHeight - this.terminalNode.clientHeight));
+                //console.log("scrollinfo:", this.terminalNode.clientHeight, this.terminalNode.scrollTop, this.terminalNode.scrollHeight, scroll);
+            
                 var node = document.createElement("div");
                 node.innerHTML = this.format_output_data(data);
                 this.outputNode.appendChild(node);
+                
+                if (scroll) {
+                    this.terminalNode.scrollTop = this.terminalNode.scrollHeight;
+                }
             },
             
             _onInputLine: function( /*Event*/ e) {

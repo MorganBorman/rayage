@@ -24,13 +24,14 @@
 			 var dojoConfig = {
 					async: true,
 					isDebug: true,
-					packages: [{
-						name: "custom",
-						location: base + '/custom'
-					}]
+					packages: [ {name: "custom", location: base + '/custom' },
+					            { name: "dgrid", location: base + "/lib/dgrid" },
+					            { name: "xstyle", location: base + "/lib/xstyle" },
+					            { name: "put-selector", location: base + "/lib/put-selector" }]
 			};
 		</script>
         
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/resources/dojo.css">
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
         
