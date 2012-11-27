@@ -18,6 +18,9 @@ from constants import *
 
 from ProjectRunner import ProjectRunner
 
+from database.User import User
+from database.SessionFactory import SessionFactory
+
 @messageHandler("project_list_request")
 def handle_project_list_request(socket_connection, message):
     """
@@ -38,6 +41,19 @@ def handle_close_project(socket_connection, message, notify=True):
     acknowledgement that the project has been closed.
     """
     socket_connection.project = None
+    
+    username = socket_connection.user.username
+    session = SessionFactory()
+    try:
+        socket_connection.user.current_project = None
+        session.add(socket_connection.user)
+        session.commit()
+    finally:
+        session.close()
+    #TODO: fix this hack! the attribute refresh operation does not succeed so
+    #      a new instance of user has to be assigned to the socket connection
+    socket_connection.user = User.get_user(username)
+    
     result_message = {'type': 'close_project_acknowledge'}
     socket_connection.write_message(json.dumps(result_message))
     if notify:
@@ -109,6 +125,20 @@ def handle_open_project_request(socket_connection, message, notify=True, selecte
     Handles open project requests by setting the project attribute of the users connection and sending a project state to the client.
     """
     project_id = message['id']
+    
+    if project_id != socket_connection.user.current_project:
+        username = socket_connection.user.username
+        
+        session = SessionFactory()
+        try:
+            socket_connection.user.current_project = project_id
+            session.add(socket_connection.user)
+            session.commit()
+        finally:
+            session.close()
+        #TODO: fix this hack! the attribute refresh operation does not succeed so
+        #      a new instance of user has to be assigned to the socket connection
+        socket_connection.user = User.get_user(username)
     
     project_dir = socket_connection.user_dir(project_id)
 

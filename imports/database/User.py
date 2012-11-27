@@ -13,6 +13,7 @@ class User(Base):
     id = Column(Integer, Sequence('users_id_seq'), primary_key=True)
     username = Column(String(64), nullable=False, unique=True)
     permission_level = Column(Integer)
+    current_project = Column(String(64), nullable=True)
 
     @classmethod
     def get_user(cls, username):
