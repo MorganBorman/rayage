@@ -1,3 +1,7 @@
+# Enables the fake_user functionality and automatic reloading of modules and
+# templates
+DEBUG = True
+
 CAS_SERVER  = "https://websso.wwu.edu:443"
 
 # If we're in the labs, use the fully qualified domain name of the system.
