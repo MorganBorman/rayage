@@ -43,33 +43,31 @@ class RequestHandler(CASVerifiedRequestHandler):
             user = User.get_user(username)
                 
             if action == "admin" and user.permission_level >= constants.PERMISSION_LEVEL_TA:
-                with open(system_directory+'/static/admin.html') as f:
-                    self.write(f.read())
-                    self.finish()
+                self.render("admin.html")
             elif user.permission_level >= constants.PERMISSION_LEVEL_USER:
-                with open(system_directory+'/static/index.html') as f:
-                    self.write(f.read())
-                    self.finish()
+                self.render("index.html")
             else:
-                with open(system_directory+'/static/denied.html') as f:
-                    self.write(f.read())
-                    self.finish()
+                self.render("denied.html")
                     
 handlers = [
     (r'/fake_user/(.*)', FakeUserRequestHandler),
     (r'/(admin|logout|)', RequestHandler),
     (r'/upload/(.*)', UploadHandler),
-    (r'/(.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
-    (r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
-    (r'/custom/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/custom'}),
-    (r'/lib/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/lib'}),
-    (r'/images/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/images'}),
-    (r'/styles/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/styles'}),
+    #(r'/(.*\.js|welcome\.html)', tornado.web.StaticFileHandler, {'path': system_directory+'/static'}),
+    #(r'/codemirror/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/codemirror'}),
+    #(r'/custom/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/custom'}),
+    #(r'/lib/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/lib'}),
+    #(r'/images/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/images'}),
+    #(r'/styles/(.*)', tornado.web.StaticFileHandler, {'path': system_directory+'/static/styles'}),
     (r'/ws', WebSocketHandler),
 ]
 
 if __name__ == "__main__":
-        tornado_app = tornado.web.Application(handlers, cookie_secret=constants.COOKIE_SECRET)
+        tornado_app = tornado.web.Application(handlers, 
+                                              debug=True,
+                                              cookie_secret=constants.COOKIE_SECRET, 
+                                              template_path=system_directory+"/templates", 
+                                              static_path=system_directory+"/static")
         
         tornado_http = tornado.httpserver.HTTPServer(tornado_app, ssl_options= {"certfile": "misc/server.crt", "keyfile": "misc/server.key"})
         tornado_http.bind(8080, family=socket.AF_INET)
