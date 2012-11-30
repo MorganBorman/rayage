@@ -44,7 +44,7 @@ class RequestHandler(CASVerifiedRequestHandler):
             else:
                 self.render("denied.html")
                     
-handlers = [,
+handlers = [
     (r'/(admin|logout|)', RequestHandler),
     (r'/upload/(.*)', UploadHandler),
     (r'/ws', WebSocketHandler),
