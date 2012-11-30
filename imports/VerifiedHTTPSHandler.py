@@ -19,7 +19,7 @@ class VerifiedHTTPSConnection(httplib.HTTPSConnection):
         self.sock = ssl.wrap_socket(sock,
                                     self.key_file,
                                     self.cert_file,
-                                    cert_reqs=ssl.CERT_NONE,
+                                    # cert_reqs=ssl.CERT_NONE,
                                     ca_certs="misc/CA_FILE.pem")
                                     
 # wraps https connections with ssl certificate verification
