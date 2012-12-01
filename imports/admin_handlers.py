@@ -83,7 +83,7 @@ class UserStoreHandler(RayageJsonStoreHandler):
         
             column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
         
-            if dojo_query is not None:
+            if dojo_query:
                 dojo_query_obj = DojoQuery(dojo_query)
                 query = dojo_query_obj.apply_to_sqla_query(query, column_map)
                 

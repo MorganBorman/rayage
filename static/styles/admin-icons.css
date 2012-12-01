@@ -1,15 +1,15 @@
 .rayage_icon_admin_modules {
-    background: url(/images/oxygen/admin-modules.png);
+    background: url(/static/images/oxygen/admin-modules.png);
 }
 
 .rayage_icon_admin_view_statistics {
-    background: url(/images/oxygen/admin-view-statistics.png);
+    background: url(/static/images/oxygen/admin-view-statistics.png);
 }
 
 .rayage_icon_admin_users {
-    background: url(/images/oxygen/users.png);
+    background: url(/static/images/oxygen/users.png);
 }
 
 .rayage_icon_admin_templates {
-    background: url(/images/oxygen/admin-templates.png);
+    background: url(/static/images/oxygen/admin-templates.png);
 }

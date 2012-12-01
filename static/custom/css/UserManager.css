@@ -1,5 +1,5 @@
-@import "/lib/dgrid/css/dgrid.css";
-@import "/lib/dgrid/css/skins/claro.css";
+@import "/static/lib/dgrid/css/dgrid.css";
+@import "/static/lib/dgrid/css/skins/claro.css";
 
 .dojoxGrid table {
   margin: 0;
