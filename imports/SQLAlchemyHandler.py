@@ -3,11 +3,17 @@
 
 import logging
 import traceback
+from SignalObject import Signal
 
 from database.LogEntry import LogEntry
 from database.SessionFactory import SessionFactory
 
 class SQLAlchemyHandler(logging.Handler):
+    RecordEmitted = Signal()
+    
+    def __init__(self):
+        logging.Handler.__init__(self)
+    
     # A very basic logger that commits LogEntry records to the database
     def emit(self, record):
         trace = None
@@ -24,6 +30,12 @@ class SQLAlchemyHandler(logging.Handler):
                                  msg=(record.msg % record.args),)
                         
             session.add(log_entry)
+            
+            session.flush()
+            session.refresh(log_entry)
+            
+            self.RecordEmitted.emit(log_entry)
+            
             session.commit()
         finally:
             session.close()

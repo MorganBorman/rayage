@@ -60,6 +60,14 @@ function(topic){
             });
         });
         
+        topic.subscribe("ui/menus/open_rayage", function() {
+            window.open("/");
+        });
+        
+        topic.subscribe("ui/menus/logout", function() {
+            window.location = "/logout";
+        });
+        
         topic.subscribe("ws/message/admin_module_tree", function(data) {
             rayage_ui.module_tree.store.setData(data.modules);
         });

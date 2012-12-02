@@ -20,6 +20,8 @@ from database.User import User
 from database.LogEntry import LogEntry
 from database.SessionFactory import SessionFactory
 
+from SQLAlchemyHandler import SQLAlchemyHandler
+
 from DojoQuery import DojoQuery
 from DojoSort import DojoSort
 
@@ -28,7 +30,7 @@ admin_modules = [
     { 'id': 'view_statistics', 'name': 'View Statistics', 'type': 'custom/StatisticsViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'view_statistics'},
     { 'id': 'user_manager', 'name': 'Manage Users', 'type': 'custom/UserManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'users'},
     { 'id': 'template_manager', 'name': 'Manage Templates', 'type': 'custom/TemplateManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
-    { 'id': 'log_viewer', 'name': 'View Logs', 'type': 'custom/LogViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
+    { 'id': 'log_viewer', 'name': 'View Logs', 'type': 'custom/LogViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'logs'},
 ]
 
 @messageHandler("admin_module_tree_request", minimum_permission_level=PERMISSION_LEVEL_TA)
@@ -85,7 +87,7 @@ class UserStoreHandler(RayageJsonStoreHandler):
         
             column_map = {u'id': User.id, u'username': User.username, u'permissions': User.permission_level}
         
-            if dojo_query is not None:
+            if dojo_query:
                 dojo_query_obj = DojoQuery(dojo_query)
                 query = dojo_query_obj.apply_to_sqla_query(query, column_map)
                 
@@ -221,10 +223,13 @@ class UserStoreHandler(RayageJsonStoreHandler):
     def __init__(self, message_type, required_fields, minimum_permission_level):
         RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
         
-    def on_update(self, user_object):
+        SQLAlchemyHandler.RecordEmitted.connect(self.on_new_record)
+        
+    def on_new_record(self, log_entry):
         result_message = {'type': "RayageJsonStore/LogEntries",
                           'action': 'update',
-                          'object': {'id': user_object.id, 'username': user_object.username, 'permissions': user_object.permission_level},
+                          'object': {u'id': log_entry.id, u'timestamp': log_entry.timestamp.isoformat(), u'logger': log_entry.logger, 
+                                     u'level': log_entry.level, u'trace': log_entry.trace, u'message': log_entry.msg},
                          }
         
         self.publish(json.dumps(result_message))

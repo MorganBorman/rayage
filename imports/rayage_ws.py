@@ -146,6 +146,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 result_message = {'type': 'login_success'}
                 self.write_message(json.dumps(result_message))
                 
+                if self.user.current_project is not None:
+                    # Send a message to re-open the current project
+                    #TODO: fix this hack! this module should not "know" about this method.
+                    self.message_handlers["open_project_request"](self, {'id': self.user.current_project})
+                
                 print "User '{}' has connected.".format(self.username)
                 return
 

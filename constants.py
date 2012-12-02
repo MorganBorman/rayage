@@ -1,3 +1,11 @@
+# Enables the fake_user functionality and automatic reloading of modules and
+# templates
+DEBUG = False
+
+import logging
+CONSOLE_LOG_LEVEL = logging.WARNING
+DATABASE_LOG_LEVEL = logging.INFO
+
 CAS_SERVER  = "https://websso.wwu.edu:443"
 
 # If we're in the labs, use the fully qualified domain name of the system.

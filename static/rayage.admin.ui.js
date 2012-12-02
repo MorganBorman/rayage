@@ -7,6 +7,23 @@ function(parser, on, topic, registry, ObjectStore, Memory, Observable, ObjectSto
     
     rayage_ui = new Object();
     
+    rayage_ui.menus = {
+        open_rayage:   registry.byId("ui_menus_open_rayage"),
+        logout:  registry.byId("ui_menus_logout")
+    };
+    
+    // Open rayage
+    on(rayage_ui.menus.open_rayage, "click", function(evt){
+        console.log("this1 happened");
+        topic.publish("ui/menus/open_rayage");
+    });
+    
+    // Logout
+    on(rayage_ui.menus.logout, "click", function(evt){
+        console.log("this2 happened");
+        topic.publish("ui/menus/logout");
+    });
+    
     rayage_ui.nav_pane = registry.byId("ui_nav_pane");
     rayage_ui.tab_container = registry.byId("ui_admin_tab_container");
     

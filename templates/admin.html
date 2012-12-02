@@ -4,17 +4,17 @@
 		<meta charset="utf-8">
 		<title>Rayage Admin</title>
 
-        <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+        <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
 
-		<link rel="stylesheet" href="/styles/style.css" media="screen">
-        <link rel="stylesheet" href="/styles/icons.css" media="screen">
-        <link rel="stylesheet" href="/styles/admin-icons.css" media="screen">
+		<link rel="stylesheet" href="/static/styles/style.css" media="screen">
+        <link rel="stylesheet" href="/static/styles/icons.css" media="screen">
+        <link rel="stylesheet" href="/static/styles/admin-icons.css" media="screen">
         
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
         
-        <script type="text/javascript" src="jquery.pnotify.js"></script>
-		<link type="text/css" rel="stylesheet" href="/styles/jquery.pnotify.default.css" />
+        <script type="text/javascript" src="/static/jquery.pnotify.js"></script>
+		<link type="text/css" rel="stylesheet" href="/static/styles/jquery.pnotify.default.css" />
         
 		<script>
 			var base = location.href.split("/");
@@ -24,10 +24,10 @@
 			 var dojoConfig = {
 					async: true,
 					isDebug: true,
-					packages: [ {name: "custom", location: base + '/custom' },
-					            { name: "dgrid", location: base + "/lib/dgrid" },
-					            { name: "xstyle", location: base + "/lib/xstyle" },
-					            { name: "put-selector", location: base + "/lib/put-selector" }]
+					packages: [ {name: "custom", location: base + '/static/custom' },
+					            { name: "dgrid", location: base + "/static/lib/dgrid" },
+					            { name: "xstyle", location: base + "/static/lib/xstyle" },
+					            { name: "put-selector", location: base + "/static/lib/put-selector" }]
 			};
 		</script>
         
@@ -35,17 +35,17 @@
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
         
-        <link type="text/css" rel="stylesheet" href="/custom/css/UserManager.css" />
-        <link type="text/css" rel="stylesheet" href="/custom/css/StatisticsViewer.css" />
-        <link type="text/css" rel="stylesheet" href="/custom/css/TemplateManager.css" />
-        <link type="text/css" rel="stylesheet" href="/custom/css/LogViewer.css" />
+        <link type="text/css" rel="stylesheet" href="/static/custom/css/UserManager.css" />
+        <link type="text/css" rel="stylesheet" href="/static/custom/css/StatisticsViewer.css" />
+        <link type="text/css" rel="stylesheet" href="/static/custom/css/TemplateManager.css" />
+        <link type="text/css" rel="stylesheet" href="/static/custom/css/LogViewer.css" />
         
-		<script src="development-mode.js"></script>
+		<script src="/static/development-mode.js"></script>
 
-        <script src="rayage.admin.js"></script>
-        <script src="rayage.admin.ui.js"></script>
-		<script src="rayage.notify.js"></script>
-		<script src="rayage.ws.js"></script>
+        <script src="/static/rayage.admin.js"></script>
+        <script src="/static/rayage.admin.ui.js"></script>
+		<script src="/static/rayage.notify.js"></script>
+		<script src="/static/rayage.ws.js"></script>
 
 	</head>
 	<body class="claro">

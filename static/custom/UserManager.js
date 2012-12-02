@@ -4,6 +4,25 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
         "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
         "dojox/form/DropDownSelect", "dojo/json"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON) {
+        
+        // Used to debounce a given function and reduce the amount of data
+        // sent on the socket.
+        var debounce = function(func, threshold) {
+            var timeout;
+
+            return function debounced() {
+                var obj = this, args = arguments;
+                function delayed() {
+                    func.apply(obj, args);
+                    timeout = null;
+                }
+                if (timeout) {
+                    window.clearTimeout(timeout);
+                }
+                timeout = window.setTimeout(delayed, threshold);
+            };
+        };
+    
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -29,6 +48,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 this.resize();
                 
                 this.setupGrid();
+                this.setupQueryFilter();
             },
             
             click_change_permissions: function() {
@@ -103,13 +123,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                     }
                 }
                 
-                /*set up layout*/
-                var layout = [[
-                  {'name': 'Id', 'field': 'id', 'width': '60px'},
-                  {'name': 'Username', 'field': 'username', 'width': '175px'},
-                  {'name': 'Permissions', 'field': 'permissions', 'width': '125px', formatter: formatPermissions}
-                ]];
-                
                 /*initialize the declaritive grid with the programmatic parameters*/
                 this.userGrid = new declare([OnDemandGrid, Keyboard, Selection])({
                     columns: {
@@ -131,6 +144,18 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                     var userRow = event.rows[0].data;
                     console.log(userRow);
                     self.updateUserInfo(userRow);
+                });
+            },
+            
+            debouncedSetQuery: debounce(function(self, value) {
+                        self.userGrid.set('query', {"op":"any","data":[{"op":"contains","data":[{"op":"string","data":"username","isCol":true},
+                                                    {"op":"string","data":value,"isCol":false}]}]});
+            }, 1000),
+            
+            setupQueryFilter: function() {
+                var self = this;
+                on(this.filterQuery, "change", function() {
+                    self.debouncedSetQuery(self, this.value);
                 });
             },
             

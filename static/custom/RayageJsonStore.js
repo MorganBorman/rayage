@@ -181,9 +181,9 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    // returns: dojo/store/api/Store.QueryResults
 		    //		The results of the query, extended with iterative methods.
 		    
-            console.log("RayageJsonStore.query(", query, options, ")");
+            //console.log("RayageJsonStore.query(", query, options, ")");
 		    
-		    options = {count: options.count, sort: options.sort, query: options.query, queryOptions: options.queryOptions, start: options.start};
+		    options = {count: options.count, sort: options.sort, query: query, queryOptions: options.queryOptions, start: options.start};
 		    
 		    // Create a new deferred and store the pending entry
 		    var def = new Deferred();

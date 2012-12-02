@@ -5,7 +5,7 @@
   margin: 0;
 }
 
-.user_manager {
+.log_viewer {
     width: 100%;
     height: 100%;
 }
@@ -16,6 +16,26 @@
     overflow: auto;
 }
 
-#userGrid {
-    height: 99%;
+#logGrid {
+    height: 100%;
+}
+
+.field-timestamp {
+    width: 10%;
+}
+
+.field-level {
+    width: 5%;
+}
+
+.field-type {
+    width: 10%;
+}
+
+.field-message {
+    width: 40%;
+}
+
+.field-traceback {
+    width: 35%;
 }
