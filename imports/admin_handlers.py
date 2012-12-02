@@ -17,6 +17,7 @@ from ws_exceptions import *
 from RayageJsonStoreHandler import RayageJsonStoreHandler
 
 from database.User import User
+from database.LogEntry import LogEntry
 from database.SessionFactory import SessionFactory
 
 from DojoQuery import DojoQuery
@@ -27,6 +28,7 @@ admin_modules = [
     { 'id': 'view_statistics', 'name': 'View Statistics', 'type': 'custom/StatisticsViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'view_statistics'},
     { 'id': 'user_manager', 'name': 'Manage Users', 'type': 'custom/UserManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'users'},
     { 'id': 'template_manager', 'name': 'Manage Templates', 'type': 'custom/TemplateManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
+    { 'id': 'log_viewer', 'name': 'View Logs', 'type': 'custom/LogViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
 ]
 
 @messageHandler("admin_module_tree_request", minimum_permission_level=PERMISSION_LEVEL_TA)
@@ -210,4 +212,51 @@ def template_upload_handler(request_handler):
             
         print response_data
         request_handler.finish(json.dumps(response_data))
+        
+@messageHandler("RayageJsonStore/LogEntries", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
+class UserStoreHandler(RayageJsonStoreHandler):
+    """
+    Handles REST-like requests over the websocket for the lazy-loading editable table showing the log entries.
+    """
+    def __init__(self, message_type, required_fields, minimum_permission_level):
+        RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
+        
+    def on_update(self, user_object):
+        result_message = {'type': "RayageJsonStore/LogEntries",
+                          'action': 'update',
+                          'object': {'id': user_object.id, 'username': user_object.username, 'permissions': user_object.permission_level},
+                         }
+        
+        self.publish(json.dumps(result_message))
+        
+    def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
+        session = SessionFactory()
+        try:
+        
+            column_map = {u'id': LogEntry.id, u'timestamp': LogEntry.timestamp, u'logger': LogEntry.logger, u'level': LogEntry.level, u'trace': LogEntry.trace, u'message': LogEntry.msg}
+            
+            query = session.query(LogEntry.id, LogEntry.timestamp, LogEntry.logger, LogEntry.level, LogEntry.trace, LogEntry.msg)
+            
+            if dojo_query:
+                dojo_query_obj = DojoQuery(dojo_query)
+                query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+                
+            if dojo_sort is not None:
+                dojo_sort_obj = DojoSort(dojo_sort)
+                query = dojo_sort_obj.apply_to_sqla_query(query, column_map)
+            
+            log_entry_count = query.count()
+            log_entry_list = query.offset(start).limit(count).all()
+            log_entry_list = [{u'id': id, u'timestamp': timestamp.isoformat(), u'logger': logger, u'level': level, u'trace': trace, u'message': msg}
+                                for id, timestamp, logger, level, trace, msg in log_entry_list]
+            
+            result_message = {'type': message[u'type'],
+                              'response': log_entry_list,
+                              'total': log_entry_count,
+                              'deferredId': message['deferredId'],
+                             }
+        finally:
+            session.close()
+        
+        socket_connection.write_message(json.dumps(result_message))
     

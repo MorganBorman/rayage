@@ -8,6 +8,9 @@ system_directory = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(system_directory + "/imports")
 
+from logger import logger
+
+import tornado.options
 import tornado.web
 import tornado.httpserver
 import tornado.ioloop
@@ -71,7 +74,10 @@ handlers = [
 if __name__ == "__main__":
         tornado_app = tornado.web.Application(handlers, cookie_secret=constants.COOKIE_SECRET)
         
+        tornado.options.parse_command_line()
+        
         tornado_http = tornado.httpserver.HTTPServer(tornado_app, ssl_options= {"certfile": "misc/server.crt", "keyfile": "misc/server.key"})
         tornado_http.bind(8080, family=socket.AF_INET)
         tornado_http.start()
+        logger.info("Rayage started.")
         tornado.ioloop.IOLoop.instance().start()
