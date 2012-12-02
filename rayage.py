@@ -66,7 +66,8 @@ if __name__ == "__main__":
                                               debug=constants.DEBUG,
                                               cookie_secret=constants.COOKIE_SECRET, 
                                               template_path=system_directory+"/templates", 
-                                              static_path=system_directory+"/static")
+                                              static_path=system_directory+"/static",
+                                              gzip=True)
         
         tornado.options.parse_command_line()
         

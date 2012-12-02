@@ -9,6 +9,8 @@ from database.User import User
 from constants import *
 from ws_exceptions import InsufficientPermissions, InvalidStateError, MalformedMessage
 
+from logger import logger
+
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     message_handlers = {}
     
@@ -22,6 +24,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     project = None
     project_runner = None
     subscriptions = [] # holds a list stream names
+    
+    def log(self, level, message):
+        ip = self.request.remote_ip
+        logger.__getattribute__(level)("{}@{}: {}".format(self.username, ip, message))
     
     @property
     def username(self):
@@ -151,7 +157,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                     #TODO: fix this hack! this module should not "know" about this method.
                     self.message_handlers["open_project_request"](self, {'id': self.user.current_project})
                 
-                print "User '{}' has connected.".format(self.username)
+                self.log("info", "User '{}' has connected.".format(self.username))
                 return
 
         self.redirect(CAS_SERVER + "/cas/login?service=" + SERVICE_URL, permanent=False)
@@ -159,10 +165,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.notify("Session expired. Please login again.", "error")
         
     def access_denied(self, details):
-        self.notify("Access denied. {}".format(details), "error")
+        message = "Access denied. {}".format(details)
+        self.log("error", message)
+        self.notify(message, "error")
         
     def malformed_message(self, details):
-        self.notify("Invalid message. {}".format(details), "error")
+        message = "Invalid message. {}".format(details)
+        self.log("error", message)
+        self.notify(message, "error")
 
     def on_message(self, message):
         try:
@@ -186,7 +196,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         if self.username is not None:
-            print "User '{}' has disconnected.".format(self.username)
+            self.log("info", "User '{}' has disconnected.".format(self.username))
             
         if self.user is not None:
             self.user.on_disconnect()
