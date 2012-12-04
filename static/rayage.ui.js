@@ -1,6 +1,6 @@
 // This file will contain publishers and subscriber to topics for all direct manipulation of the UI (that is the public interface to the UI)
 
-require(["dojo/parser", "dojo/on", "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dijit/TooltipDialog", "custom/BasicTerminal",
+require(["dojo/parser", "dojo/on", /*"dojo/connect",*/ "dojo/topic", "dijit/registry", "dojo/data/ObjectStore", "dojo/store/Memory", "dijit/layout/ContentPane", "dijit/TooltipDialog", "custom/BasicTerminal",
          "dojo/domReady!", "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/MenuItem", "dijit/DropDownMenu", "dijit/layout/BorderContainer", 
          "dijit/layout/TabContainer", "dijit/Dialog", "dijit/form/Select", "dijit/form/TextBox"],
 function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip, BasicTerminal){
@@ -24,6 +24,8 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
         error_widget_instances: {},
         dirty_document_widget_instances: {}
     };
+    
+	
     
     on(rayage_ui.editor.tab_container, "selectChild", function() {
         var nval = rayage_ui.editor.tab_container.selectedChildWidget;
@@ -95,6 +97,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
             open_project: registry.byId("ui_menus_project_open_project"),
             delete_project: registry.byId("ui_menus_project_delete_project"),
             new_file: registry.byId("ui_menus_project_new_file"),
+            revert_file: registry.byId("ui_menus_project_revert_file"),
             save_file: registry.byId("ui_menus_project_save_file"),
             save_all_files: registry.byId("ui_menus_project_save_all_files"),
             delete_file: registry.byId("ui_menus_project_delete_file"),
@@ -115,8 +118,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
     };
 
     // Hook up the topic publishers
-	/*on(rayage_ui.editor.welcome_tab,"keypress",function(evt){
+	/*on(rayage_ui.editor.welcome_tab,"keydown",function(evt){
 		topic.publish("ui/menus/project/new_project");
+    });*/
+    /*dojo.connect(null,"keypress",null,function(evt){
+    	topic.publish("ui/menus/project/new_project");
     });*/
     // Project menu
     
@@ -139,6 +145,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
     on(rayage_ui.menus.project.save_file, "click", function(evt) {
         var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
         topic.publish("ui/menus/project/save_file", filename);
+    });
+    
+    on(rayage_ui.menus.project.revert_file, "click", function(evt) {
+        var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
+        topic.publish("ui/menus/project/revert_file", filename);
     });
     
     on(rayage_ui.menus.project.save_all_files, "click", function(evt) {

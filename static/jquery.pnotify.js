@@ -236,7 +236,7 @@
 					if (opts.nonblock) {
 						e.stopPropagation();
 						e.preventDefault();
-						nonblock_pass(e,"onclick");
+						nonblock_pass(e,"keypress");
 					}
 				}
 			});

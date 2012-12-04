@@ -62,6 +62,7 @@ function(topic){
         rayage_ui.menus.project.new_file.set("disabled", true);
         rayage_ui.menus.project.save_file.set("disabled", true);
         rayage_ui.menus.project.save_all_files.set("disabled", true);
+        rayage_ui.menus.project.revert_file.set("disabled", true);
         rayage_ui.menus.project.delete_file.set("disabled", true);
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
@@ -87,6 +88,12 @@ function(topic){
         topic.subscribe("ui/menus/project/save_file", function(filename) {
             // TODO: Synchronize state
             rayage_ws.send({"type": "save_file_request", "filename": filename});
+        });
+        
+        topic.subscribe("ui/menus/project/revert_file", function(filename) {
+        	if (confirm("Do you really want to revert back to the saved state?")) {
+            	rayage_ws.send({"type": "revert_file_request", "filename": filename});
+            }
         });
 
         topic.subscribe("ui/menus/project/delete_project", function() {
@@ -166,12 +173,14 @@ function(topic){
             rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
             
             rayage_ui.menus.project.new_file.set("disabled", true);
-            rayage_ui.menus.project.save_file.set("disabled", true);
-            rayage_ui.menus.project.delete_file.set("disabled", true);
-            rayage_ui.menus.project.close_project.set("disabled", true);
-            rayage_ui.menus.project.delete_project.set("disabled", true);
-            rayage_ui.menus.build.set("disabled", true);
-            rayage_ui.menus.run.set("disabled", true);
+		    rayage_ui.menus.project.save_file.set("disabled", true);
+		    rayage_ui.menus.project.save_all_files.set("disabled", true);
+		    rayage_ui.menus.project.revert_file.set("disabled", true);
+		    rayage_ui.menus.project.delete_file.set("disabled", true);
+		    rayage_ui.menus.project.close_project.set("disabled", true);
+		    rayage_ui.menus.project.delete_project.set("disabled", true);
+		    rayage_ui.menus.build.set("disabled", true);
+		    rayage_ui.menus.run.set("disabled", true);
         });
         
         topic.subscribe("ui/menus/project/open_project", function() {
@@ -210,10 +219,14 @@ function(topic){
             rayage_ui.menus.project.delete_project.set("disabled", false);
             rayage_ui.menus.build.set("disabled", false);
             rayage_ui.menus.run.set("disabled", false);
-            if (files.length > 0)
+            if (files.length > 0){
                 rayage_ui.menus.project.save_file.set("disabled", false);
-            else
+                rayage_ui.menus.project.save_all_files.set("disabled", false);
+                rayage_ui.menus.project.revert_file.set("disabled", false);}
+            else{
                 rayage_ui.menus.project.save_file.set("disabled", true);
+                rayage_ui.menus.project.save_all_files.set("disabled", true);
+                rayage_ui.menus.project.revert_file.set("disabled", true);}
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
