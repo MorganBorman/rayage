@@ -41,7 +41,9 @@
 
 		<link type="text/css" rel="stylesheet" href="/static/custom/css/BasicTerminal.css" />
 
+        {% if debug %}
 		<script src="/static/development-mode.js"></script>
+        {% end %}
 
 		<script src="/static/rayage.js"></script>
 		<script src="/static/rayage.notify.js"></script>

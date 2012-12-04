@@ -41,11 +41,11 @@ class RequestHandler(CASVerifiedRequestHandler):
             user = User.get_user(username)
                 
             if action == "admin" and user.permission_level >= constants.PERMISSION_LEVEL_TA:
-                self.render("admin.html")
+                self.render("admin.html", debug=constants.DEBUG)
             elif user.permission_level >= constants.PERMISSION_LEVEL_USER:
-                self.render("index.html")
+                self.render("index.html", debug=constants.DEBUG)
             else:
-                self.render("denied.html")
+                self.render("denied.html", debug=constants.DEBUG, user=user)
                     
 handlers = [
     (r'/(admin|logout|)', RequestHandler),
@@ -75,4 +75,8 @@ if __name__ == "__main__":
         tornado_http.bind(8080, family=socket.AF_INET)
         tornado_http.start()
         logger.info("Rayage started.")
-        tornado.ioloop.IOLoop.instance().start()
+        
+        try:
+            tornado.ioloop.IOLoop.instance().start()
+        except KeyboardInterrupt:
+            print "\nReceived KeyboardInterrupt exiting..."

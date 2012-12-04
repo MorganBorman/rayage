@@ -40,8 +40,10 @@
         <link type="text/css" rel="stylesheet" href="/static/custom/css/TemplateManager.css" />
         <link type="text/css" rel="stylesheet" href="/static/custom/css/LogViewer.css" />
         
+        {% if debug %}
 		<script src="/static/development-mode.js"></script>
-
+        {% end %}
+        
         <script src="/static/rayage.admin.js"></script>
         <script src="/static/rayage.admin.ui.js"></script>
 		<script src="/static/rayage.notify.js"></script>
