@@ -58,17 +58,17 @@ function(topic){
         
         rayage_ui.menus.edit.menu.set("disabled", true);
         rayage_ui.menus.project.menu.set("disabled", true);
-        
-        rayage_ui.menus.project.new_file.set("disabled", true);
-        rayage_ui.menus.project.save_file.set("disabled", true);
+        rayage_ui.menus.file.menu.set("disabled", true);
+        rayage_ui.menus.file.new_file.set("disabled", true);
+        rayage_ui.menus.file.save_file.set("disabled", true);
         rayage_ui.menus.project.save_all_files.set("disabled", true);
-        rayage_ui.menus.project.revert_file.set("disabled", true);
-        rayage_ui.menus.project.delete_file.set("disabled", true);
+        rayage_ui.menus.file.revert_file.set("disabled", true);
+        rayage_ui.menus.file.delete_file.set("disabled", true);
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
         rayage_ui.menus.build.set("disabled", true);
         rayage_ui.menus.run.set("disabled", true);
-        
+
         topic.subscribe("ws/message/redirect", function(data) {
             window.location = data.target;
         });
@@ -172,11 +172,12 @@ function(topic){
         
             rayage_ui.editor.tab_container.addChild(rayage_ui.editor.welcome_tab);
             
-            rayage_ui.menus.project.new_file.set("disabled", true);
-		    rayage_ui.menus.project.save_file.set("disabled", true);
+            rayage_ui.menus.file.new_file.set("disabled", true);
+		    rayage_ui.menus.file.save_file.set("disabled", true);
+		    rayage_ui.menus.file.menu.set("disabled", true);
 		    rayage_ui.menus.project.save_all_files.set("disabled", true);
-		    rayage_ui.menus.project.revert_file.set("disabled", true);
-		    rayage_ui.menus.project.delete_file.set("disabled", true);
+		    rayage_ui.menus.file.revert_file.set("disabled", true);
+		    rayage_ui.menus.file.delete_file.set("disabled", true);
 		    rayage_ui.menus.project.close_project.set("disabled", true);
 		    rayage_ui.menus.project.delete_project.set("disabled", true);
 		    rayage_ui.menus.build.set("disabled", true);
@@ -213,20 +214,22 @@ function(topic){
             rayage_ui.dialogs.open_project.dialog.hide();
             rayage_ui.dialogs.new_project.dialog.hide();
 
-            rayage_ui.menus.project.new_file.set("disabled", false);
-            rayage_ui.menus.project.delete_file.set("disabled", false);
+            rayage_ui.menus.file.new_file.set("disabled", false);
+            rayage_ui.menus.file.menu.set("disabled", false);
             rayage_ui.menus.project.close_project.set("disabled", false);
             rayage_ui.menus.project.delete_project.set("disabled", false);
             rayage_ui.menus.build.set("disabled", false);
             rayage_ui.menus.run.set("disabled", false);
             if (files.length > 0){
-                rayage_ui.menus.project.save_file.set("disabled", false);
+                rayage_ui.menus.file.save_file.set("disabled", false);
                 rayage_ui.menus.project.save_all_files.set("disabled", false);
-                rayage_ui.menus.project.revert_file.set("disabled", false);}
+                rayage_ui.menus.file.revert_file.set("disabled", false);
+                rayage_ui.menus.file.delete_file.set("disabled", false);}
             else{
-                rayage_ui.menus.project.save_file.set("disabled", true);
+                rayage_ui.menus.file.save_file.set("disabled", true);
                 rayage_ui.menus.project.save_all_files.set("disabled", true);
-                rayage_ui.menus.project.revert_file.set("disabled", true);}
+                rayage_ui.menus.file.revert_file.set("disabled", true);
+                rayage_ui.menus.file.delete_file.set("disabled", true);}
         });
 
         topic.subscribe("ui/dialogs/open_project/open", function(data) {
