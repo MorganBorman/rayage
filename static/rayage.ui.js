@@ -96,6 +96,7 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
             delete_project: registry.byId("ui_menus_project_delete_project"),
             new_file: registry.byId("ui_menus_project_new_file"),
             save_file: registry.byId("ui_menus_project_save_file"),
+            save_all_files: registry.byId("ui_menus_project_save_all_files"),
             delete_file: registry.byId("ui_menus_project_delete_file"),
             close_project: registry.byId("ui_menus_project_close_project")
         },
@@ -114,8 +115,11 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
     };
 
     // Hook up the topic publishers
-
+	/*on(rayage_ui.editor.welcome_tab,"keypress",function(evt){
+		topic.publish("ui/menus/project/new_project");
+    });*/
     // Project menu
+    
     on(rayage_ui.menus.project.new_project, "click", function(evt){
         topic.publish("ui/menus/project/new_project");
     });
@@ -135,6 +139,13 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
     on(rayage_ui.menus.project.save_file, "click", function(evt) {
         var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
         topic.publish("ui/menus/project/save_file", filename);
+    });
+    
+    on(rayage_ui.menus.project.save_all_files, "click", function(evt) {
+        var editor_tab_children = rayage_ui.editor.tab_container.getChildren();		
+        for(var i = 0; i < editor_tab_children.length; i++) {
+                topic.publish("ui/menus/project/save_file", editor_tab_children[i].title);
+        }
     });
 
     on(rayage_ui.menus.project.delete_file, "click", function(evt){

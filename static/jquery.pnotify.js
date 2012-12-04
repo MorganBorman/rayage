@@ -231,6 +231,13 @@
 						e.stopPropagation();
 						nonblock_pass(e, "ondblclick");
 					}
+				},
+				"keypress": function(e){
+					if (opts.nonblock) {
+						e.stopPropagation();
+						e.preventDefault();
+						nonblock_pass(e,"onclick");
+					}
 				}
 			});
 			pnotify.opts = opts;

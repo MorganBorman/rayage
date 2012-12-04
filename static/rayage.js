@@ -61,6 +61,7 @@ function(topic){
         
         rayage_ui.menus.project.new_file.set("disabled", true);
         rayage_ui.menus.project.save_file.set("disabled", true);
+        rayage_ui.menus.project.save_all_files.set("disabled", true);
         rayage_ui.menus.project.delete_file.set("disabled", true);
         rayage_ui.menus.project.close_project.set("disabled", true);
         rayage_ui.menus.project.delete_project.set("disabled", true);
