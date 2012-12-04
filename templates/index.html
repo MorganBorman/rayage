@@ -97,6 +97,11 @@
                 <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
                     Logout
                 </div>
+                {% if user.permission_level >= constants.PERMISSION_LEVEL_TA %}
+                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_admin" style="float: right;" onClick="window.location = '/admin';">
+                    Admin Panel
+                </div>
+                {% end %}
             </div>
 		
             <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'" id="ui_editor_tab_container">
