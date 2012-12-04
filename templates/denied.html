@@ -1,1 +1,40 @@
-You do not have permissions to access this page. If you think you should have access contact an administrator.
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Access Denied</title>
+
+        <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+        
+        <style>
+            .centered {
+                position:absolute; 
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+			    margin: auto;
+			    height: 256px;
+			    width: 100%;
+            }
+        </style>
+
+	</head>
+	<body>
+	        <div class="centered">
+	            <center>
+                    <img src="/static/images/oxygen/security-low.png">
+                    <br>
+                    You do not have permissions to access this page. If you think you should have access contact an administrator.
+                    
+                    {% if debug %}
+                    <br><br>
+		            Logged in as: {{ user.username }} <br>
+		            Permission level: {{ user.permission_level }}
+                    {% end %}
+                    
+                </center>
+	        </div>
+	</body>
+</html>
+
