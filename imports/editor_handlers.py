@@ -97,9 +97,12 @@ def handle_new_project_request(socket_connection, message):
     TODO:
     Send proper responses
     """
+    
     name = message["name"]
     template = message["template"]
-
+    if template == "": template_name = "empty template"
+    else: template_name = template
+    	
     try:
         new_project_dir = socket_connection.user_dir(name)
 
@@ -112,7 +115,8 @@ def handle_new_project_request(socket_connection, message):
             shutil.copytree(os.path.join(TEMPLATES_DIR, template), new_project_dir)
         else:
             os.makedirs(new_project_dir)
-
+            
+        socket_connection.log("debug","Has created new project called \"{}\" from template \"{}\"".format(name,template_name))
         socket_connection.notify("You made a new project!", "success")
         handle_open_project_request(socket_connection, {'id': name}, False)
     except shutil.Error as e:
@@ -190,6 +194,8 @@ def handle_open_project_request(socket_connection, message, notify=True, selecte
                      'files': project_file_data}
     
     socket_connection.write_message(json.dumps(project_state))
+
+    socket_connection.log("debug","has opened project \"{}\"".format(project_id))
     if notify:
         socket_connection.notify("You've opened %s!" % socket_connection.project, "success")
 
@@ -200,6 +206,7 @@ def handle_project_state_push(socket_connection, message):
         return
 
     for file in message['files']:
+        socket_connection.log("debug","has pushed state for file \"{}\"".format(file['filename']))
         # if modified, overwrite the .swp file with new data
         if file['modified']:
             with open(socket_connection.project_dir("%s.swp" % file['filename']), 'w+') as f:
@@ -236,6 +243,7 @@ def handle_new_file_request(socket_connection, message):
 
     # reopen the project with newly created file.
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False, filename)
+    socket_connection.log("debug","has created file \"{}\"".format(filename))
     socket_connection.notify("You just created %s!" % filename, "success")
 
 @messageHandler("save_file_request", ["filename"])
@@ -246,6 +254,7 @@ def handle_save_file_request(socket_connection, message):
     shutil.copyfile(src, dst)
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False, filename)
     socket_connection.notify("You just saved %s!" % filename, "success")
+    socket_connection.log("debug","has saved file \"{}\"".format(filename))
 
 @messageHandler("delete_project_request", [])
 def handle_delete_project_request(socket_connection, message):
@@ -256,6 +265,7 @@ def handle_delete_project_request(socket_connection, message):
     shutil.move(src, dst)
     # notify on deletion and close their windows
     socket_connection.notify("You just deleted %s." % socket_connection.project, "success")
+    socket_connection.log("debug","has deleted project \"{}\"".format(socket_connection.project))
     handle_close_project(socket_connection, {}, False)
 
 @messageHandler("delete_file_request", ["file"])
@@ -271,6 +281,7 @@ def handle_delete_file_request(socket_connection, message):
 
     handle_open_project_request(socket_connection, {'id': socket_connection.project}, False)
     socket_connection.notify("You just deleted %s." % f, "success")
+    socket_connection.log("debug","has deleted file \"{}\"".format(f))
 
 @messageHandler("build_project_request", [])
 def handle_build_project_request(socket_connection, message):
@@ -289,6 +300,7 @@ def handle_build_project_request(socket_connection, message):
         else:
             # return success message (possibly pass to build).
             socket_connection.notify("You just built %s." % socket_connection.project, "success")
+            socket_connection.log("debug","has built project \"{}\"".format(socket_connection.project))
 
 
 
@@ -337,4 +349,5 @@ def handle_run_project_request(socket_connection, message):
     
     socket_connection.project_runner = ProjectRunner(executable, args, stdout_cb, stderr_cb, exited_cb, timeout_cb)
     socket_connection.project_runner.start()
+    socket_connection.log("debug","has run project \"{}\"".format(socket_connection.project))
     
