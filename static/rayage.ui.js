@@ -142,29 +142,29 @@ function(parser, on, topic, registry, ObjectStore, Memory, ContentPane, Tooltip,
     });
 
     on(rayage_ui.menus.file.new_file, "click", function(evt){
-        topic.publish("ui/menus/project/new_file");
+        topic.publish("ui/menus/file/new_file");
     });
 
     on(rayage_ui.menus.file.save_file, "click", function(evt) {
         var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
-        topic.publish("ui/menus/project/save_file", filename);
+        topic.publish("ui/menus/file/save_file", filename);
     });
     
     on(rayage_ui.menus.file.revert_file, "click", function(evt) {
         var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
-        topic.publish("ui/menus/project/revert_file", filename);
+        topic.publish("ui/menus/file/revert_file", filename);
     });
-    console.log("there we go");
+
     on(rayage_ui.menus.project.save_all_files, "click", function(evt) {
         var editor_tab_children = rayage_ui.editor.tab_container.getChildren();		
         for(var i = 0; i < editor_tab_children.length; i++) {
-                topic.publish("ui/menus/project/save_file", editor_tab_children[i].title);
+                topic.publish("ui/menus/file/save_file", editor_tab_children[i].title);
         }
     });
-console.log("here we are");
+
     on(rayage_ui.menus.file.delete_file, "click", function(evt){
         var filename = rayage_ui.editor.tab_container.selectedChildWidget.title;
-        topic.publish("ui/menus/project/delete_file", filename);
+        topic.publish("ui/menus/file/delete_file", filename);
     });
 
     on(rayage_ui.menus.project.close_project, "click", function(evt){

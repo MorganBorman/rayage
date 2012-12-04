@@ -81,16 +81,16 @@ function(topic){
         	rayage_ws.send({"type": "template_list_request"});
         });
         
-        topic.subscribe("ui/menus/project/new_file", function() {
+        topic.subscribe("ui/menus/file/new_file", function() {
         	rayage_ws.send({"type": "file_type_list_request"});
         });
 
-        topic.subscribe("ui/menus/project/save_file", function(filename) {
+        topic.subscribe("ui/menus/file/save_file", function(filename) {
             // TODO: Synchronize state
             rayage_ws.send({"type": "save_file_request", "filename": filename});
         });
         
-        topic.subscribe("ui/menus/project/revert_file", function(filename) {
+        topic.subscribe("ui/menus/file/revert_file", function(filename) {
         	if (confirm("Do you really want to revert back to the saved state?")) {
             	rayage_ws.send({"type": "revert_file_request", "filename": filename});
             }
