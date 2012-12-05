@@ -103,7 +103,7 @@ function(topic){
             }
         });
 
-        topic.subscribe("ui/menus/project/delete_file", function(filename) {
+        topic.subscribe("ui/menus/file/delete_file", function(filename) {
             // TODO: Synchronize project state (before tabs refresh)
             if (confirm("Do you really want to delete " + filename + "?")) {
                 // delete it!
