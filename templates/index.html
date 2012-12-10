@@ -10,9 +10,6 @@
         <link rel="stylesheet" href="/static/codemirror/theme/neat.css">
         <script src="/static/codemirror/lib/codemirror.js"></script>
         <script src="/static/codemirror/mode/clike/clike.js"></script>
-
-		<link rel="stylesheet" href="/static/styles/style.css" media="screen">
-        <link rel="stylesheet" href="/static/styles/icons.css" media="screen">
         
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" media="all" rel="stylesheet" type="text/css" />
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
@@ -39,122 +36,17 @@
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
 		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js"></script>
 
-		<link type="text/css" rel="stylesheet" href="/static/custom/css/BasicTerminal.css" />
-
         {% if debug %}
 		<script src="/static/development-mode.js"></script>
         {% end %}
+        
+        <link rel="stylesheet" href="/static/custom/css/Rayage.css">
 
 		<script src="/static/rayage.js"></script>
 		<script src="/static/rayage.notify.js"></script>
-		<script src="/static/rayage.ui.js"></script>
-		<script src="/static/rayage.ws.js"></script>
-
 	</head>
 	<body class="claro">
-        
-		<div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%">
-		
-            <div data-dojo-type="dijit/MenuBar" id="ui_menu_bar" data-dojo-props="region:'top'" id="ui_menus">
-                <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_project">
-                    <span>Project</span>
-                    <div data-dojo-type="dijit/DropDownMenu" id="ui_menus_project_drop_down">
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project'">New Project</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_open_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project'">Open Project</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_delete_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_project'">Delete Project</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_save_all_files" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save All Files</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_close_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_close_project'">Close Project</div>
-                    </div>
-                </div>
-                <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_file">
-                    <span>File</span>
-                    <div data-dojo-type="dijit/DropDownMenu" id="ui_menus_file_drop_down">
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_new_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_revert_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_revert_file'">Revert File</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_save_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save File</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_delete_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_source'">Delete File</div>
-                    </div>
-                </div>
-                <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_edit">
-                    <span>Edit</span>
-                    <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_undo" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_undo'">Undo</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_redo" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_redo'">Redo</div>
-                        <div data-dojo-type="dijit/MenuSeparator"></div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_cut" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_copy" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy'">Copy</div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_paste" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste'">Paste</div>
-                        <div data-dojo-type="dijit/MenuSeparator"></div>
-                        <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_select_all" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_select_all'">Select All</div>
-                    </div>
-                </div>
-                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_build">
-                    Build
-                </div>
-                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_run">
-                    Run
-                </div>
-                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
-                    Logout
-                </div>
-                {% if user.permission_level >= constants.PERMISSION_LEVEL_TA %}
-                <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_admin" style="float: right;" onClick="window.location = '/admin';">
-                    Admin Panel
-                </div>
-                {% end %}
-            </div>
-		
-            <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'" id="ui_editor_tab_container">
-                <div id="ui_editor_welcome_tab" data-dojo-type="dijit/layout/ContentPane" href="/static/welcome.html" data-dojo-props='title:"Welcome", iconClass:"rayage_icon rayage_icon_help", tooltip:"Welcome to Rayage IDE"'>
-                </div>
-            </div>
-            
-		    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true, minSize: 200, maxSize: 600" id="ui_bottom_pane">
-                <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'" id="ui_output_tab_container">
-                    <div id="ui_output_tab_run" data-dojo-type="dijit/layout/ContentPane" data-dojo-props='title:"Run output", iconClass:"rayage_icon rayage_icon_console", tooltip:"Run output shows up here."'>
-                        <div id="ui_output_terminal" data-dojo-type="custom/BasicTerminal"></div>
-                    </div>
-                </div>
-		    </div>
-		</div>
-		
-		<div data-dojo-type="dijit/Dialog" id="ui_dialogs_new_project" title="New project">
-            <label for="name">Project Name:</label>
-            <input type="text" name="name" data-dojo-type="dijit/form/TextBox" id="ui_dialogs_new_project_name" value="" required="true" />
-
-            <label for="template">Template:</label>
-            <select name="template" data-dojo-type="dijit/form/Select" id="ui_dialogs_new_project_selection">
-            </select>
-
-            <div class="dijitDialogPaneActionBar">
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_new_project_open">New</button>
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_new_project_cancel">Cancel</button>
-            </div>
-        </div>
-		
-		<div data-dojo-type="dijit/Dialog" id="ui_dialogs_open_project" title="Open a project">
-            <select data-dojo-type="dijit/form/Select" id="ui_dialogs_open_project_selection">
-            </select>
-
-            <div class="dijitDialogPaneActionBar">
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_open_project_open">Open</button>
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_open_project_cancel">Cancel</button>
-            </div>
-        </div>
-        
-		<div data-dojo-type="dijit/Dialog" id="ui_dialogs_new_file" title="New file">
-            <label for="name">Filename:</label>
-            <input type="text" name="name" data-dojo-type="dijit/form/TextBox" id="ui_dialogs_new_file_name" value="" required="true" />
-
-            <label for="template">Type:</label>
-            <select name="template" data-dojo-type="dijit/form/Select" id="ui_dialogs_new_file_selection">
-            </select>
-
-            <div class="dijitDialogPaneActionBar">
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_new_file_new">New</button>
-                <button dojoType="dijit.form.Button" type="button" id="ui_dialogs_new_file_cancel">Cancel</button>
-            </div>
-        </div>
+        <div id="rayage" data-dojo-type="custom/Rayage"></div>
 	</body>
 </html>
 

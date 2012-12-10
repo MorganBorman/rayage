@@ -1,5 +1,5 @@
 // custom.LogViewer
-define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/LogViewer.html", "dojo/dom-style", 
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/LogViewer.html", "dojo/dom-style", 
         "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", 
         "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
         "dojox/form/DropDownSelect", "dojo/json"],

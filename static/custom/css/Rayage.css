@@ -1,0 +1,9 @@
+@import "/static/styles/style.css";
+@import "/static/styles/icons.css";
+
+@import "/static/custom/css/BasicTerminal.css";
+
+.rayage {
+    width: 100%; 
+    height: 100%;
+}
