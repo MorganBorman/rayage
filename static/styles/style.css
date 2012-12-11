@@ -40,3 +40,12 @@ html, body {
 .error-text {
     font-weight: bold !important;
 }
+
+#preloader {
+  width:100%; height:100%; margin:0; padding:0;
+  background:#fff
+    url('//ajax.googleapis.com/ajax/libs/dojo/1.5/dojox/image/resources/images/loading.gif')
+    no-repeat center center;
+    position:absolute;
+    z-index:999;
+}
