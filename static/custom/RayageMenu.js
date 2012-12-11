@@ -55,7 +55,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     }
                 }
                 
-                
                 this.applyRecursively([topic_hookup, assign_to_functionality_groups]);
                 
                 // Example of setting the menus to a particular state.

@@ -1,13 +1,15 @@
-<div data-dojo-type="dijit/Dialog" id="ui_dialogs_new_file" title="New file">
-    <label for="name">Filename:</label>
-    <input type="text" name="name" data-dojo-type="dijit/form/TextBox" id="ui_dialogs_new_file_name" value="" required="true" />
+<div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dialog" title="New file">
+        <label for="name">Filename:</label>
+        <input type="text" name="name" data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="file_name_input" value="" required="true" />
 
-    <label for="template">Type:</label>
-    <select name="template" data-dojo-type="dijit/form/Select" id="ui_dialogs_new_file_selection">
-    </select>
+        <label for="template">Type:</label>
+        <select name="template" data-dojo-type="dijit/form/Select" data-dojo-attach-point="file_type_select">
+        </select>
 
-    <div class="dijitDialogPaneActionBar">
-        <button data-dojo-type="dijit/form/Button" type="button" id="ui_dialogs_new_file_new">New</button>
-        <button data-dojo-type="dijit/form/Button" type="button" id="ui_dialogs_new_file_cancel">Cancel</button>
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="new_button">New</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="cancel_button">Cancel</button>
+        </div>
     </div>
 </div>
