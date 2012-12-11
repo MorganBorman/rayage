@@ -1,45 +1,45 @@
 <div>
     <div data-dojo-attach-point="menu_bar" data-dojo-type="dijit/MenuBar">
-        <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_project">
+        <div data-dojo-attach-point="project_menu" data-dojo-type="dijit/PopupMenuBarItem">
             <span>Project</span>
-            <div data-dojo-type="dijit/DropDownMenu" id="ui_menus_project_drop_down">
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_new_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project'">New Project</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_open_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project'">Open Project</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_delete_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_project'">Delete Project</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_save_all_files" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save All Files</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_project_close_project" data-dojo-props="iconClass:'rayage_icon rayage_icon_close_project'">Close Project</div>
+            <div data-dojo-attach-point="project_menu_drop_down" data-dojo-type="dijit/DropDownMenu">
+                <div topic="ui/menus/project/new" data-dojo-attach-point="project_menu_new" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_project'">New Project</div>
+                <div topic="ui/menus/project/open" data-dojo-attach-point="project_menu_open" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_open_project'">Open Project</div>
+                <div topic="ui/menus/project/delete" data-dojo-attach-point="project_menu_delete" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_project'">Delete Project</div>
+                <div topic="ui/menus/project/save" data-dojo-attach-point="project_menu_save" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save All Files</div>
+                <div topic="ui/menus/project/close" data-dojo-attach-point="project_menu_close" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_close_project'">Close Project</div>
             </div>
         </div>
-        <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_file">
+        <div data-dojo-attach-point="file_menu" data-dojo-type="dijit/PopupMenuBarItem">
             <span>File</span>
-            <div data-dojo-type="dijit/DropDownMenu" id="ui_menus_file_drop_down">
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_new_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_revert_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_revert_file'">Revert File</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_save_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save File</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_file_delete_file" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_source'">Delete File</div>
+            <div data-dojo-attach-point="file_menu_drop_down" data-dojo-type="dijit/DropDownMenu">
+                <div topic="ui/menus/file/new" data-dojo-attach-point="file_menu_new" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_new_source'">New File</div>
+                <div topic="ui/menus/file/revert" data-dojo-attach-point="file_menu_revert" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_revert_file'">Revert File</div>
+                <div topic="ui/menus/file/save" data-dojo-attach-point="file_menu_save" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_save_source'">Save File</div>
+                <div topic="ui/menus/file/delete" data-dojo-attach-point="file_menu_delete" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_delete_source'">Delete File</div>
             </div>
         </div>
-        <div data-dojo-type="dijit/PopupMenuBarItem" id="ui_menus_edit">
+        <div data-dojo-attach-point="edit_menu" data-dojo-type="dijit/PopupMenuBarItem">
             <span>Edit</span>
-            <div data-dojo-type="dijit/DropDownMenu" id="rayage_edit_menu_drop_down">
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_undo" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_undo'">Undo</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_redo" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_redo'">Redo</div>
+            <div data-dojo-attach-point="edit_menu_drop_down" data-dojo-type="dijit/DropDownMenu">
+                <div topic="ui/menus/edit/undo" data-dojo-attach-point="edit_menu_undo" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_undo'">Undo</div>
+                <div topic="ui/menus/edit/redo" data-dojo-attach-point="edit_menu_redo" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_redo'">Redo</div>
                 <div data-dojo-type="dijit/MenuSeparator"></div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_cut" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_copy" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy'">Copy</div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_paste" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste'">Paste</div>
+                <div topic="ui/menus/edit/cut" data-dojo-attach-point="edit_menu_cut" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_cut'">Cut</div>
+                <div topic="ui/menus/edit/copy" data-dojo-attach-point="edit_menu_copy" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_copy'">Copy</div>
+                <div topic="ui/menus/edit/paste" data-dojo-attach-point="edit_menu_paste" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_paste'">Paste</div>
                 <div data-dojo-type="dijit/MenuSeparator"></div>
-                <div data-dojo-type="dijit/MenuItem" id="ui_menus_edit_select_all" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_select_all'">Select All</div>
+                <div topic="ui/menus/edit/select_all" data-dojo-attach-point="edit_menu_select_all" data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'rayage_icon rayage_icon_edit_select_all'">Select All</div>
             </div>
         </div>
-        <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_build">
-            Build
+        <div topic="ui/menus/build" data-dojo-type="dijit/MenuBarItem" data-dojo-attach-point="build_menu">
+            <span>Build</span>
         </div>
-        <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_run">
-            Run
+        <div topic="ui/menus/run" data-dojo-type="dijit/MenuBarItem" data-dojo-attach-point="run_menu">
+            <span>Run</span>
         </div>
-        <div data-dojo-type="dijit/MenuBarItem" id="ui_menus_logout">
-            Logout
+        <div topic="ui/menus/logout" data-dojo-type="dijit/MenuBarItem" data-dojo-attach-point="logout_menu">
+            <span>Logout</span>
         </div>
     </div>
 </div>
