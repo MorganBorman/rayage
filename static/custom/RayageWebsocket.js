@@ -41,7 +41,7 @@ function(topic, JSON){
                 console.log("sending: ", message_data);
                 this.ws.send(message_data);
             }
-        },
+        }
     };
     return Singleton;
 });

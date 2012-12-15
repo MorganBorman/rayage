@@ -4,10 +4,10 @@ function(parser, fx, style){
     
     var fadeArgs = {
         node: "preloader",
-        duration: 1000
+        duration: 1000,
+        onEnd: function(node) {
+            style.set(node, "display", "none");
+        }
     };
     fx.fadeOut(fadeArgs).play();
-    setTimeout(function() {
-        style.set("preloader", "display", "none");
-    }, 1000)
 });

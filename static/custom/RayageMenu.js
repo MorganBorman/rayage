@@ -122,6 +122,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 
                 dojo.safeMixin(this, args);
                 
-            },
+            }
         });
 });

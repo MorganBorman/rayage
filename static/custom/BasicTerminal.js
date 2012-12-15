@@ -55,7 +55,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo
             
             outputErrLine: function(data) {
                 var node = document.createElement("div");
-                node.class = "error";
+                node["class"] = "error";
                 node.innerHTML = this.format_output_data(data);
                 this.outputNode.appendChild(node);
             },

@@ -59,6 +59,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 
                 dojo.safeMixin(this, args);
                 
-            },
+            }
         });
 });

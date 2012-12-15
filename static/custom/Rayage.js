@@ -13,11 +13,13 @@ var get_icon_class = function(mimetype) {
 
 // custom.Rayage
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/Rayage.html",
-        "dojo/topic", "custom/RayageWebsocket", "dijit/layout/ContentPane", "custom/debounce", "dojo/on", 
+        "dojo/topic", "custom/RayageWebsocket", "dijit/layout/ContentPane", "custom/debounce", "dojo/on", "dojo/dom-attr", "dojo/dom-construct", 
+        "dojo/_base/unload", 
         "dijit/layout/BorderContainer", "custom/RayageMenu", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "custom/BasicTerminal",
-        "custom/RayageNewProjectDialog", "custom/RayageOpenProjectDialog", "custom/RayageNewFileDialog"],
+        "custom/RayageNewProjectDialog", "custom/RayageOpenProjectDialog", "custom/RayageNewFileDialog", "custom/RayageDisconnectedDialog"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, 
-             topic, RayageWebsocket, ContentPane, debounce, on) {
+             topic, RayageWebsocket, ContentPane, debounce, on, domAttr, domConstruct,
+             baseUnload) {
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -32,6 +34,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             
             // Stuff to do after the widget is created
             postCreate: function(){
+            },
+            
+            reconnect: function(){
+                RayageWebsocket.connect();
             },
             
             editor_instances: {},
@@ -99,8 +105,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 topic.subscribe("ui/menus/project/new", function() {
         	        RayageWebsocket.send({"type": "template_list_request"});
                 });
-                
-                // UNTESTED BELOW
                 
                 on(self.editor_tab_container, "selectChild", function() {
                     var nval = self.editor_tab_container.selectedChildWidget;
@@ -333,9 +337,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
                             if ((!editor.isClean() || editor.rayageDirty === true)
                                 && self.dirty_document_widget_instances[filename] === undefined) {
-                                var dirty = dojo.create("div", { style: "text-align: center;",
-                                                                 class: "error-bg",
-                                                                 innerHTML: "This document is unsaved." });
+                                
+                                var dirty = domConstruct.create("div");
+                                domAttr.set(dirty, "class", "error-bg");
+                                domAttr.set(dirty, "innerHTML", "This document is unsaved.");
+                                domAttr.set(dirty, "style", "text-align: center;");
+                                                                 
                                 var w = editor.addLineWidget(0, dirty, {coverGutter: true, noHScroll: true, above: true});
                                 self.dirty_document_widget_instances[filename] = w;
                             }
@@ -366,11 +373,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     }
                 });
                 
-                topic.subscribe("ws/connection/closed", function() {
-                    topic.publish("notify/disconnected");
+                var socket_closed_subscription = topic.subscribe("ws/connection/closed", function() {
+                    //topic.publish("notify/disconnected");
+                    self.disconnected_dialog.show();
                 });
                 
-                // UNTESTED ABOVE
+                baseUnload.addOnUnload(window, function() { 
+                    socket_closed_subscription.remove();
+                });
+                
+                topic.subscribe("ui/dialogs/disconnected/reconnect", function() {
+                    RayageWebsocket.connect();
+                });
+                
+                topic.subscribe("ws/connection/opened", function() {
+                    self.disconnected_dialog.hide();
+                });
                 
                 RayageWebsocket.connect();
             },
@@ -378,6 +396,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             // The constructor
             constructor: function(args) {
                 dojo.safeMixin(this, args);
-            },
+            }
         });
 });
