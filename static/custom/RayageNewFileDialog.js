@@ -1,9 +1,9 @@
 // custom.RayageNewFileDialog
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/RayageNewFileDialog.html",
-        "dojo/on", "dojo/topic", 
+        "dojo/on", "dojo/topic", "dojo/data/ObjectStore", "dojo/store/Memory", 
         "dijit/Dialog", "dijit/form/TextBox", "dijit/form/Select", "dijit/form/Button"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, 
-             on, topic) {
+             on, topic, ObjectStore, Memory) {
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -13,7 +13,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             
             parseOnLoad: true,
             
-            ws: null,
+            selection_store: null,
+            selection_object_store: null,
  
             // A class to be applied to the root node in our template
             baseClass: "rayage_new_file_dialog",
@@ -46,12 +47,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.resize();
             },
             
+            setSelections: function(selections) {
+                this.selection_store.setData(selections);
+                this.file_type_select.setStore(this.selection_object_store);
+            },
+            
             // The constructor
             constructor: function(args) {
-            
-                this.onClose = function() {
-                    return true;
-                };
+                this.selection_store = new Memory({data: []});
+                this.selection_object_store = new ObjectStore({ objectStore: this.selection_store });
                 
                 dojo.safeMixin(this, args);
                 

@@ -1,9 +1,11 @@
-<div data-dojo-type="dijit/Dialog" id="ui_dialogs_open_project" title="Open a project">
-    <select data-dojo-type="dijit/form/Select" id="ui_dialogs_open_project_selection">
-    </select>
-
-    <div class="dijitDialogPaneActionBar">
-        <button data-dojo-type="dijit/form/Button" type="button" id="ui_dialogs_open_project_open">Open</button>
-        <button data-dojo-type="dijit/form/Button" type="button" id="ui_dialogs_open_project_cancel">Cancel</button>
+<div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dialog" title="Open a project">
+        <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="project_select">
+        </select>
+        
+        <div class="dijitDialogPaneActionBar">
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="open_button">Open</button>
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="cancel_button">Cancel</button>
+        </div>
     </div>
 </div>

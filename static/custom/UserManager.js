@@ -2,26 +2,8 @@
 define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/UserManager.html", "dojo/dom-style", 
         "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", 
         "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
-        "dojox/form/DropDownSelect", "dojo/json"],
-    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON) {
-        
-        // Used to debounce a given function and reduce the amount of data
-        // sent on the socket.
-        var debounce = function(func, threshold) {
-            var timeout;
-
-            return function debounced() {
-                var obj = this, args = arguments;
-                function delayed() {
-                    func.apply(obj, args);
-                    timeout = null;
-                }
-                if (timeout) {
-                    window.clearTimeout(timeout);
-                }
-                timeout = window.setTimeout(delayed, threshold);
-            };
-        };
+        "dojox/form/DropDownSelect", "dojo/json", "custom/debounce"],
+    function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON, debounce) {
     
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
