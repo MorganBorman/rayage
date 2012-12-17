@@ -57,21 +57,18 @@ class CASVerifiedRequestHandler(tornado.web.RequestHandler):
                 return
             
             user_name = None
-            wid = None
             #find <cas:user> in ElementTree
             for e in assertion_tree.iter():
                 #print "DEBUG: Found tag '%s'" % e.tag
                 if e.tag == "{http://www.yale.edu/tp/cas}user":
                     user_name = e.text
-                elif e.tag == "{http://www.yale.edu/tp/cas}wid":
-                    wid = e.text
                 
             #close the handle to the ticket assertion
             f_xml_assertion.close()
                 
-            print "Got validation: user=%s wid=%s" %(user_name, wid)
+            print "Got validation: user=%s" %(user_name)
                 
-            if not user_name or not wid:
+            if not user_name:
                 #couldn't find <cas:user> in the tree
                 print 'Unable to validate ticket: could not locate cas:user element.'
                 self.send_error(status_code=401)
