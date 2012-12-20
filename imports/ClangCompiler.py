@@ -12,7 +12,7 @@ class ClangCompiler:
     stdout = ""
 
     def compile(self, files, executable):
-        args = ["clang++", "-g", "-Wall"]
+        args = ["clang++", "-g", "-static", "-Wall"]
         args.extend(files)
         args.extend(["-o", executable])
 

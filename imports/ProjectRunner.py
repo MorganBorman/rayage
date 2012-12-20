@@ -8,14 +8,29 @@ import subprocess
 import threading
 import select
 import pty
+import sys
 import os
+
+check_has_sandbox_support = os.path.join(os.path.dirname(os.path.abspath(__file__)), "HasSandboxSupport.py")
+HAS_SANDBOX_SUPPORT = (subprocess.call(["python", check_has_sandbox_support]) == 0)
+
+if not HAS_SANDBOX_SUPPORT:
+    sys.stderr.write("Modules (or the correct module versions) necessary for sandboxing project runs were not found.\n")
+    sys.stderr.write("Projects can still be run but without sandboxing. PROCEED WITH CAUTION.\n")
 
 class ProjectRunner(threading.Thread):
     def __init__(self, path, args, stdout_cb, stderr_cb, exited_cb, timeout_cb, timeout=15):
         threading.Thread.__init__(self)
         
-        self.path = path
-        self.arguments = [path]
+        self.path = os.path.abspath(path)
+        
+        if HAS_SANDBOX_SUPPORT:
+            self.sandboxpy = os.path.join(os.path.dirname(os.path.abspath(__file__)), "MiniSandbox.py")
+            self.arguments = ["python", self.sandboxpy, os.path.dirname(self.path), self.path]
+        else:
+            self.sandboxpy = os.path.join(os.path.dirname(os.path.abspath(__file__)), "NoSandbox.py")
+            self.arguments = ["python", self.sandboxpy, os.path.dirname(self.path), self.path]
+        
         self.arguments.extend(args)
         
         self.master, slave = pty.openpty()
