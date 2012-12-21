@@ -1,5 +1,5 @@
 import constants
-from database.User import User
+from rayage.database.User import User
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
 class PageRequestHandler(CASVerifiedRequestHandler):

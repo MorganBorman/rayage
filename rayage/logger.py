@@ -1,6 +1,6 @@
 import logging
 import constants
-from SQLAlchemyHandler import SQLAlchemyHandler
+from rayage.SQLAlchemyHandler import SQLAlchemyHandler
 
 # create logger
 logger = logging.getLogger('rayage')

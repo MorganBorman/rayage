@@ -11,8 +11,8 @@ sys.path.append(system_directory + "/imports")
 #from names import names as usernames
 from names_from_home_directories import names as usernames
 
-from database.User import User
-from database.SessionFactory import SessionFactory
+from rayage.database.User import User
+from rayage.database.SessionFactory import SessionFactory
 
 import constants
 

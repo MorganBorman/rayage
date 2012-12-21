@@ -13,7 +13,7 @@ def get_mime_type(full_filename):
     mime, encoding = mimetypes.guess_type(full_filename)
     return mime
 
-from rayage_ws import messageHandler
+from WebSocketHandler import messageHandler
 from ClangCompiler import ClangCompiler
 from constants import *
 
@@ -312,9 +312,6 @@ def handle_build_project_request(socket_connection, message):
             # return success message (possibly pass to build).
             socket_connection.notify("You just built %s." % socket_connection.project, "success")
             socket_connection.log("debug","has built project \"{}\"".format(socket_connection.project))
-
-
-
 
 @messageHandler("run_stdin_data", ["data"])
 def handle_run_stdin_data(socket_connection, message):

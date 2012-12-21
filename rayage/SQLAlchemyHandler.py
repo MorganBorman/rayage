@@ -5,10 +5,12 @@ import logging
 import traceback
 from SignalObject import Signal
 
-from database.LogEntry import LogEntry
-from database.SessionFactory import SessionFactory
+from rayage.database.LogEntry import LogEntry
+from rayage.database.SessionFactory import SessionFactory
 
 class SQLAlchemyHandler(logging.Handler):
+    "Handles logging into database table."
+    
     RecordEmitted = Signal()
     
     def __init__(self):

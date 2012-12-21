@@ -3,11 +3,12 @@ import json
 from constants import *
 from ws_exceptions import *
 
-from database.User import User
+from rayage.database.User import User
 
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
 class UploadHandler(CASVerifiedRequestHandler):
+    "Tornado request handler to deal with uploads."
     upload_handlers = {}
     
     @property
@@ -31,6 +32,7 @@ class UploadHandler(CASVerifiedRequestHandler):
             self.upload_handlers[upload_type](self)
             
 class uploadHandler(object):
+    "Decorator to attach handlers for specific upload paths."
     def __init__(self, upload_type, minimum_permission_level=PERMISSION_LEVEL_USER):
         self.upload_type = upload_type
         self.minimum_permission_level = minimum_permission_level

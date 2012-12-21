@@ -1,4 +1,4 @@
-from rayage_ws import StreamHandle
+from WebSocketHandler import StreamHandle
 import json
 
 class RayageJsonStoreHandler(object):

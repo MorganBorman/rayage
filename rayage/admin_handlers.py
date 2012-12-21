@@ -10,8 +10,8 @@ import traceback
 from sqlalchemy import func
 import sqlalchemy
 
-from rayage_ws import messageHandler, WebSocketHandler
-from rayage_upload import uploadHandler
+from WebSocketHandler import messageHandler, WebSocketHandler
+from rayage.UploadHandler import uploadHandler
 from constants import *
 from ws_exceptions import *
 from RayageJsonStoreHandler import RayageJsonStoreHandler
@@ -50,27 +50,6 @@ class UserStoreHandler(RayageJsonStoreHandler):
     """
     def __init__(self, message_type, required_fields, minimum_permission_level):
         RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
-        """
-        def after_insert_listener(mapper, connection, target):
-            result_message = {'type': "RayageJsonStore/Users",
-                              'action': 'create',
-                              'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
-                             }
-            
-            self.publish(json.dumps(result_message))
-
-        sqlalchemy.event.listen(User, 'after_insert', after_insert_listener)
-        
-        def after_update_listener(mapper, connection, target):
-            result_message = {'type': "RayageJsonStore/Users",
-                              'action': 'update',
-                              'object': {'id': target.id, 'username': target.username, 'permissions': target.permission_level},
-                             }
-            
-            self.publish(json.dumps(result_message))
-
-        sqlalchemy.event.listen(User, 'after_update', after_update_listener)
-        """
         
     def on_update(self, user_object):
         result_message = {'type': "RayageJsonStore/Users",

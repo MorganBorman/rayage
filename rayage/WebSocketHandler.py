@@ -5,7 +5,7 @@ import json
 import os
 import shutil
 
-from database.User import User
+from rayage.database.User import User
 from constants import *
 from ws_exceptions import InsufficientPermissions, InvalidStateError, MalformedMessage
 
