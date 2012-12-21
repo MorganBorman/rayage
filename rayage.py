@@ -22,33 +22,14 @@ from database.User import User
 
 from rayage_ws import WebSocketHandler
 from rayage_upload import UploadHandler
+from PageRequestHandler import PageRequestHandler
 from CASVerifiedRequestHandler import CASVerifiedRequestHandler
 
 import editor_handlers
 import admin_handlers
-
-class RequestHandler(CASVerifiedRequestHandler):
-    def get(self, action):
-        if action == "logout":
-            self.logout_user()
-        else:
-            username = self.get_current_user()
-            
-            if username is None:
-                self.validate_user()
-                return
-                
-            user = User.get_user(username)
-                
-            if action == "admin" and user.permission_level >= constants.PERMISSION_LEVEL_TA:
-                self.render("admin.html", debug=constants.DEBUG, user=user, constants=constants)
-            elif user.permission_level >= constants.PERMISSION_LEVEL_USER:
-                self.render("index.html", debug=constants.DEBUG, user=user, constants=constants)
-            else:
-                self.render("denied.html", debug=constants.DEBUG, user=user, constants=constants)
                     
 handlers = [
-    (r'/(admin|logout|)', RequestHandler),
+    (r'/(admin|logout|)', PageRequestHandler),
     (r'/upload/(.*)', UploadHandler),
     (r'/ws', WebSocketHandler),
 ]

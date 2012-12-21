@@ -3,6 +3,7 @@ import json
 import time
 import shutil
 import glob
+import shlex
 
 import mimetypes
 mimetypes.init()
@@ -327,7 +328,7 @@ def handle_run_stdin_data(socket_connection, message):
 
 @messageHandler("run_project_request", ["args"])
 def handle_run_project_request(socket_connection, message):
-    args = message['args']
+    args = shlex.split(message['args'])
     executable = socket_connection.project_dir("a.out")
     
     print "run_project_request:", executable, " with args:", args

@@ -35,8 +35,12 @@
         <div topic="ui/menus/build" data-dojo-attach-point="build_menu" functionality-groups="user, project, file" data-dojo-type="dijit/MenuBarItem">
             <span>Build</span>
         </div>
-        <div topic="ui/menus/run" data-dojo-attach-point="run_menu" functionality-groups="user, project, file" data-dojo-type="dijit/MenuBarItem">
+        <div data-dojo-attach-point="run_menu" functionality-groups="user, project, file" data-dojo-type="dijit/PopupMenuBarItem">
             <span>Run</span>
+            <div data-dojo-type="dijit/TooltipDialog">
+                <label>Arguments: </label><input data-dojo-attach-point="run_arguments_input" data-dojo-type="dijit/form/TextBox" style="width: 200px;" />
+                <button topic="ui/menus/run" data-dojo-attach-point="run_button" data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="iconClass:'rayage_icon rayage_icon_run'">Run</button>
+            </div>
         </div>
         <div topic="ui/menus/logout" data-dojo-attach-point="logout_menu" functionality-groups="user" data-dojo-type="dijit/MenuBarItem">
             <span>Logout</span>

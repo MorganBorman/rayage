@@ -22,6 +22,10 @@
     background: url(/static/images/oxygen/authenticate.png);
 }
 
+.rayage_icon_run {
+    background: url(/static/images/oxygen/debug-run.png);
+}
+
 /* Project menu icons */
 .rayage_icon_open_project {
     background: url(/static/images/oxygen/open-project.png);

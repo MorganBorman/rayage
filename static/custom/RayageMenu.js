@@ -1,7 +1,8 @@
 // custom.RayageMenu
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/RayageMenu.html",
         "dojo/on", "dojo/topic", "dijit/registry", "dojo/dom-attr", "dojo/_base/lang", "dojo/_base/array", 
-        "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/MenuSeparator", "dijit/MenuBarItem"],
+        "dijit/MenuBar", "dijit/PopupMenuBarItem", "dijit/DropDownMenu", "dijit/MenuItem", "dijit/MenuSeparator", "dijit/MenuBarItem", "dijit/form/TextBox",
+        "dijit/TooltipDialog"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template,
              on, topic, registry, domAttr, lang, array) {
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {

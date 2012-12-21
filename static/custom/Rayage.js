@@ -291,7 +291,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
 
                 topic.subscribe("ui/menus/run", function() {
-                    RayageWebsocket.send({"type": "run_project_request", "args": []});
+                    var args = self.main_menu.run_arguments_input.value;
+                    RayageWebsocket.send({"type": "run_project_request", "args": args});
                 });
                 
                 on(self.output_terminal, "inputLine", function(evt){
