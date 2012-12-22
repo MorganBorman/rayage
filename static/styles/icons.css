@@ -47,6 +47,10 @@
     background: url(/static/images/oxygen/document-revert.png);
 }
 
+.rayage_icon_assignment_complete {
+    background: url(/static/images/oxygen/assignment-complete.png);
+}
+
 .rayage_icon_save_source {
     background: url(/static/images/oxygen/save.png);
 }

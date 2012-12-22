@@ -6,7 +6,9 @@ from PageRequestHandler import PageRequestHandler
 #from FakeUserRequestHandler import FakeUserRequestHandler
 
 import editor_handlers
-import admin_handlers
+
+import rayage.websocket_message_handlers
+import rayage.upload_handlers
 
 handlers = [
     (r'/(admin|logout|)', PageRequestHandler),
