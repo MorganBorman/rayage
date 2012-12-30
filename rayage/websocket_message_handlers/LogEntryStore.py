@@ -5,24 +5,24 @@ from DojoQuery import DojoQuery
 from DojoSort import DojoSort
 
 from ..WebSocketHandler import messageHandler
-from ..RayageJsonStoreHandler import RayageJsonStoreHandler
+from ..DojoWebsocketJsonStoreHandler import DojoWebsocketJsonStoreHandler
 from ..SQLAlchemyHandler import SQLAlchemyHandler
 
 from ..database.LogEntry import LogEntry
 from ..database.SessionFactory import SessionFactory
 
-@messageHandler("RayageJsonStore/LogEntries", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
-class LogEntryStoreHandler(RayageJsonStoreHandler):
+@messageHandler("WebsocketJsonStore/LogEntries", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
+class LogEntryStoreHandler(DojoWebsocketJsonStoreHandler):
     """
     Handles REST-like requests over the websocket for the lazy-loading editable table showing the log entries.
     """
     def __init__(self, message_type, required_fields, minimum_permission_level):
-        RayageJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
+        DojoWebsocketJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
         
         SQLAlchemyHandler.RecordEmitted.connect(self.on_new_record)
         
     def on_new_record(self, log_entry):
-        result_message = {'type': "RayageJsonStore/LogEntries",
+        result_message = {'type': self.message_type,
                           'action': 'update',
                           'object': {u'id': log_entry.id, u'timestamp': log_entry.timestamp.isoformat(), u'logger': log_entry.logger, 
                                      u'level': log_entry.level, u'trace': log_entry.trace, u'message': log_entry.msg},
@@ -51,7 +51,7 @@ class LogEntryStoreHandler(RayageJsonStoreHandler):
             log_entry_list = [{u'id': id, u'timestamp': timestamp.isoformat(), u'logger': logger, u'level': level, u'trace': trace, u'message': msg}
                                 for id, timestamp, logger, level, trace, msg in log_entry_list]
             
-            result_message = {'type': message[u'type'],
+            result_message = {'type': self.message_type,
                               'response': log_entry_list,
                               'total': log_entry_count,
                               'deferredId': message['deferredId'],

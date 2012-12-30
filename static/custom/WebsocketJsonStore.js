@@ -1,15 +1,17 @@
+// custom.WebsocketJsonStore
+
 /* 
  * Implements the dojo/store api by sending messages over a specified websocket and subscribing
  * to a particular topic to resolve the deferreds.
  *
  * Essentially works similarily to JsonRestStore but over websockets and using topics to interact with
- * the existing rayage websocket system.
+ * the existing system.
  *
  * Based on the tutorial at http://dojotoolkit.org/documentation/tutorials/1.8/creating_stores/
  * And dojo/store/JsonRest.js from the dojo toolkit.
 */
 
-var rayage_json_store_id = 0;
+var websocket_json_store_id = 0;
 
 define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/store/util/QueryResults"],
         function(declare, topic, Deferred, JSON, QueryResults){
@@ -20,20 +22,20 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    // summary:
 		    //		This is a basic store for communication with a server through JSON
 		    //		formatted data over a websocket connection.
-		    // options: custom/RayageJsonStore
+		    // options: custom/WebsocketJsonStore
 		    //		This provides any configuration information that will be mixed into the store
 		    declare.safeMixin(this, options);
 		    
 		    // This is the application global instance id
 		    // Used to construct ids which will result in globally unique deferred id values.
-		    this.store_id = rayage_json_store_id++;
+		    this.store_id = websocket_json_store_id++;
 		    
 		    // Holds the id value of the next deferred
 		    this.deferred_pos = 0;
 		    
 		    this.pendingDeferreds = {};
 		
-		    this.messageType = "RayageJsonStore"+this.target;
+		    this.messageType = "WebsocketJsonStore"+this.target;
 		    this.topic = "ws/message/"+this.messageType;
 		    
 		    var self = this;
@@ -181,7 +183,7 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    // returns: dojo/store/api/Store.QueryResults
 		    //		The results of the query, extended with iterative methods.
 		    
-            //console.log("RayageJsonStore.query(", query, options, ")");
+            //console.log("WebsocketJsonStore.query(", query, options, ")");
 		    
 		    options = {count: options.count, sort: options.sort, query: query, queryOptions: options.queryOptions, start: options.start};
 		    

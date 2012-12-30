@@ -1,7 +1,7 @@
 // custom.LogViewer
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/LogViewer.html", "dojo/dom-style", 
         "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", 
-        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableRayageJsonStore', "custom/RayageJsonStore", "dojo/on", 
+        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", 'custom/ObservableWebsocketJsonStore', "custom/WebsocketJsonStore", "dojo/on", 
         "dojox/form/DropDownSelect", "dojo/json"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, BorderContainer, ContentPane, ObservableRayageJsonStore, RayageJsonStore, on, DropDownSelect, JSON) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {

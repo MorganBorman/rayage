@@ -1,4 +1,4 @@
-// custom.RayageWebsocket
+// custom.SingletonWebsocket
 
 /* published topics
 ws/connection/opened

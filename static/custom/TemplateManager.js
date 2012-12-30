@@ -16,11 +16,11 @@ define(["dojo/_base/declare",
         "dojox/form/uploader/plugins/IFrame", 
         "dijit/form/Button",
         "dojox/form/uploader/FileList",
-        "custom/RayageJsonStore",
+        "custom/WebsocketJsonStore",
         'dojox/grid/EnhancedGrid', 
         "dojox/grid/enhanced/plugins/Filter", 
         'dojo/data/ObjectStore',
-        'custom/ObservableRayageJsonStore',
+        'custom/ObservableWebsocketJsonStore',
         'dojo/data/ItemFileWriteStore'],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, baseFx, lang, timing, on, BorderContainer, ContentPane, AccordionContainer, Uploader, IFrame, Button, FileList, RayageJsonStore, EnhancedGrid, Filter, ObjectStore, ObservableRayageJsonStore, ItemFileWriteStore) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -60,7 +60,7 @@ define(["dojo/_base/declare",
                 /*set up layout*/
                 var layout = [[
                   {'name': 'Id', 'field': 'id', 'width': '175px'},
-                  {'name': 'Name', 'field': 'name', 'width': '175px'}
+                  {'name': 'Name', 'field': 'label', 'width': '175px'}
                 ]];
                 
                 /*initialize the declaritive grid with the programmatic parameters*/

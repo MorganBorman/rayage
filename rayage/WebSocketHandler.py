@@ -51,13 +51,21 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def write_message_username(username, message_data):
         if username in WebSocketHandler.active_users.keys():
             for socket_connection in WebSocketHandler.active_users[username]:
-                socket_connection.write_message(message_data)
+                if socket_connection is not None:
+                    try:
+                        socket_connection.write_message(message_data)
+                    except AttributeError:
+                        pass
                 
     @staticmethod
     def notify_username(username, msg, severity="message", duration=1.5):
         if username in WebSocketHandler.active_users.keys():
             for socket_connection in WebSocketHandler.active_users[username]:
-                socket_connection.notify(msg, severity, duration)
+                if socket_connection is not None:
+                    try:
+                        socket_connection.notify(msg, severity, duration)
+                    except AttributeError:
+                        pass
         
     @staticmethod
     def register_stream(stream_name, minimum_permission_level=PERMISSION_LEVEL_USER):
@@ -67,7 +75,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def publish(stream_name, message_data):
         if stream_name in WebSocketHandler.subscribers.keys():
             for socket_connection in WebSocketHandler.subscribers[stream_name]:
-                socket_connection.write_message(message_data)
+                if socket_connection is not None:
+                    try:
+                        socket_connection.write_message(message_data)
+                    except AttributeError:
+                        pass
         
     def subscribe(self, stream_name):
         if not stream_name in WebSocketHandler.streams.keys():
@@ -175,6 +187,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.notify(message, "error")
 
     def on_message(self, message):
+        print message
         try:
             msg = json.loads(message)
             
@@ -245,7 +258,7 @@ class StreamHandle(object):
         WebSocketHandler.publish(self.stream_name, message_data)
         
 @messageHandler("subscribe_request", ['stream'])
-def handle_admin_module_tree_request(socket_connection, message):
+def handle_subscribe_request(socket_connection, message):
     """
     Subscribes this websocket connection to a message stream.
     """

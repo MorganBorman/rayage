@@ -18,6 +18,22 @@
     background: url(/static/images/oxygen/assignments.png);
 }
 
+.rayage_icon_admin_add_assignment {
+    background: url(/static/images/oxygen/assignment-add.png);
+}
+
+.rayage_icon_admin_edit_assignment {
+    background: url(/static/images/oxygen/assignment-edit.png);
+}
+
+.rayage_icon_admin_delete_assignment {
+    background: url(/static/images/oxygen/assignment-delete.png);
+}
+
+.rayage_icon_admin_download_assignment {
+    background: url(/static/images/oxygen/assignment-download.png);
+}
+
 .rayage_icon_admin_logs {
     background: url(/static/images/oxygen/text-x-log.png);
 }

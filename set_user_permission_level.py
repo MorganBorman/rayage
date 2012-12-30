@@ -10,8 +10,8 @@ sys.path.append(system_directory + "/imports")
 username = sys.argv[1]
 permission_level = int(sys.argv[2])
 
-from database.User import User
-from database.SessionFactory import SessionFactory
+from rayage.database.User import User
+from rayage.database.SessionFactory import SessionFactory
 
 session = SessionFactory()
 try:

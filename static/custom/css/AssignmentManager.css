@@ -1,21 +1,17 @@
 @import "/static/lib/dgrid/css/dgrid.css";
 @import "/static/lib/dgrid/css/skins/claro.css";
 
-.dojoxGrid table {
-  margin: 0;
+.assignment_manager {
+    width: 100%;
+    height: 100%;
 }
 
-.user_manager {
-    width: 100%;
+.dgrid-grid {
     height: 100%;
 }
 
 .dgrid .dgrid-scroller {
     position: relative;
-    height: 100%;
     overflow: auto;
-}
-
-#userGrid {
-    height: 99%;
+    height: 100%;
 }

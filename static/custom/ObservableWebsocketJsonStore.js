@@ -2,10 +2,10 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/_ba
 ], function(kernel, lang, Deferred, array, Observable, topic, JSON){
 
 // module:
-//		custom/ObservableRayageJsonStore
+//		custom/ObservableJsonStore
 
-var ObservableRayageJsonStore = function(store, ws) {
-    var observableStore = Observable(store);
+var ObservableJsonStore = function(store, ws) {
+    var observableStore = new Observable(store);
     
     ws.send({'type': 'subscribe_request', 'stream': store.messageType});
     
@@ -15,7 +15,7 @@ var ObservableRayageJsonStore = function(store, ws) {
             switch(data.action){
                 case "create": observableStore.notify(data.object); console.log("create fired."); break;
                 case "update": observableStore.notify(data.object, data.object.id); console.log("update fired."); break;
-                case "delete": observableStore.notify(undefined, data.object.id); console.log("delete fired."); break;
+                case "delete": observableStore.notify(undefined, data.object_id); console.log("delete fired."); break;
                 default: break;
             }
         }
@@ -24,8 +24,8 @@ var ObservableRayageJsonStore = function(store, ws) {
     return observableStore;
 };
 
-lang.setObject("custom.ObservableRayageJsonStore", ObservableRayageJsonStore);
+lang.setObject("custom.ObservableJsonStore", ObservableJsonStore);
 
-return ObservableRayageJsonStore;
+return ObservableJsonStore;
 
 });

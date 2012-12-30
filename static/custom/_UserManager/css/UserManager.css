@@ -1,0 +1,44 @@
+@import "/static/lib/dgrid/css/dgrid.css";
+@import "/static/lib/dgrid/css/skins/claro.css";
+
+.user_manager {
+    width: 100%;
+    height: 100%;
+}
+
+.icon {
+  background-repeat: no-repeat;
+  background-size: 18px 18px !important;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+}
+
+.icon_add_user {
+    background: url(/static/images/oxygen/add-user.png);
+}
+
+.icon_remove_user {
+    background: url(/static/images/oxygen/remove-user.png);
+}
+
+.icon_edit_user {
+    background: url(/static/images/oxygen/edit-user.png);
+}
+
+.dgrid {
+    width: 100%;
+    height: 100%;
+}
+
+.field-id {
+    width: 10%;
+}
+
+.field-username {
+    width: 45%;
+}
+
+.field-permissions {
+    width: 45%;
+}

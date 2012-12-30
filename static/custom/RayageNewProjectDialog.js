@@ -1,9 +1,9 @@
 // custom.RayageNewProjectDialog
 define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/RayageNewProjectDialog.html",
-        "dojo/on", "dojo/topic", "dojo/data/ObjectStore", "dojo/store/Memory", 
-        "dijit/Dialog", "dijit/form/TextBox", "dijit/form/Select", "dijit/form/Button"],
+        "dojo/on", "dojo/topic", "dojo/data/ObjectStore", "custom/SingletonWebsocket", "custom/WebsocketJsonStore", 'custom/ObservableWebsocketJsonStore', 
+        "dijit/Dialog", "dijit/form/TextBox", "dijit/form/FilteringSelect", "dijit/form/Button"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, 
-             on, topic, ObjectStore, Memory) {
+             on, topic, ObjectStore, RayageWebsocket, RayageJsonStore, ObservableRayageJsonStore) {
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
             templateString: template,
@@ -12,9 +12,6 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
             widgetsInTemplate: true,
             
             parseOnLoad: true,
-            
-            selection_store: null,
-            selection_object_store: null,
  
             // A class to be applied to the root node in our template
             baseClass: "rayage_new_project_dialog",
@@ -32,6 +29,14 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                     var template_id = self.template_select.get("value");
                     topic.publish("ui/dialogs/new_project/new", name, template_id);
                 });
+                
+                this.templateObjectStore = new RayageJsonStore({target:"/Templates", ws:RayageWebsocket});
+                this.observableTemplateStore = ObservableRayageJsonStore(this.templateObjectStore, RayageWebsocket);
+                this.templateDataStore = new ObjectStore({objectStore: this.observableTemplateStore});
+                
+                this.template_select.set("searchAttr", "label");
+                
+                this.template_select.set("store", this.templateDataStore);
             },
             
             startup: function() {
@@ -47,16 +52,8 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
                 this.dialog.hide();
             },
             
-            setSelections: function(selections) {
-                this.selection_store.setData(selections);
-                this.template_select.setStore(this.selection_object_store);
-            },
-            
             // The constructor
             constructor: function(args) {
-                this.selection_store = new Memory({data: []});
-                this.selection_object_store = new ObjectStore({ objectStore: this.selection_store });
-                
                 dojo.safeMixin(this, args);
                 
             }

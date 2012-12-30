@@ -1,0 +1,24 @@
+<div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dialog" title="Edit User">
+        <table class="dijitDialogPaneContentArea">
+            <tr>
+                <td><label>Username:</label></td>
+                <td><input data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="name_input"></td>
+            </tr>
+            <tr>
+                <td><label>Permission Level:</label></td>
+                <td><select data-dojo-type="dijit/form/Select" data-dojo-attach-point="permission_input">
+                        <option value="0">None</option>
+                        <option value="1">User</option>
+                        <option value="2">TA</option>
+                        <option value="3">Professor</option>
+                        <option value="4">Admin</option>
+                </select></td>
+            </tr>
+        </table>
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="save_button">Save</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="cancel_button">Cancel</button>
+        </div>
+    </div>
+</div>

@@ -13,12 +13,12 @@ var get_icon_class = function(mimetype) {
 
 // custom.Rayage
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/Rayage.html",
-        "dojo/topic", "custom/RayageWebsocket", "dijit/layout/ContentPane", "custom/debounce", "dojo/on", "dojo/dom-attr", "dojo/dom-construct", 
+        "dojo/topic", "custom/SingletonWebsocket", "dijit/layout/ContentPane", "custom/debounce", "dojo/on", "dojo/dom-attr", "dojo/dom-construct", 
         "dojo/_base/unload", 
         "dijit/layout/BorderContainer", "custom/RayageMenu", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "custom/BasicTerminal",
         "custom/RayageNewProjectDialog", "custom/RayageOpenProjectDialog", "custom/RayageNewFileDialog", "custom/RayageDisconnectedDialog"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, 
-             topic, RayageWebsocket, ContentPane, debounce, on, domAttr, domConstruct,
+             topic, SingletonWebsocket, ContentPane, debounce, on, domAttr, domConstruct,
              baseUnload) {
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
@@ -37,7 +37,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             },
             
             reconnect: function(){
-                RayageWebsocket.connect();
+                SingletonWebsocket.connect();
             },
             
             editor_instances: {},
@@ -87,7 +87,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 
                 this.main_menu.setFunctionalityGroups(["user"], "disabled", true);
                 
-                RayageWebsocket.url = "wss://" + document.location.hostname + ":" + document.location.port + "/ws";
+                SingletonWebsocket.url = "wss://" + document.location.hostname + ":" + document.location.port + "/ws";
                 
                 topic.subscribe("ws/message/redirect", function(data) {
                     window.location = data.target;
@@ -103,7 +103,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
                 
                 topic.subscribe("ui/menus/project/new", function() {
-        	        RayageWebsocket.send({"type": "template_list_request"});
+        	        self.new_project_dialog.show();
                 });
                 
                 on(self.editor_tab_container, "selectChild", function() {
@@ -120,26 +120,26 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
         
                 topic.subscribe("ui/menus/file/new", function() {
-                	RayageWebsocket.send({"type": "file_type_list_request"});
+                	SingletonWebsocket.send({"type": "file_type_list_request"});
                 });
 
                 topic.subscribe("ui/menus/file/save", function() {
                     // TODO: Synchronize state
                     var filename = self.editor_tab_container.selectedChildWidget.title;
-                    RayageWebsocket.send({"type": "save_file_request", "filename": filename});
+                    SingletonWebsocket.send({"type": "save_file_request", "filename": filename});
                 });
                 
                 topic.subscribe("ui/menus/file/revert", function() {
                     var filename = self.editor_tab_container.selectedChildWidget.title;
                 	if (confirm("Do you really want to revert back to the saved state?")) {
-                    	RayageWebsocket.send({"type": "revert_file_request", "filename": filename});
+                    	SingletonWebsocket.send({"type": "revert_file_request", "filename": filename});
                     }
                 });
 
                 topic.subscribe("ui/menus/project/delete", function() {
                     if (confirm("Do you really want to delete this project?")) {
                         // delete it!
-                        RayageWebsocket.send({"type": "delete_project_request"});
+                        SingletonWebsocket.send({"type": "delete_project_request"});
                     }
                 });
 
@@ -148,7 +148,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     var filename = self.editor_tab_container.selectedChildWidget.title;
                     if (confirm("Do you really want to delete " + filename + "?")) {
                         // delete it!
-                        RayageWebsocket.send({"type": "delete_file_request", "file": filename});
+                        SingletonWebsocket.send({"type": "delete_file_request", "file": filename});
                     }
                 });
                 
@@ -180,28 +180,23 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
                 topic.subscribe("ui/dialogs/new_file/new", function(name, type) {
                     // TODO: synchronize the project state (get latest undo state)
-                    RayageWebsocket.send({"type": "new_file_request", "name": name, "filetype": type});
+                    SingletonWebsocket.send({"type": "new_file_request", "name": name, "filetype": type});
                     self.new_file_dialog.hide();
                 });
                 
                 topic.subscribe("ui/dialogs/new_project/new", function(name, template) {
-                    RayageWebsocket.send({"type": "new_project_request", "name": name, "template": template});
-                });
-                
-                topic.subscribe("ws/message/template_list", function(data) {
-                    self.new_project_dialog.setSelections(data.templates);
-                    self.new_project_dialog.show();
+                    SingletonWebsocket.send({"type": "new_project_request", "name": name, "template": template});
                 });
                 
                 topic.subscribe("ui/menus/project/close", function() {
-                    RayageWebsocket.send({"type": "close_project_request"});
+                    SingletonWebsocket.send({"type": "close_project_request"});
                 });
                 
                 topic.subscribe("ui/menus/project/save", function() {
                     var editor_tab_children = self.editor_tab_container.getChildren();		
                     for(var i = 0; i < editor_tab_children.length; i++) {
                             var filename = editor_tab_children[i].title;
-                            RayageWebsocket.send({"type": "save_file_request", "filename": filename});
+                            SingletonWebsocket.send({"type": "save_file_request", "filename": filename});
                     }
                 });
                 
@@ -225,7 +220,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
                 
                 topic.subscribe("ui/menus/project/open", function() {
-                    RayageWebsocket.send({"type": "project_list_request"});
+                    SingletonWebsocket.send({"type": "project_list_request"});
                 });
                 
                 topic.subscribe("ws/message/project_state", function(data) {
@@ -264,7 +259,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
 
                 topic.subscribe("ui/dialogs/open_project/open", function(data) {
-                    RayageWebsocket.send({"type": "open_project_request", 'id': data});
+                    SingletonWebsocket.send({"type": "open_project_request", 'id': data});
                 });
 
                 topic.subscribe("ui/menus/build", function() {
@@ -284,19 +279,19 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                         // This probably should be changed to a save all request of some kind
                         for (var i=0,len=unsavedFiles.length; i<len; i++) {
                             var filename = unsavedFiles[i];
-                            RayageWebsocket.send({"type": "save_file_request", "filename": filename});
+                            SingletonWebsocket.send({"type": "save_file_request", "filename": filename});
                         }
-                        RayageWebsocket.send({"type": "build_project_request"});
+                        SingletonWebsocket.send({"type": "build_project_request"});
                     }
                 });
 
                 topic.subscribe("ui/menus/run", function() {
                     var args = self.main_menu.run_arguments_input.value;
-                    RayageWebsocket.send({"type": "run_project_request", "args": args});
+                    SingletonWebsocket.send({"type": "run_project_request", "args": args});
                 });
                 
                 on(self.output_terminal, "inputLine", function(evt){
-                    RayageWebsocket.send({"type": "run_stdin_data", "data": evt.data});
+                    SingletonWebsocket.send({"type": "run_stdin_data", "data": evt.data});
                 });
                 
                 topic.subscribe("ws/message/run_stdout_data", function(data) {
@@ -354,7 +349,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                                          "undo_data": editor.getHistory()};
                             serialized.files.push(file);
                         }
-                        RayageWebsocket.send(serialized);
+                        SingletonWebsocket.send(serialized);
                     }, delay)();
                 });
 
@@ -384,14 +379,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 });
                 
                 topic.subscribe("ui/dialogs/disconnected/reconnect", function() {
-                    RayageWebsocket.connect();
+                    SingletonWebsocket.connect();
                 });
                 
                 topic.subscribe("ws/connection/opened", function() {
                     self.disconnected_dialog.hide();
                 });
                 
-                RayageWebsocket.connect();
+                SingletonWebsocket.connect();
             },
             
             // The constructor

@@ -3,8 +3,8 @@
 DEBUG = True
 
 import logging
-CONSOLE_LOG_LEVEL = logging.WARNING
-DATABASE_LOG_LEVEL = logging.WARNING
+CONSOLE_LOG_LEVEL = logging.DEBUG
+DATABASE_LOG_LEVEL = logging.DEBUG
 
 CAS_SERVER  = "https://websso.wwu.edu:443"
 

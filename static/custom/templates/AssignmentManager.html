@@ -1,0 +1,37 @@
+<div class="assignment_manager" data-dojo-type="dijit/layout/ContentPane">
+    <div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%" data-dojo-attach-point="border_container">
+        
+        <div data-dojo-props="region:'top'" data-dojo-type="dijit/Toolbar">
+            <div data-dojo-attach-point="add_button" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'rayage_icon rayage_icon_admin_add_assignment', showLabel:true">Add</div>
+            <div data-dojo-attach-point="edit_button" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'rayage_icon rayage_icon_admin_edit_assignment', showLabel:true">Edit</div>
+            <div data-dojo-attach-point="delete_button" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'rayage_icon rayage_icon_admin_delete_assignment', showLabel:true">Delete</div>
+            <div data-dojo-attach-point="download_button" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'rayage_icon rayage_icon_admin_download_assignment', showLabel:true">Download</div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+            <div data-dojo-attach-point="assignmentGridNode" data-dojo-props="region:'center'" class="assignmentGrid" ></div>
+        </div>
+    </div>
+    
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="create_assignment_dialog" title="Create Assignment">
+        <table class="dijitDialogPaneContentArea">
+            <tr>
+                <td><label>Name:</label></td>
+                <td><input data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="name_input"></td>
+            </tr>
+            <tr>
+                <td><label>Template:</label></td>
+                <td><select name="template" data-dojo-type="dijit/form/FilteringSelect" data-dojo-attach-point="template_select"></select></td>
+            </tr>
+            <tr>
+                <td><label>Due Date:</label></td>
+                <td><input type="text" value="now" data-dojo-type="dijit/form/DateTextBox" required="true" data-dojo-attach-point="date_input" /></td>
+                <td><input type="text" value="now" data-dojo-type="dijit/form/TimeTextBox" required="true" data-dojo-attach-point="time_input" /></td>
+            </tr>
+        </table>
+        <div class="dijitDialogPaneActionBar">
+            <button dojoType="dijit/form/Button" type="button" data-dojo-attach-point="save_button">OK</button>
+            <button dojoType="dijit/form/Button" type="button" data-dojo-attach-point="cancel_button">Cancel</button>
+        </div>
+    </div>
+    
+</div>
