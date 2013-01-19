@@ -2,6 +2,7 @@ from constants import *
 import json
 import shutil
 from ..WebSocketHandler import messageHandler
+from .open_project_request import handle_open_project_request
 
 @messageHandler("save_file_request", ["filename"])
 def handle_save_file_request(socket_connection, message):
