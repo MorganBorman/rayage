@@ -39,6 +39,10 @@
     background: url(/static/images/oxygen/new-project.png);
 }
 
+.rayage_icon_submit_project {
+    background: url(/static/images/oxygen/assignment-submit.png);
+}
+
 .rayage_icon_new_source {
     background: url(/static/images/oxygen/new-src.png);
 }

@@ -184,8 +184,10 @@ define(["dojo/_base/declare", "dojo/topic", "dojo/Deferred", "dojo/json", "dojo/
 		    //		The results of the query, extended with iterative methods.
 		    
             //console.log("WebsocketJsonStore.query(", query, options, ")");
+            
+            jsonable_query = (typeof options.query == "function") ? query : options.query;
 		    
-		    options = {count: options.count, sort: options.sort, query: query, queryOptions: options.queryOptions, start: options.start};
+		    options = {count: options.count, sort: options.sort, query: jsonable_query, queryOptions: options.queryOptions, start: options.start};
 		    
 		    // Create a new deferred and store the pending entry
 		    var def = new Deferred();

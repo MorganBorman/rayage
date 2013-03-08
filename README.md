@@ -19,7 +19,7 @@ Replace _potterh_ with your CAS username.
 To run:
 ```bash
 git submodule update
-python rayage.py
+python main.py
 ```
 
 

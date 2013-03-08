@@ -16,7 +16,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         "dojo/topic", "custom/SingletonWebsocket", "dijit/layout/ContentPane", "custom/debounce", "dojo/on", "dojo/dom-attr", "dojo/dom-construct", 
         "dojo/_base/unload", 
         "dijit/layout/BorderContainer", "custom/RayageMenu", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "custom/BasicTerminal",
-        "custom/RayageNewProjectDialog", "custom/RayageOpenProjectDialog", "custom/RayageNewFileDialog", "custom/RayageDisconnectedDialog"],
+        "custom/RayageNewProjectDialog", "custom/RayageOpenProjectDialog", "custom/RayageNewFileDialog", "custom/RayageDisconnectedDialog",
+        "custom/RayageSubmitProjectDialog"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, 
              topic, SingletonWebsocket, ContentPane, debounce, on, domAttr, domConstruct,
              baseUnload) {
@@ -221,6 +222,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 
                 topic.subscribe("ui/menus/project/open", function() {
                     SingletonWebsocket.send({"type": "project_list_request"});
+                });
+                
+                topic.subscribe("ui/menus/project/submit", function() {
+                    self.submit_project_dialog.show();
                 });
                 
                 topic.subscribe("ws/message/project_state", function(data) {

@@ -21,14 +21,6 @@ class UserStoreHandler(DojoWebsocketJsonStoreHandler):
     def object_to_json(self, user_object):
         return {'id': user_object.id, 'username': user_object.username, 'permissions': user_object.permission_level}
         
-    def on_update(self, user_object):
-        result_message = {'type': self.message_type,
-                          'action': 'update',
-                          'object': {'id': user_object.id, 'username': user_object.username, 'permissions': user_object.permission_level},
-                         }
-        
-        self.publish(json.dumps(result_message))
-        
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         session = SessionFactory()
         try:

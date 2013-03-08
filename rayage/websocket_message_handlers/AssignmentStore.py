@@ -1,6 +1,11 @@
 from constants import *
-import json
 
+import os
+import json
+import shutil
+import os.path
+
+from SimpleDojoQuery import SimpleDojoQuery
 from DojoQuery import DojoQuery
 from DojoSort import DojoSort
 
@@ -10,6 +15,10 @@ from ..DojoWebsocketJsonStoreHandler import DojoWebsocketJsonStoreHandler
 from ..database.Assignment import Assignment
 from ..database.SessionFactory import SessionFactory
 
+def count_submissions(assignment_id):
+    assignment_dir = os.path.join(ASSIGNMENTS_DIR, str(assignment_id))
+    return len([name for name in os.listdir(assignment_dir) if os.path.isdir(os.path.join(assignment_dir, name))])
+
 @messageHandler("WebsocketJsonStore/Assignments", ['action', 'deferredId'], minimum_permission_level=PERMISSION_LEVEL_TA)
 class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
     """
@@ -18,21 +27,12 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
     def __init__(self, message_type, required_fields, minimum_permission_level):
         DojoWebsocketJsonStoreHandler.__init__(self, message_type, required_fields, minimum_permission_level)
         
-    def on_update(self, assignment_object):
-        result_message = {'type': self.message_type,
-                          'action': 'update',
-                          'object': {'id': assignment_object.id, 'name': assignment_object.name, 'template': assignment_object.template, 'due_date': assignment_object.due_date},
-                         }
-        
-        self.publish(json.dumps(result_message))
-        
-    def on_delete(self, object_id):
-        result_message = {'type': self.message_type,
-                          'action': 'delete',
-                          'object': {'id': object_id},
-                         }
-        
-        self.publish(json.dumps(result_message))
+    def object_to_json(self, assignment_object):
+        return {'id': assignment_object.id, 
+                'name': assignment_object.name, 
+                'template': assignment_object.template, 
+                'due_date': assignment_object.due_date,
+                'submission_count': count_submissions(assignment_object.id)}
         
     def query(self, socket_connection, message, count, start, dojo_sort, dojo_query):
         session = SessionFactory()
@@ -42,8 +42,12 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
             column_map = {u'id': Assignment.id, u'name': Assignment.name, u'template': Assignment.template, u'due_date': Assignment.due_date}
         
             if dojo_query:
-                dojo_query_obj = DojoQuery(dojo_query)
-                query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+                if u"op" in dojo_query.keys():
+                    dojo_query_obj = DojoQuery(dojo_query)
+                    query = dojo_query_obj.apply_to_sqla_query(query, column_map)
+                else:
+                    dojo_query_obj = SimpleDojoQuery(dojo_query)
+                    query = dojo_query_obj.apply_to_sqla_query(query, column_map)
                 
             if dojo_sort is not None:
                 dojo_sort_obj = DojoSort(dojo_sort)
@@ -51,7 +55,7 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
             
             assignment_count = query.count()
             assignment_list = query.offset(start).limit(count).all()
-            assignment_list = [{'id': aid, 'name': name, 'template': template, 'due_date': due_date} for aid, name, template, due_date in assignment_list]
+            assignment_list = map(self.object_to_json, assignment_list)
             
             result_message = {'type': self.message_type,
                               'response': assignment_list,
@@ -75,6 +79,10 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
         finally:
             session.close()
             
+        assignment_dir = os.path.join(ASSIGNMENTS_DIR, str(object_id))
+        if os.path.exists(assignment_dir):
+            shutil.rmtree(assignment_dir)
+            
         self.on_delete(object_id)
         
     def put(self, socket_connection, message, object_data):
@@ -95,12 +103,17 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
             session.add(assignment)
             session.commit()
             
+            # Ensure the assignment turn in directory exists
+            assignment_dir = os.path.join(ASSIGNMENTS_DIR, str(assignment.id))
+            if not os.path.exists(assignment_dir):
+                os.makedirs(assignment_dir)
+            
             self.on_update(assignment)
         finally:
             session.close()
             
         result_message = {'type': self.message_type,
-                          'response': [],
+                          'response': self.object_to_json(assignment),
                           'deferredId': message['deferredId'],
                          }
         

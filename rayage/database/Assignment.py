@@ -21,6 +21,14 @@ class Assignment(Base):
         self.template = template
         self.name = name
         self.due_date = due_date
+        
+    @staticmethod
+    def by_id(assignment_id):
+        session = SessionFactory()
+        try:
+            return session.query(Assignment).filter(Assignment.id==assignment_id).one()
+        finally:
+            session.close()
 
     def __repr__(self):
         return "<Assignment('%s', '%s', %d)>" % (self.template, self.name, self.due_date)

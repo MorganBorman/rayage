@@ -2,12 +2,12 @@
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/text!./templates/AssignmentManager.html", "dojo/dom-style", 
         "dojo/_base/fx", "dojo/_base/lang", "dojox/timing", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", "dgrid/extensions/DijitRegistry", "dijit/Toolbar",
         "dojo/data/ObjectStore", "custom/SingletonWebsocket", "custom/WebsocketJsonStore", 'custom/ObservableWebsocketJsonStore', "dijit/form/TimeTextBox", "dijit/form/DateTextBox", 
-        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/on", 
+        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/on", "dojo/store/Cache", "dojo/store/Memory", 
         "dojox/form/DropDownSelect", "dojo/json", "dijit/form/Button", "dijit/Dialog", "dijit/form/TextBox", "dijit/form/FilteringSelect"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, template, domStyle, 
              baseFx, lang, timing, on, OnDemandGrid, Keyboard, Selection, DijitRegistry, Toolbar, 
-             ObjectStore, RayageWebsocket, RayageJsonStore, ObservableRayageJsonStore, TimeTextBox, DateTextBox, 
-             BorderContainer, ContentPane, on, 
+             ObjectStore, SingletonWebsocket, WebsocketJsonStore, ObservableWebsocketJsonStore, TimeTextBox, DateTextBox, 
+             BorderContainer, ContentPane, on, Cache, Memory, 
              DropDownSelect, JSON, Button, Dialog, TextBox, FilteringSelect) {
         return declare([ContentPane, TemplatedMixin, WidgetsInTemplateMixin], {
             // Our template - important!
@@ -59,14 +59,24 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 on(this.delete_button, "click", function() {
                     for (var id in self.assignmentGrid.selection) {
                         if (self.assignmentGrid.selection[id]) {
-                            self.assignmentObjectStore.remove(id);
+                            self.observableCachedAssignmentStore.remove(id);
                             break;
                         }
                     }
                 });
                 
-                this.templateObjectStore = new RayageJsonStore({target:"/Templates", ws:this.ws});
-                this.observableTemplateStore = ObservableRayageJsonStore(this.templateObjectStore, this.ws);
+                on(this.download_button, "click", function() {
+                    for (var id in self.assignmentGrid.selection) {
+                        if (self.assignmentGrid.selection[id]) {
+                            var assignment = self.assignmentGrid.row(id).data;
+                            self.downloadAssignment(assignment);
+                            break;
+                        }
+                    }
+                });
+                
+                this.templateObjectStore = new WebsocketJsonStore({target:"/Templates", ws:SingletonWebsocket});
+                this.observableTemplateStore = ObservableWebsocketJsonStore(this.templateObjectStore, SingletonWebsocket);
                 this.templateDataStore = new ObjectStore({objectStore: this.observableTemplateStore});
                 
                 this.template_select.set("searchAttr", "label");
@@ -89,7 +99,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     
                     obj["due_date"] = (date.getTime() / 1000);
                     
-                    self.assignmentObjectStore.add(obj);
+                    self.observableCachedAssignmentStore.put(obj);
+                    
+                    self.create_assignment_dialog.hide();
+                });
+                
+                on(this.cancel_button, "click", function() {
+                    self.create_assignment_dialog.hide();
                 });
             },
             
@@ -123,10 +139,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.create_assignment_dialog.show();
             },
             
+            downloadAssignment: function(assignment) {
+                window.open("/download/assignment/"+assignment.id);
+            },
+            
             setupGrid: function() {
                 /*set up data store*/
-                this.assignmentObjectStore = new RayageJsonStore({target:"/Assignments", ws:this.ws});
-                this.observableAssignmentStore = ObservableRayageJsonStore(this.assignmentObjectStore, this.ws);
+                this.assignmentStore = new WebsocketJsonStore({target: "/Assignments", ws: SingletonWebsocket, idProperty: "id"});
+                this.cachedAssignmentStore = new Cache(this.assignmentStore, new Memory());
+                this.observableCachedAssignmentStore = ObservableWebsocketJsonStore(this.cachedAssignmentStore, SingletonWebsocket);
                 
                 var formatDueDate = function(object) {
                     var d = object.due_date;
@@ -138,31 +159,48 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     columns: {
                         name: { label: "Name" },
                         template: { label: "Template"},
-                        due_date: { label: "Due Date", get: formatDueDate }
+                        due_date: { label: "Due Date", get: formatDueDate },
+                        submission_count: { label: "# Submissions" }
                     },
-                    selectionMode: "single",
+                    selectionMode: "extended",
                     cellNavigation: false,
                     pagingDelay: 500,
-                    store: this.observableAssignmentStore
+                    store: this.observableCachedAssignmentStore
                 }, this.assignmentGridNode);
                 
                 this.assignmentGrid.startup();
                 
                 var self = this;
                 
-                this.assignmentGrid.on("dgrid-select", function(event){
-                    var assignmentRow = event.rows[0].data;
-                    console.log("assignment clicked: ", assignmentRow);
+                // Handle changes of grid selections
+                var countattr = function(obj) {
+                    var count = 0;
+                    for(var key in obj) count++;
+                    return count;
+                };
+                
+                var on_selection_changed = lang.hitch(this, function(event){
+                    var selection_count = countattr(this.assignmentGrid.selection);
                     
-                    self.edit_button.set("disabled", false);
-                    self.delete_button.set("disabled", false);
-                    self.download_button.set("disabled", false);
+                    if (selection_count > 0) this.delete_button.set("disabled", false);
+                    else this.delete_button.set("disabled", true);
+                    
+                    if (selection_count == 1) {
+                        this.edit_button.set("disabled", false);
+                        self.download_button.set("disabled", false);
+                    }
+                    else {
+                        this.edit_button.set("disabled", true);
+                        self.download_button.set("disabled", true);
+                    }
                 });
                 
-                this.assignmentGrid.on("dgrid-deselect", function(event){
-                    self.edit_button.set("disabled", true);
-                    self.delete_button.set("disabled", true);
-                    self.download_button.set("disabled", true);
+                on(this.assignmentGrid, "dgrid-select", function(event){
+                    on_selection_changed(event);
+                });
+                
+                on(this.assignmentGrid, "dgrid-deselect", function(event){
+                    on_selection_changed(event);
                 });
             },
             

@@ -1,0 +1,15 @@
+<div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dialog" title="Turn-in project">
+        <label for="name">Project Name:</label>
+        <input type="text" name="name" data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="project_name_input" value="" required="true" />
+
+        <label for="template">Template:</label>
+        <select name="template" data-dojo-type="dijit/form/FilteringSelect" data-dojo-attach-point="template_select">
+        </select>
+
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="new_button">Turn-in</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="cancel_button">Cancel</button>
+        </div>
+    </div>
+</div>
