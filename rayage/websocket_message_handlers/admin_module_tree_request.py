@@ -9,6 +9,7 @@ admin_modules = [
     { 'id': 'template_manager', 'name': 'Manage Templates', 'type': 'custom/TemplateManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'templates'},
     { 'id': 'assignment_manager', 'name': 'Manage Assignments', 'type': 'custom/AssignmentManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'assignments'},
     { 'id': 'log_viewer', 'name': 'View Logs', 'type': 'custom/LogViewer', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'logs'},
+    { 'id': 'test_manager', 'name': 'Manage Test', 'type': 'custom/TestManager', 'parent': 'admin_modules', 'params': {}, 'iconClass': 'test'},
 ]
 
 @messageHandler("admin_module_tree_request", minimum_permission_level=PERMISSION_LEVEL_TA)
