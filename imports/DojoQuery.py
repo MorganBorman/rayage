@@ -8,13 +8,13 @@ class MalformedDojoQuery(Exception):
         Exception.__init__(self, value)
 
 def validate_statement_dict(statement_dict):
-    if not u'data' in statement_dict.keys():
+    if not u'data' in statement_dict:
         raise MalformedDojoQuery("Missing 'data' key in statement dictionary.")
         
-    if not statement_dict[u'op'] in statement_types.keys():
+    if not statement_dict[u'op'] in statement_types:
         raise MalformedDojoQuery("Unknown statement type.")
         
-    if statement_dict[u'op'] == u'string' and not u'isCol' in statement_dict.keys():
+    if statement_dict[u'op'] == u'string' and not u'isCol' in statement_dict:
         raise MalformedDojoQuery("Missing 'isCol' key in string statement dictionary.")
 
 ################################################################################
@@ -25,7 +25,7 @@ class DojoQuery(object):
         "Validate that this query conforms to the expected syntax."
         
         #Check that u'op' is a key here so we can index based on it
-        if not u'op' in query_dict.keys():
+        if not u'op' in query_dict:
             raise MalformedDojoQuery("Missing 'op' key in statement dictionary.")
             
         self.query = statement_types[query_dict[u'op']](query_dict)
@@ -45,7 +45,7 @@ class DojoAnyStatement(object):
         
         for substatement_dict in statement_dict[u'data']:
             
-            if not u'op' in statement_dict.keys():
+            if not u'op' in statement_dict:
                 raise MalformedDojoQuery("Missing 'op' key in statement dictionary.")
                 
             self.substatements.append(statement_types[substatement_dict[u'op']](substatement_dict))
@@ -63,7 +63,7 @@ class DojoAllStatement(object):
         
         for substatement_dict in statement_dict[u'data']:
             
-            if not u'op' in statement_dict.keys():
+            if not u'op' in statement_dict:
                 raise MalformedDojoQuery("Missing 'op' key in statement dictionary.")
                 
             self.substatements.append(statement_types[substatement_dict[u'op']](substatement_dict))
@@ -86,7 +86,7 @@ class DojoContainsStatement(object):
         
         for substatement_dict in statement_dict[u'data']:
             
-            if not u'op' in statement_dict.keys():
+            if not u'op' in statement_dict:
                 raise MalformedDojoQuery("Missing 'op' key in statement dictionary.")
                 
             if substatement_dict[u'op'] != u'string':

@@ -42,7 +42,7 @@ class AssignmentStoreHandler(DojoWebsocketJsonStoreHandler):
             column_map = {u'id': Assignment.id, u'name': Assignment.name, u'template': Assignment.template, u'due_date': Assignment.due_date}
         
             if dojo_query:
-                if u"op" in dojo_query.keys():
+                if u"op" in dojo_query:
                     dojo_query_obj = DojoQuery(dojo_query)
                     query = dojo_query_obj.apply_to_sqla_query(query, column_map)
                 else:

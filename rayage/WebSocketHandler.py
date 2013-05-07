@@ -49,7 +49,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         
     @staticmethod
     def write_message_username(username, message_data):
-        if username in WebSocketHandler.active_users.keys():
+        if username in WebSocketHandler.active_users:
             for socket_connection in WebSocketHandler.active_users[username]:
                 if socket_connection is not None:
                     try:
@@ -59,7 +59,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 
     @staticmethod
     def notify_username(username, msg, severity="message", duration=1.5):
-        if username in WebSocketHandler.active_users.keys():
+        if username in WebSocketHandler.active_users:
             for socket_connection in WebSocketHandler.active_users[username]:
                 if socket_connection is not None:
                     try:
@@ -73,7 +73,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         
     @staticmethod
     def publish(stream_name, message_data):
-        if stream_name in WebSocketHandler.subscribers.keys():
+        if stream_name in WebSocketHandler.subscribers:
             for socket_connection in WebSocketHandler.subscribers[stream_name]:
                 if socket_connection is not None:
                     try:
@@ -82,7 +82,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         pass
         
     def subscribe(self, stream_name):
-        if not stream_name in WebSocketHandler.streams.keys():
+        if not stream_name in WebSocketHandler.streams:
             raise InvalidStateError("Unknown stream.")
             
         if self.permission_level < WebSocketHandler.streams[stream_name]:
@@ -90,7 +90,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         
         self.subscriptions.append(stream_name)
         
-        if not stream_name in WebSocketHandler.subscribers.keys():
+        if not stream_name in WebSocketHandler.subscribers:
             WebSocketHandler.subscribers[stream_name] = []
         
         WebSocketHandler.subscribers[stream_name].append(self)
@@ -99,7 +99,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if stream_name in self.subscriptions:
             self.subscriptions.remove(stream_name)
             
-        if stream_name in WebSocketHandler.subscribers.keys():
+        if stream_name in WebSocketHandler.subscribers:
             if self in WebSocketHandler.subscribers[stream_name]:
                 WebSocketHandler.subscribers[stream_name].remove(self)
     
@@ -155,7 +155,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 if not os.path.exists(self.user_dir()):
                     os.makedirs(self.user_dir())
                 
-                if not self.username in self.active_users.keys():
+                if not self.username in self.active_users:
                     self.active_users[self.username] = []
                 self.active_users[self.username].append(self)
                 
@@ -191,12 +191,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         try:
             msg = json.loads(message)
             
-            if not "type" in msg.keys():
+            if not "type" in msg:
                 raise MalformedMessage()
             
             msgtype = msg["type"]
             
-            if not msgtype in self.message_handlers.keys():
+            if not msgtype in self.message_handlers:
                 raise MalformedMessage()
                 
             self.message_handlers[msgtype](self, msg)
@@ -214,7 +214,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.user is not None:
             self.user.on_disconnect()
             
-        if self.username in self.active_users.keys():
+        if self.username in self.active_users:
             if self in self.active_users[self.username]:
                 self.active_users[self.username].remove(self)
             
@@ -234,7 +234,7 @@ class messageHandler(object):
         
         def handler(socket_connection, message):
             for field in self.required_fields:
-                if not field in message.keys():
+                if not field in message:
                     raise MalformedMessage()
                     
             if self.minimum_permission_level > socket_connection.permission_level:

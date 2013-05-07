@@ -28,7 +28,7 @@ class UploadHandler(CASVerifiedRequestHandler):
             self.validate_user()
             return
             
-        if upload_type in self.upload_handlers.keys():
+        if upload_type in self.upload_handlers:
             self.upload_handlers[upload_type](self)
             
 class uploadHandler(object):

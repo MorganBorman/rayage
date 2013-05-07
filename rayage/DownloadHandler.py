@@ -29,7 +29,7 @@ class DownloadHandler(CASVerifiedRequestHandler):
             return
             
         try:    
-            if download_type in self.download_handlers.keys():
+            if download_type in self.download_handlers:
                 self.download_handlers[download_type](self, download_selector)
             else:
                 self.send_error(404)

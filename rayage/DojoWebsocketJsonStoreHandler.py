@@ -34,23 +34,23 @@ class DojoWebsocketJsonStoreHandler(object):
         
         if action == u'QUERY':
             options = {}
-            if u'options' in message.keys():
+            if u'options' in message:
                 options = message[u'options']
             
             count = 30
-            if u'count' in options.keys() and options[u'count'] is not None:
+            if u'count' in options and options[u'count'] is not None:
                 count = int(options[u'count'])
                 
             start = 0
-            if u'start' in options.keys() and options[u'start'] is not None:
+            if u'start' in options and options[u'start'] is not None:
                 start = int(options[u'start'])
                 
             sort = None
-            if u'sort' in options.keys():
+            if u'sort' in options:
                 sort = options[u'sort']
                 
             query = None
-            if u'query' in options.keys():
+            if u'query' in options:
                 query = options[u'query']
                 
             self.query(socket_connection, message, count, start, sort, query)

@@ -11,7 +11,7 @@ from ..websocket_message_handlers.TestStore import TestStoreHandler
 
 @uploadHandler('test', PERMISSION_LEVEL_PROF)
 def test_upload_handler(request_handler):
-    if u'uploadedfiles[]' in request_handler.request.files.keys():
+    if u'uploadedfiles[]' in request_handler.request.files:
         file_info = request_handler.request.files[u'uploadedfiles[]'][0]
         response_data = {'file': file_info[u'filename'], 'type': file_info[u'content_type'], 'size': len(file_info[u'body'])}
         
